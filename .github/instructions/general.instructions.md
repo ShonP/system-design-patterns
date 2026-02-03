@@ -21,3 +21,8 @@ When creating an educational resource make sure its working run it yourself and 
 When creating backend educational resources, please follow these guidelines to ensure clarity and ease of understanding for beginners:
 - Use a simple and widely adopted backend framework like fastapi.
 - Use pydantic or similar libraries for data validation and serialization.
+
+
+When creating educational resources that involve real-time data or databases, consider incorporating visualization tools to help users better understand the concepts being demonstrated. Here are some suggestions:
+RedisInsight for Redis: A graphical tool that allows users to visualize and manage their Redis databases. It provides features like real-time monitoring, query analysis, and data exploration.
+Adminer for postgres

@@ -71,7 +71,7 @@ When systems require real-time updates, the solution requires two distinct piece
 # Navigate to the pattern directory
 cd patterns/real-time-updates
 
-# Start the required services
+# Start the required services (Redis + RedisInsight)
 docker-compose up -d
 
 # Install Python dependencies (using uv)
@@ -84,6 +84,13 @@ uv pip install -r requirements.txt
 
 # Start with the first notebook!
 ```
+
+## 🔍 Visualization Tools (Included in Docker)
+
+### RedisInsight (Redis GUI)
+- **URL**: http://localhost:5540
+- **First time setup**: Click "Add Redis Database" → Host: `redis`, Port: `6379`
+- **Use for**: Watch Pub/Sub channels and messages in Notebook 7
 
 ## Real-World Applications
 

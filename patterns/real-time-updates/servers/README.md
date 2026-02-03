@@ -23,3 +23,17 @@ python websocket_server.py       # port 5004
 | long_polling_server.py | 5002 | Held requests until data available |
 | sse_server.py | 5003 | Server-Sent Events with Last-Event-ID |
 | websocket_server.py | 5004 | Bidirectional WebSocket chat |
+
+## 🔍 Visualization Tools
+
+Start Redis and RedisInsight with Docker:
+
+```bash
+cd ..
+docker-compose up -d
+```
+
+### RedisInsight (Redis GUI)
+- **URL**: http://localhost:5540
+- **Setup**: Add database with Host = `redis`, Port = `6379`
+- **Use for**: Watch Pub/Sub messages in real-time (Notebook 7)

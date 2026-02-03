@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Redis for Pub/Sub examples
   redis:
     image: redis:7-alpine
     container_name: realtime-redis
@@ -14,6 +13,14 @@ services:
       interval: 5s
       timeout: 3s
       retries: 3
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: realtime-redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
 
 volumes:
   redis_data:
