@@ -35,5 +35,5 @@ docker-compose up -d
 
 ### RedisInsight (Redis GUI)
 - **URL**: http://localhost:5540
-- **Setup**: Add database with Host = `redis`, Port = `6379`
+- **Setup**: Add database with Host = `host.docker.internal`, Port = `6379`
 - **Use for**: Watch Pub/Sub messages in real-time (Notebook 7)
