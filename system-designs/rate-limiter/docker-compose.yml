@@ -1,0 +1,19 @@
+services:
+  redis:
+    image: redis:7
+    container_name: ratelimiter-redis
+    ports:
+      - "6381:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: ratelimiter-redisinsight
+    ports:
+      - "5541:5540"
+    depends_on:
+      - redis
