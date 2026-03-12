@@ -26,3 +26,9 @@ When creating backend educational resources, please follow these guidelines to e
 When creating educational resources that involve real-time data or databases, consider incorporating visualization tools to help users better understand the concepts being demonstrated. Here are some suggestions:
 RedisInsight for Redis: A graphical tool that allows users to visualize and manage their Redis databases. It provides features like real-time monitoring, query analysis, and data exploration.
 Adminer for postgres
+
+When creating Jupyter notebooks, always include setup instructions for the virtual environment and kernel selection:
+- Each lab folder should have its own `.venv` created with `python -m venv .venv`
+- Dependencies are installed via `pip install -r requirements.txt`
+- The notebook setup cell must instruct the user to select the `.venv` kernel in VS Code's kernel picker (top-right of the notebook)
+- If the kernel doesn't appear, advise the user to reload the VS Code window (`Cmd+Shift+P` → "Reload Window")
