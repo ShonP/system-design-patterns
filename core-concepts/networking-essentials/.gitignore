@@ -1,0 +1,12 @@
+# Generated TLS certificates (regenerate with: bash nginx/generate_certs.sh)
+nginx/certs/
+
+# Python virtual environment
+.venv/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python bytecode
+__pycache__/
+*.pyc

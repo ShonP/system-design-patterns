@@ -1,0 +1,41 @@
+services:
+  # ── Flask Backend Servers (3 instances for load balancing) ──
+  backend1:
+    build: ./backends
+    container_name: net-backend1
+    environment:
+      - SERVER_NAME=backend1
+    ports:
+      - "5001:5000"
+
+  backend2:
+    build: ./backends
+    container_name: net-backend2
+    environment:
+      - SERVER_NAME=backend2
+    ports:
+      - "5002:5000"
+
+  backend3:
+    build: ./backends
+    container_name: net-backend3
+    environment:
+      - SERVER_NAME=backend3
+    ports:
+      - "5003:5000"
+
+  # ── Nginx Reverse Proxy / Load Balancer ──
+  nginx:
+    image: nginx:latest
+    container_name: net-nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    ports:
+      - "8080:80"     # HTTP
+      - "8443:443"    # HTTPS (TLS)
+      - "9443:8443"   # mTLS
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
