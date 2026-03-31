@@ -10,6 +10,24 @@ services:
       timeout: 5s
       retries: 5
 
+  flask-api:
+    image: python:3.11-slim
+    container_name: ratelimiter-flask
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    ports:
+      - "5050:5050"
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: >
+      bash -c "pip install flask redis --quiet && python server.py"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      FLASK_PORT: 5050
+
   redisinsight:
     image: redis/redisinsight:latest
     container_name: ratelimiter-redisinsight
