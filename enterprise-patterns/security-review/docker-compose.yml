@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: security-postgres
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: security_demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d security_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: security-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # The intentionally vulnerable Flask app for notebook demos
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: security-flask
+    ports:
+      - "5001:5001"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: security_demo
+      DB_USER: demo
+      DB_PASS: demo
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      JWT_SECRET: "change-me-in-production"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Adminer — PostgreSQL GUI for inspecting data
+  adminer:
+    image: adminer:latest
+    container_name: security-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+
+  # RedisInsight — Redis GUI for inspecting rate-limit keys, sessions, etc.
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: security-redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
