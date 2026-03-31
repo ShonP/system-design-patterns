@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: data-modeling-postgres
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: data_modeling_demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d data_modeling_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: data-modeling-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+
+volumes:
+  postgres_data:
