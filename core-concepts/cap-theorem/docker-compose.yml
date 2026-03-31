@@ -1,0 +1,75 @@
+services:
+  postgres-primary:
+    image: postgres:16
+    container_name: cap-postgres-primary
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: cap_demo
+    command: >
+      postgres
+        -c wal_level=replica
+        -c max_wal_senders=3
+        -c max_replication_slots=3
+        -c hot_standby=on
+    ports:
+      - "5432:5432"
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./db/setup_replication.sh:/docker-entrypoint-initdb.d/02_setup_replication.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d cap_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres-replica:
+    image: postgres:16
+    container_name: cap-postgres-replica
+    environment:
+      PGUSER: replicator
+      PGPASSWORD: replicator
+    ports:
+      - "5433:5432"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+      - ./db/start_replica.sh:/start_replica.sh
+    entrypoint: /bin/bash
+    command: /start_replica.sh
+
+  redis:
+    image: redis:7
+    container_name: cap-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: cap-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-primary
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres-primary
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: cap-redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
+volumes:
+  primary_data:
+  replica_data:
