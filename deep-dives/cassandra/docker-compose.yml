@@ -1,0 +1,63 @@
+services:
+  cassandra-node1:
+    image: cassandra:4.1
+    container_name: cassandra-node1
+    environment:
+      CASSANDRA_CLUSTER_NAME: "demo-cluster"
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack1"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+      CASSANDRA_SEEDS: "cassandra-node1"
+      # Lower memory for local dev
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
+    ports:
+      - "9042:9042"   # CQL native transport
+      - "7000:7000"   # Inter-node communication
+    volumes:
+      - cassandra_node1_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE CLUSTER'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  cassandra-node2:
+    image: cassandra:4.1
+    container_name: cassandra-node2
+    environment:
+      CASSANDRA_CLUSTER_NAME: "demo-cluster"
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack2"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+      CASSANDRA_SEEDS: "cassandra-node1"
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
+    depends_on:
+      cassandra-node1:
+        condition: service_healthy
+    volumes:
+      - cassandra_node2_data:/var/lib/cassandra
+
+  cassandra-node3:
+    image: cassandra:4.1
+    container_name: cassandra-node3
+    environment:
+      CASSANDRA_CLUSTER_NAME: "demo-cluster"
+      CASSANDRA_DC: "dc1"
+      CASSANDRA_RACK: "rack3"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+      CASSANDRA_SEEDS: "cassandra-node1"
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
+    depends_on:
+      cassandra-node2:
+        condition: service_started
+    volumes:
+      - cassandra_node3_data:/var/lib/cassandra
+
+volumes:
+  cassandra_node1_data:
+  cassandra_node2_data:
+  cassandra_node3_data:
