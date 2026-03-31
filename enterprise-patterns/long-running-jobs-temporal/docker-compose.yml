@@ -1,0 +1,99 @@
+# Temporal Workflow Engine - Local Development Stack
+#
+# This spins up everything you need to learn Temporal:
+#   - PostgreSQL: stores Temporal's internal state (workflow history, timers, etc.)
+#   - Temporal Server: the brain that orchestrates your workflows
+#   - Temporal UI: a web dashboard to inspect running/completed workflows
+#   - Worker: a Python process that executes your workflow and activity code
+#
+# Usage:
+#   docker compose up -d
+#
+# Then open Temporal UI at http://localhost:8080
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────
+  # Temporal needs a database to persist workflow state. Every time your
+  # workflow makes progress (starts an activity, receives a signal, sleeps),
+  # Temporal writes an "event" to this database. This is what makes
+  # workflows survive crashes — they replay from these events.
+  postgresql:
+    image: postgres:16
+    container_name: temporal-postgresql
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - temporal_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Temporal Server ─────────────────────────────────────────────────────
+  # The "auto-setup" image automatically creates the database schema on
+  # first startup. In production you'd use the regular temporalio/server
+  # image and run schema migrations separately.
+  #
+  # Key port: 7233 (gRPC) — this is what your Python code connects to.
+  temporal:
+    image: temporalio/auto-setup:latest
+    container_name: temporal-server
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+    ports:
+      - "7233:7233"
+    healthcheck:
+      test: ["CMD", "tctl", "--address", "temporal:7233", "cluster", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ── Temporal Web UI ─────────────────────────────────────────────────────
+  # A browser-based dashboard where you can:
+  #   - See all running and completed workflows
+  #   - Inspect the event history of any workflow
+  #   - Send signals to running workflows
+  #   - Terminate stuck workflows
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: temporal-ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:8080
+    ports:
+      - "8080:8080"
+
+  # ── Python Worker ───────────────────────────────────────────────────────
+  # A worker is a process that polls Temporal for tasks and executes your
+  # workflow/activity code. You can run workers from the notebooks too —
+  # this container is here to show what a "production-like" deployment
+  # looks like.
+  #
+  # The worker waits for Temporal to be ready, then starts polling the
+  # "demo-task-queue" for work.
+  worker:
+    build: ./worker
+    container_name: temporal-worker
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    restart: on-failure
+
+volumes:
+  temporal_pgdata:
