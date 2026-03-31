@@ -1,0 +1,142 @@
+# =============================================================================
+# BCDR Lab — Business Continuity & Disaster Recovery
+# =============================================================================
+# This docker-compose sets up:
+#   - PostgreSQL primary (with streaming replication enabled)
+#   - PostgreSQL standby (hot standby that replicates from primary)
+#   - Redis primary
+#   - Redis replica (replicates from primary)
+#   - Nginx (health-check dashboard)
+#   - Adminer (PostgreSQL web GUI)
+#   - RedisInsight (Redis web GUI)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Primary — the main database that handles all writes
+  # ---------------------------------------------------------------------------
+  pg-primary:
+    image: postgres:16
+    container_name: bcdr-pg-primary
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: bcdr_demo
+    # Enable WAL (Write-Ahead Log) settings needed for replication
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=10
+      -c max_replication_slots=10
+      -c hot_standby=on
+      -c archive_mode=on
+      -c archive_command='test ! -f /var/lib/postgresql/archive/%f && cp %p /var/lib/postgresql/archive/%f'
+      -c log_replication_commands=on
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_primary_data:/var/lib/postgresql/data
+      - pg_archive:/var/lib/postgresql/archive
+      - ./db/00_setup_replication.sh:/docker-entrypoint-initdb.d/00_setup_replication.sh
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d bcdr_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Standby — hot standby that streams WAL from primary
+  # ---------------------------------------------------------------------------
+  pg-standby:
+    image: postgres:16
+    container_name: bcdr-pg-standby
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      PGPASSWORD: replicator
+    entrypoint: /standby-entrypoint.sh
+    volumes:
+      - pg_standby_data:/var/lib/postgresql/data
+      - ./db/standby-entrypoint.sh:/standby-entrypoint.sh
+    ports:
+      - "5433:5432"
+    depends_on:
+      pg-primary:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Redis Primary — the main cache/session store
+  # ---------------------------------------------------------------------------
+  redis-primary:
+    image: redis:7
+    container_name: bcdr-redis-primary
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_primary_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Redis Replica — replicates from primary for read scaling + failover
+  # ---------------------------------------------------------------------------
+  redis-replica:
+    image: redis:7
+    container_name: bcdr-redis-replica
+    # --replicaof tells this Redis to copy all data from the primary
+    command: redis-server --replicaof redis-primary 6379
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_replica_data:/data
+    depends_on:
+      redis-primary:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Nginx — serves as a health-check dashboard for monitoring
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: bcdr-nginx-health
+    ports:
+      - "8090:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - pg-primary
+      - redis-primary
+
+  # ---------------------------------------------------------------------------
+  # Adminer — web GUI for PostgreSQL (connect to primary or standby)
+  # ---------------------------------------------------------------------------
+  adminer:
+    image: adminer:latest
+    container_name: bcdr-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - pg-primary
+    environment:
+      ADMINER_DEFAULT_SERVER: pg-primary
+
+  # ---------------------------------------------------------------------------
+  # RedisInsight — web GUI for Redis (visualize replication)
+  # ---------------------------------------------------------------------------
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: bcdr-redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis-primary
+
+volumes:
+  pg_primary_data:
+  pg_standby_data:
+  pg_archive:
+  redis_primary_data:
+  redis_replica_data:
