@@ -1,0 +1,5 @@
+psycopg2-binary>=2.9.9
+redis>=5.0.0
+confluent-kafka>=2.3.0
+jupyter>=1.0.0
+ipykernel>=6.28.0
