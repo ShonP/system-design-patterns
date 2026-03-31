@@ -1,0 +1,71 @@
+services:
+  shard-1:
+    image: postgres:16
+    container_name: sharding-shard-1
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: shard_1
+    ports:
+      - "5433:5432"
+    volumes:
+      - shard1_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d shard_1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  shard-2:
+    image: postgres:16
+    container_name: sharding-shard-2
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: shard_2
+    ports:
+      - "5434:5432"
+    volumes:
+      - shard2_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d shard_2"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  shard-3:
+    image: postgres:16
+    container_name: sharding-shard-3
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: shard_3
+    ports:
+      - "5435:5432"
+    volumes:
+      - shard3_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d shard_3"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: sharding-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - shard-1
+      - shard-2
+      - shard-3
+    environment:
+      ADMINER_DEFAULT_SERVER: shard-1
+
+volumes:
+  shard1_data:
+  shard2_data:
+  shard3_data:
