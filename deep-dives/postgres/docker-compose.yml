@@ -1,0 +1,70 @@
+services:
+  postgres-primary:
+    image: postgres:16
+    container_name: pg-primary
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=3
+      -c max_replication_slots=3
+      -c hot_standby=on
+      -c hot_standby_feedback=on
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: postgres_demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+      - ./db/00_replication.sh:/docker-entrypoint-initdb.d/00_replication.sh
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo -d postgres_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgres-replica:
+    image: postgres:16
+    container_name: pg-replica
+    environment:
+      PGUSER: replicator
+      PGPASSWORD: replicator_pass
+    ports:
+      - "5433:5432"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+      - ./db/replica-entrypoint.sh:/replica-entrypoint.sh
+    entrypoint: /replica-entrypoint.sh
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pg-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@demo.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+
+  adminer:
+    image: adminer:latest
+    container_name: pg-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres-primary
+
+volumes:
+  primary_data:
+  replica_data:
