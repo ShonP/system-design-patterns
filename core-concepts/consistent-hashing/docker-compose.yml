@@ -1,0 +1,51 @@
+services:
+  # Three standalone Redis instances to demonstrate consistent hashing.
+  # We use separate instances (not Redis Cluster) so you can see
+  # the hashing logic explicitly in Python code.
+
+  redis-node-1:
+    image: redis:7
+    container_name: ch-redis-node-1
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis-node-2:
+    image: redis:7
+    container_name: ch-redis-node-2
+    ports:
+      - "6381:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis-node-3:
+    image: redis:7
+    container_name: ch-redis-node-3
+    ports:
+      - "6382:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # RedisInsight – visual tool to inspect each Redis node
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: ch-redisinsight
+    ports:
+      - "5541:5540"
+    depends_on:
+      redis-node-1:
+        condition: service_healthy
+      redis-node-2:
+        condition: service_healthy
+      redis-node-3:
+        condition: service_healthy

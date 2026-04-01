@@ -1,0 +1,4 @@
+redis>=5.0.0
+jupyter>=1.0.0
+ipykernel>=6.28.0
+matplotlib>=3.7.0
