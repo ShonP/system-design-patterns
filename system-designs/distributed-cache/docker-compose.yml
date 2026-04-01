@@ -1,0 +1,50 @@
+services:
+  # --- Three standalone Redis nodes simulating a distributed cache cluster ---
+  # Each node represents a separate "shard" in our cache cluster.
+  # We use standalone instances (not Redis Cluster mode) so we can
+  # control partitioning and routing from Python — that's the whole point
+  # of the lab!
+
+  redis-node-1:
+    image: redis:7
+    container_name: dcache-redis-1
+    ports:
+      - "6381:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-node-2:
+    image: redis:7
+    container_name: dcache-redis-2
+    ports:
+      - "6382:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis-node-3:
+    image: redis:7
+    container_name: dcache-redis-3
+    ports:
+      - "6383:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --- RedisInsight: GUI for exploring all three nodes ---
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: dcache-redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
