@@ -1,0 +1,98 @@
+services:
+  # ==========================================================
+  # Backend Service: Users (Instance 1)
+  # ==========================================================
+  # First instance of the user service. We run TWO instances
+  # so the API gateway can load-balance between them.
+  user-service-1:
+    build: ./services
+    container_name: gateway-user-1
+    command: python user_service.py
+    environment:
+      - INSTANCE_ID=1
+    ports:
+      - "5001:5000"    # Exposed so notebooks can call it directly (the "BAD" pattern)
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================================
+  # Backend Service: Users (Instance 2) — for load balancing
+  # ==========================================================
+  user-service-2:
+    build: ./services
+    container_name: gateway-user-2
+    command: python user_service.py
+    environment:
+      - INSTANCE_ID=2
+    ports:
+      - "5003:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================================
+  # Backend Service: Orders
+  # ==========================================================
+  order-service:
+    build: ./services
+    container_name: gateway-orders
+    command: python order_service.py
+    environment:
+      - INSTANCE_ID=1
+    ports:
+      - "5002:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================================
+  # Redis — used for rate limiting demos in Notebook 2
+  # ==========================================================
+  redis:
+    image: redis:7
+    container_name: gateway-redis
+    ports:
+      - "6380:6379"    # Port 6380 to avoid conflicts with other labs
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================================
+  # API Gateway (nginx)
+  # ==========================================================
+  # This is the star of the show — the single entry point for all clients.
+  # It routes requests to the correct backend service based on the URL path.
+  api-gateway:
+    image: nginx:latest
+    container_name: api-gateway
+    ports:
+      - "8080:80"      # The ONE port clients need to know about
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      user-service-1:
+        condition: service_healthy
+      user-service-2:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+
+  # ==========================================================
+  # RedisInsight — GUI for visualizing Redis data
+  # ==========================================================
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: gateway-redisinsight
+    ports:
+      - "5541:5540"
+    depends_on:
+      - redis
