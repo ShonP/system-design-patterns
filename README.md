@@ -1,29 +1,19 @@
 # 🏗️ System Design Labs
 
-Hands-on Python notebooks for learning system design patterns through practical examples.
+**57 hands-on labs · 220 Jupyter notebooks · Real Docker infrastructure**
 
-## 🎯 Purpose
+Learn system design by running real code. Each lab includes Docker-based infrastructure, Python notebooks with working examples, and follows a **bad → better → best** teaching pattern.
 
-This repository provides **interactive, runnable examples** of common system design patterns. Instead of just reading about these concepts, you can:
+## 🎯 What's Inside
 
-- Run real code that demonstrates each pattern
-- See failures happen and understand why
-- Compare different approaches side-by-side
-- Experiment with configurations and observe effects
-
-Each pattern includes Docker-based infrastructure (PostgreSQL, Redis, MinIO, Temporal) so you can run everything locally with visualization tools like Adminer and RedisInsight.
-
-## 📚 Patterns
-
-| Pattern | Description | Notebooks |
-|---------|-------------|-----------|
-| [Real-Time Updates](patterns/real-time-updates/) | Polling, SSE, WebSockets, pub/sub | 7 |
-| [Dealing with Contention](patterns/contention/) | Locks, optimistic concurrency, CRDTs | 5 |
-| [Scaling Reads](patterns/scaling-reads/) | Caching, read replicas, materialized views | 6 |
-| [Scaling Writes](patterns/scaling-writes/) | Sharding, partitioning, write buffering | 6 |
-| [Handling Large Blobs](patterns/large-blobs/) | Chunked uploads, presigned URLs, CDN | 6 |
-| [Long Running Tasks](patterns/long-running-tasks/) | Queues, workers, DLQ, backpressure | 6 |
-| [Multi-Step Processes](patterns/multi-step-processes/) | Workflows, sagas, Temporal | 6 |
+| Category | Labs | Notebooks | Description |
+|----------|------|-----------|-------------|
+| [Core Concepts](#-core-concepts) | 8 | 30 | Fundamental building blocks |
+| [Deep Dives](#-deep-dives) | 10 | 36 | Technology-specific deep dives |
+| [System Designs](#-system-designs) | 27 | 93 | End-to-end system design problems |
+| [Enterprise Patterns](#-enterprise-patterns) | 5 | 20 | Microsoft/enterprise-grade patterns |
+| [Patterns](#-patterns) | 7 | 42 | Cross-cutting design patterns |
+| **Total** | **57** | **220** | |
 
 ## 🚀 Getting Started
 
@@ -37,11 +27,11 @@ Each pattern includes Docker-based infrastructure (PostgreSQL, Redis, MinIO, Tem
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/system-design-labs.git
+git clone https://github.com/ShonP/system-design-patterns.git
 cd system-design-labs
 
-# Pick a pattern to explore
-cd patterns/real-time-updates
+# Pick a lab to explore
+cd core-concepts/caching
 
 # Start the infrastructure
 docker compose up -d
@@ -55,122 +45,162 @@ jupyter notebook notebooks/
 
 ### Visualization Tools
 
-Each pattern includes web UIs for observing what's happening:
+Each lab includes web UIs for observing what's happening:
 
 | Tool | Purpose | Common Port |
 |------|---------|-------------|
-| Adminer | PostgreSQL GUI | 8080 or 8081 |
+| Adminer | PostgreSQL GUI | 8080 |
 | RedisInsight | Redis GUI | 5540 |
-| MinIO Console | Object storage GUI | 9001 |
+| Kibana | Elasticsearch GUI | 5601 |
+| Grafana | Metrics dashboards | 3000 |
 | Temporal UI | Workflow visualization | 8080 |
+| MinIO Console | Object storage GUI | 9001 |
+| pgAdmin | Advanced PostgreSQL GUI | 5050 |
+| kafka-ui | Kafka cluster GUI | 8080 |
 
-## 📖 Pattern Overview
+---
 
-### 1. Real-Time Updates
-*How do you push data to clients instantly?*
+## 📘 Core Concepts
 
-- **Polling** - Simple but wasteful
-- **Long Polling** - Better, but still has overhead
-- **Server-Sent Events** - One-way streaming
-- **WebSockets** - Bidirectional communication
-- **Pub/Sub** - Decoupled message delivery
+Fundamental building blocks every engineer needs to know.
 
-### 2. Dealing with Contention
-*What happens when multiple users edit the same data?*
+| Lab | Notebooks | Topics |
+|-----|-----------|--------|
+| [API Design](core-concepts/api-design/) | 4 | REST principles, pagination, rate limiting, versioning |
+| [Caching](core-concepts/caching/) | 5 | Cache-aside, write-through, invalidation, TTL, stampede |
+| [CAP Theorem](core-concepts/cap-theorem/) | 3 | Consistency vs availability, partition tolerance |
+| [Consistent Hashing](core-concepts/consistent-hashing/) | 3 | Modulo → hash ring → virtual nodes (bad→better→best) |
+| [Data Modeling](core-concepts/data-modeling/) | 4 | Relational, denormalization, NoSQL, schema evolution |
+| [Networking Essentials](core-concepts/networking-essentials/) | 4 | DNS, load balancing, TCP/UDP, HTTP/2, TLS |
+| [Numbers to Know](core-concepts/numbers-to-know/) | 3 | Latency benchmarks, throughput, back-of-envelope estimation |
+| [Sharding](core-concepts/sharding/) | 4 | Hash-based, range-based, consistent hashing, rebalancing |
 
-- **Pessimistic Locking** - Lock first, edit later
-- **Optimistic Concurrency** - Detect conflicts on save
-- **CRDTs** - Conflict-free data structures
-- **Last-Write-Wins** - Simple but lossy
+## 🔬 Deep Dives
 
-### 3. Scaling Reads
-*How do you handle millions of read requests?*
+Technology-specific deep dives with real infrastructure.
 
-- **Caching** - Store frequent queries in memory
-- **Read Replicas** - Distribute load across databases
-- **Materialized Views** - Pre-compute expensive queries
-- **Cache Invalidation** - The hardest problem in CS
+| Lab | Notebooks | Topics |
+|-----|-----------|--------|
+| [API Gateway](deep-dives/api-gateway/) | 3 | Routing, load balancing, rate limiting, auth (nginx) |
+| [Cassandra](deep-dives/cassandra/) | 4 | Partition keys, wide rows, consistency levels, compaction |
+| [DynamoDB](deep-dives/dynamodb/) | 4 | Partition/sort keys, GSI/LSI, single-table design, Streams |
+| [Elasticsearch](deep-dives/elasticsearch/) | 4 | Full-text search, analyzers, aggregations, scaling |
+| [Kafka](deep-dives/kafka/) | 4 | Producers/consumers, partitioning, exactly-once, Streams |
+| [PostgreSQL](deep-dives/postgres/) | 4 | Indexing (bad→best), query optimization, replication, partitioning |
+| [Redis](deep-dives/redis/) | 4 | Data structures, pub/sub, cache vs primary, cluster |
+| [Time-Series Databases](deep-dives/time-series-databases/) | 3 | TimescaleDB, windowed aggregations, retention policies |
+| [Vector Databases](deep-dives/vector-databases/) | 3 | pgvector, linear scan → IVFFlat → HNSW (bad→best) |
+| [ZooKeeper](deep-dives/zookeeper/) | 3 | Distributed locks, leader election, config management |
 
-### 4. Scaling Writes
-*How do you handle high write throughput?*
+## 🏛️ System Designs
 
-- **Partitioning** - Split data across nodes
-- **Sharding** - Route writes to specific nodes
-- **Write Buffering** - Batch writes for efficiency
-- **Event Sourcing** - Append-only writes
+Complete system design problems with hands-on implementations.
 
-### 5. Handling Large Blobs
-*How do you upload/download large files reliably?*
+| Lab | Notebooks | Topics |
+|-----|-----------|--------|
+| [Ad Click Aggregator](system-designs/ad-click-aggregator/) | 3 | Click ingestion, real-time aggregation, deduplication |
+| [Bitly (URL Shortener)](system-designs/bitly/) | 3 | URL encoding, redirect caching, analytics |
+| [Distributed Cache](system-designs/distributed-cache/) | 3 | Cache partitioning, coherence, consistent hashing |
+| [Dropbox (File Storage)](system-designs/dropbox/) | 4 | Chunked uploads, sync, deduplication, sharing |
+| [FB Live Comments](system-designs/fb-live-comments/) | 3 | Real-time streaming, ordering, scaling |
+| [FB News Feed](system-designs/fb-news-feed/) | 4 | Fan-out, ranking, social graph, feed caching |
+| [FB Post Search](system-designs/fb-post-search/) | 3 | Full-text indexing, typeahead, search ranking |
+| [Google Docs](system-designs/google-docs/) | 4 | OT, CRDTs, real-time collaboration, versioning |
+| [Gopuff (Local Delivery)](system-designs/gopuff/) | 3 | Inventory, delivery routing, demand forecasting |
+| [Instagram](system-designs/instagram/) | 4 | Photo pipeline, news feed, stories, explore |
+| [Job Scheduler](system-designs/job-scheduler/) | 3 | Job queues, distributed execution, dead letter queues |
+| [LeetCode](system-designs/leetcode/) | 3 | Code submission, sandboxed execution, leaderboards |
+| [Metrics Monitoring](system-designs/metrics-monitoring/) | 3 | Prometheus, alerting, Grafana dashboards |
+| [News Aggregator](system-designs/news-aggregator/) | 3 | RSS crawling, deduplication, personalized feeds |
+| [Online Auction](system-designs/online-auction/) | 3 | Bid processing, auction lifecycle, real-time notifications |
+| [Payment System](system-designs/payment-system/) | 4 | Processing pipeline, idempotency, ledger, fraud detection |
+| [Rate Limiter](system-designs/rate-limiter/) | 4 | Token bucket, sliding window, distributed, API gateway |
+| [Robinhood (Stock Trading)](system-designs/robinhood/) | 3 | Order matching, portfolio tracking, market data streaming |
+| [Strava (Fitness Tracking)](system-designs/strava/) | 3 | GPS tracking, activity feed, segment leaderboards |
+| [Ticketmaster](system-designs/ticketmaster/) | 4 | Seat locking, flash sales, reservation flow, scaling |
+| [Tinder (Dating App)](system-designs/tinder/) | 3 | Geolocation matching, swipe system, notifications |
+| [Top-K](system-designs/top-k/) | 3 | Count-min sketch, heap-based, distributed MapReduce |
+| [Uber (Ride-Sharing)](system-designs/uber/) | 4 | Geospatial matching, driver tracking, surge pricing |
+| [Web Crawler](system-designs/web-crawler/) | 4 | Basic crawler, fault tolerance, politeness, efficiency |
+| [WhatsApp (Messaging)](system-designs/whatsapp/) | 4 | Message delivery, read receipts, groups, E2E encryption |
+| [Yelp (Local Search)](system-designs/yelp/) | 3 | Geospatial search, reviews, search ranking |
+| [YouTube (Video Streaming)](system-designs/youtube/) | 4 | Upload, streaming, processing, resumable uploads |
 
-- **Chunked Uploads** - Split files into pieces
-- **Presigned URLs** - Direct client-to-storage uploads
-- **Resumable Uploads** - Continue after failures
-- **CDN Integration** - Serve files from edge locations
+## 🏢 Enterprise Patterns
 
-### 6. Long Running Tasks
-*How do you process jobs that take minutes or hours?*
+Production patterns used at Microsoft and large enterprises.
 
-- **Message Queues** - Decouple producers and consumers
-- **Worker Pools** - Scale processing independently
-- **Dead Letter Queues** - Handle poison messages
-- **Backpressure** - Prevent queue overflow
+| Lab | Notebooks | Topics |
+|-----|-----------|--------|
+| [BCDR](enterprise-patterns/bcdr/) | 4 | RPO/RTO, replication failover, backup strategies, DR drills |
+| [GDPR Paired Regions](enterprise-patterns/gdpr-paired-regions/) | 4 | Data residency, cross-region replication, right to erasure |
+| [Long-Running Jobs (Temporal)](enterprise-patterns/long-running-jobs-temporal/) | 4 | Workflow engines, saga pattern, signals, versioning |
+| [Privacy Review](enterprise-patterns/privacy-review/) | 4 | Data classification, PIA, anonymization, retention |
+| [Security Review](enterprise-patterns/security-review/) | 4 | STRIDE, OWASP Top 10, secrets management, SDL |
 
-### 7. Multi-Step Processes
-*How do you coordinate workflows across services?*
+## 🔄 Patterns
 
-- **Sagas** - Compensating transactions
-- **Workflow Engines** - Durable execution
-- **Event Sourcing** - Replay for recovery
-- **Temporal** - Production-grade workflows
+Cross-cutting design patterns (pre-existing).
+
+| Pattern | Notebooks | Topics |
+|---------|-----------|--------|
+| [Real-Time Updates](patterns/real-time-updates/) | 7 | Polling, SSE, WebSockets, pub/sub |
+| [Dealing with Contention](patterns/dealing-with-contention/) | 5 | Locks, optimistic concurrency, CRDTs |
+| [Scaling Reads](patterns/scaling-reads/) | 6 | Caching, read replicas, materialized views |
+| [Scaling Writes](patterns/scaling-writes/) | 6 | Sharding, partitioning, write buffering |
+| [Handling Large Blobs](patterns/large-blobs/) | 6 | Chunked uploads, presigned URLs, CDN |
+| [Long Running Tasks](patterns/long-running-tasks/) | 6 | Queues, workers, DLQ, backpressure |
+| [Multi-Step Processes](patterns/multi-step-processes/) | 6 | Workflows, sagas, Temporal |
+
+---
 
 ## 🏛️ Repository Structure
 
 ```
 system-design-labs/
-├── README.md
-└── patterns/
-    ├── real-time-updates/
-    │   ├── README.md
-    │   ├── docker-compose.yml
-    │   ├── requirements.txt
-    │   └── notebooks/
-    │       ├── 01_polling.ipynb
-    │       ├── 02_long_polling.ipynb
-    │       └── ...
-    ├── contention/
-    │   └── ...
-    └── ...
+├── core-concepts/          # 8 fundamental concept labs
+│   ├── caching/
+│   ├── sharding/
+│   └── ...
+├── deep-dives/             # 10 technology deep dives
+│   ├── redis/
+│   ├── kafka/
+│   └── ...
+├── system-designs/         # 27 system design problems
+│   ├── uber/
+│   ├── instagram/
+│   └── ...
+├── enterprise-patterns/    # 5 enterprise/Microsoft patterns
+│   ├── bcdr/
+│   ├── gdpr-paired-regions/
+│   └── ...
+├── patterns/               # 7 cross-cutting patterns
+│   ├── real-time-updates/
+│   ├── scaling-reads/
+│   └── ...
+└── scraper/                # Content source (hellointerview.com)
 ```
 
-Each pattern follows the same structure:
-- **README.md** - Pattern overview and architecture
-- **docker-compose.yml** - Infrastructure setup
-- **requirements.txt** - Python dependencies
-- **notebooks/** - Interactive Jupyter notebooks
-- **db/** (optional) - SQL initialization scripts
+Each lab follows the same structure:
+- **README.md** — Overview and learning objectives
+- **docker-compose.yml** — Infrastructure setup
+- **requirements.txt** — Python dependencies
+- **notebooks/** — Interactive Jupyter notebooks (numbered)
+- **db/** (optional) — SQL initialization scripts
 
 ## 🎓 How to Learn
 
-1. **Read the pattern README** - Understand the problem and solutions
-2. **Start Docker services** - `docker compose up -d`
-3. **Run notebooks in order** - Each builds on the previous
-4. **Experiment** - Change parameters, break things, observe
-5. **Check visualization tools** - See data flow in real-time
-
-## 🤝 Contributing
-
-Contributions welcome! Ideas for new patterns:
-- Rate Limiting
-- Circuit Breakers
-- Leader Election
-- Distributed Transactions
-- Search Indexing
+1. **Pick a topic** — Start with Core Concepts if new, or jump to a System Design
+2. **Read the README** — Understand the problem and architecture
+3. **Start infrastructure** — `docker compose up -d`
+4. **Run notebooks in order** — Each builds on the previous
+5. **Follow bad → better → best** — See why naive solutions fail before learning the right way
+6. **Experiment** — Change parameters, break things, observe
 
 ## 📝 License
 
-MIT License - Use freely for learning and teaching.
+MIT License — Use freely for learning and teaching.
 
 ## 🙏 Acknowledgments
 
-Inspired by system design resources from:
-- [Hello Interview](https://www.hellointerview.com/)
+Content inspired by [Hello Interview](https://www.hellointerview.com/) System Design course.
