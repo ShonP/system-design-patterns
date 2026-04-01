@@ -1,0 +1,24 @@
+# Prometheus configuration for the Metrics Monitoring lab.
+# Prometheus scrapes (pulls) metrics from HTTP endpoints at regular intervals.
+
+global:
+  scrape_interval: 10s      # How often to collect metrics (matches our lab's 10s interval)
+  evaluation_interval: 15s  # How often to evaluate alert rules
+
+# Load alert rules from a separate file
+rule_files:
+  - "alert_rules.yml"
+
+# Targets to scrape metrics from
+scrape_configs:
+  # Prometheus monitors itself (meta-monitoring!)
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Our demo Python app that generates fake server metrics
+  # (started from the notebooks)
+  - job_name: "demo_app"
+    static_configs:
+      - targets: ["host.docker.internal:8000"]
+    scrape_interval: 5s

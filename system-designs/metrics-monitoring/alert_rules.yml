@@ -1,0 +1,60 @@
+# Prometheus alerting rules for the Metrics Monitoring lab.
+# These rules are evaluated every 15 seconds (see prometheus.yml evaluation_interval).
+#
+# How it works:
+#   1. Prometheus evaluates each rule's "expr" (a PromQL expression)
+#   2. If the result is true, a timer starts ("for" duration)
+#   3. If still true after "for" duration, the alert fires
+#   4. Labels and annotations attach metadata for notifications
+
+groups:
+  - name: server_alerts
+    rules:
+      # Alert when CPU usage stays above 80% for 1 minute
+      - alert: HighCpuUsage
+        expr: demo_cpu_usage > 80
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU usage is high on {{ $labels.host }}"
+          description: "CPU has been above 80% for 1 minute. Current value: {{ $value }}%"
+
+      # Alert when CPU exceeds 95% — critical, shorter window
+      - alert: CriticalCpuUsage
+        expr: demo_cpu_usage > 95
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: CPU above 95% on {{ $labels.host }}"
+
+      # Alert when memory exceeds 85%
+      - alert: HighMemoryUsage
+        expr: demo_memory_usage > 85
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory usage is high on {{ $labels.host }}"
+          description: "Memory above 85% for 1 minute. Current value: {{ $value }}%"
+
+      # Alert when error rate spikes above 5%
+      - alert: HighErrorRate
+        expr: demo_error_rate > 5
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate is high on {{ $labels.host }}"
+          description: "Error rate above 5%. Current value: {{ $value }}%"
+
+      # Alert when request latency is too high
+      - alert: HighLatency
+        expr: demo_request_latency > 2.0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request latency on {{ $labels.host }}"
+          description: "p50 latency above 2s. Current value: {{ $value }}s"
