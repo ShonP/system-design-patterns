@@ -1,0 +1,5 @@
+psycopg2-binary>=2.9.9
+redis>=5.0.0
+kafka-python-ng>=2.2.2
+jupyter>=1.0.0
+ipykernel>=6.28.0
