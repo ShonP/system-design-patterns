@@ -37,7 +37,7 @@ cd core-concepts/caching
 docker compose up -d
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Open notebooks
 jupyter notebook notebooks/
@@ -184,7 +184,7 @@ system-design-labs/
 Each lab follows the same structure:
 - **README.md** — Overview and learning objectives
 - **docker-compose.yml** — Infrastructure setup
-- **requirements.txt** — Python dependencies
+- **pyproject.toml** — Python dependencies (managed with [uv](https://docs.astral.sh/uv/))
 - **notebooks/** — Interactive Jupyter notebooks (numbered)
 - **db/** (optional) — SQL initialization scripts
 

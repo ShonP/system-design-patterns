@@ -1,0 +1,17 @@
+[project]
+name = "security-review"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "psycopg2-binary>=2.9.9",
+    "redis>=5.0.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.28.0",
+    "flask>=3.0.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "pyjwt>=2.8.0",
+    "bcrypt>=4.1.0",
+    "bandit>=1.7.0",
+    "safety>=2.3.0",
+]

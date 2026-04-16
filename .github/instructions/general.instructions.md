@@ -28,7 +28,7 @@ RedisInsight for Redis: A graphical tool that allows users to visualize and mana
 Adminer for postgres
 
 When creating Jupyter notebooks, always include setup instructions for the virtual environment and kernel selection:
-- Each lab folder should have its own `.venv` created with `python -m venv .venv`
-- Dependencies are installed via `pip install -r requirements.txt`
+- Each lab folder should have its own `.venv` managed by uv
+- Dependencies are installed via `uv sync`
 - The notebook setup cell must instruct the user to select the `.venv` kernel in VS Code's kernel picker (top-right of the notebook)
 - If the kernel doesn't appear, advise the user to reload the VS Code window (`Cmd+Shift+P` → "Reload Window")

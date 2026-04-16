@@ -29,17 +29,14 @@ cd deep-dives/redis
 # 2. Start all services (Redis standalone, Sentinel cluster, RedisInsight)
 docker compose up -d
 
-# 3. Create a Python virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# 4. Install dependencies
-pip install -r requirements.txt
+# 3. Install dependencies
+uv sync
 
-# 5. Register the Jupyter kernel
-python -m ipykernel install --user --name=redis-deep-dive --display-name="Redis Deep Dive (Python)"
+# 4. Register the Jupyter kernel
+uv run python -m ipykernel install --user --name=redis-deep-dive --display-name="Redis Deep Dive (Python)"
 
-# 6. Open the notebooks in VS Code or Jupyter
+# 5. Open the notebooks in VS Code or Jupyter
 # In VS Code: Select the "Redis Deep Dive (Python)" kernel from the kernel picker (top-right)
 # If the kernel doesn't appear, reload the VS Code window (Cmd+Shift+P → "Reload Window")
 ```

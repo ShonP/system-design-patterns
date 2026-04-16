@@ -32,13 +32,11 @@ cd system-designs/ticketmaster
 # Start PostgreSQL + Redis + Visualization Tools
 docker-compose up -d
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=ticketmaster --display-name="Ticketmaster (Python)"
+uv run python -m ipykernel install --user --name=ticketmaster --display-name="Ticketmaster (Python)"
 
 # Open the first notebook and start learning!
 ```

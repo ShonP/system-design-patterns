@@ -53,13 +53,11 @@ docker-compose up -d
 
 # Wait ~30 seconds for the replica to finish base backup
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=postgres-deep-dive --display-name="PostgreSQL Deep Dive (Python)"
+uv run python -m ipykernel install --user --name=postgres-deep-dive --display-name="PostgreSQL Deep Dive (Python)"
 
 # Open the first notebook and start learning!
 ```

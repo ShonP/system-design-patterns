@@ -63,7 +63,7 @@ File size?
 docker compose up -d
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Open notebooks in order
 ```

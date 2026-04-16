@@ -85,7 +85,7 @@ When a user clicks "Generate Report" and it takes 45 seconds, synchronous proces
 docker compose up -d
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Open notebooks in order
 ```

@@ -40,13 +40,11 @@ Imagine you have 3 database servers and thousands of keys to store. How do you d
 # 1. Start the Redis nodes
 docker compose up -d
 
-# 2. Create a virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # 3. Register the kernel for Jupyter
-python -m ipykernel install --user --name consistent-hashing --display-name "Consistent Hashing (.venv)"
+uv run python -m ipykernel install --user --name consistent-hashing --display-name "Consistent Hashing (.venv)"
 
 # 4. Open notebooks in VS Code or Jupyter
 #    In VS Code: select the "Consistent Hashing (.venv)" kernel (top-right of notebook)

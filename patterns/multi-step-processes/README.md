@@ -104,7 +104,7 @@ docker compose up -d
 sleep 30
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Open notebooks
 jupyter notebook notebooks/

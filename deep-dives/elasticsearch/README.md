@@ -37,13 +37,11 @@ docker-compose up -d
 # Wait for Elasticsearch to be healthy (may take 30–60 seconds)
 curl -s http://localhost:9200/_cluster/health | python -m json.tool
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=elasticsearch --display-name="Elasticsearch (Python)"
+uv run python -m ipykernel install --user --name=elasticsearch --display-name="Elasticsearch (Python)"
 
 # Open the first notebook and start learning!
 ```

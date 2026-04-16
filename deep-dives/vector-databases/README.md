@@ -35,13 +35,11 @@ cd deep-dives/vector-databases
 # Start PostgreSQL (with pgvector) + Adminer
 docker-compose up -d
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=vector-databases --display-name="Vector Databases (Python)"
+uv run python -m ipykernel install --user --name=vector-databases --display-name="Vector Databases (Python)"
 
 # Open the first notebook and start learning!
 ```

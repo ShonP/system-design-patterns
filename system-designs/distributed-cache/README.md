@@ -32,13 +32,11 @@ cd system-designs/distributed-cache
 # Start 3 Redis nodes + RedisInsight
 docker-compose up -d
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=distributed-cache --display-name="Distributed Cache (Python)"
+uv run python -m ipykernel install --user --name=distributed-cache --display-name="Distributed Cache (Python)"
 
 # Open the first notebook and start learning!
 ```

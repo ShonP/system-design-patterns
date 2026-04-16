@@ -1,0 +1,10 @@
+[project]
+name = "consistent-hashing"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "redis>=5.0.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.28.0",
+    "matplotlib>=3.7.0",
+]

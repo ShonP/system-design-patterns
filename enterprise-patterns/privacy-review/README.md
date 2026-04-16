@@ -155,13 +155,11 @@ cd enterprise-patterns/privacy-review
 # Start PostgreSQL + Redis + Visualization Tools
 docker-compose up -d
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=privacy-review --display-name="Privacy Review (Python)"
+uv run python -m ipykernel install --user --name=privacy-review --display-name="Privacy Review (Python)"
 
 # Open the first notebook and start learning!
 ```

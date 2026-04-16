@@ -35,13 +35,11 @@ bash nginx/generate_certs.sh
 # Start nginx + 3 Flask backends
 docker-compose up -d --build
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=networking --display-name="Networking (Python)"
+uv run python -m ipykernel install --user --name=networking --display-name="Networking (Python)"
 
 # Open the first notebook and start learning!
 ```

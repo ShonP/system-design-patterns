@@ -1,5 +1,0 @@
-psycopg2-binary>=2.9.9
-elasticsearch>=8.13.0
-jupyter>=1.0.0
-ipykernel>=6.28.0
-pandas>=2.0.0

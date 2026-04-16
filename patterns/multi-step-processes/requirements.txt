@@ -1,3 +1,0 @@
-temporalio
-psycopg2-binary
-ipykernel

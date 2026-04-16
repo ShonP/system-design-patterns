@@ -75,10 +75,8 @@ cd enterprise-patterns/azure-authentication
 docker-compose up -d
 
 # Python env for the notebooks
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m ipykernel install --user --name=azure-auth --display-name="Azure Auth (Python)"
+uv sync
+uv run python -m ipykernel install --user --name=azure-auth --display-name="Azure Auth (Python)"
 ```
 
 Then open any notebook and select the `Azure Auth (Python)` kernel (top-right of VS Code notebook). If it doesn't show up, `Cmd+Shift+P` → **Reload Window**.

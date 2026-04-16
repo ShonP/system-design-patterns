@@ -36,13 +36,11 @@ docker-compose up -d
 # Wait ~30s for Elasticsearch to start, then verify:
 curl http://localhost:9200/_cluster/health?pretty
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=fb-post-search --display-name="FB Post Search (Python)"
+uv run python -m ipykernel install --user --name=fb-post-search --display-name="FB Post Search (Python)"
 
 # Open the first notebook and start learning!
 ```

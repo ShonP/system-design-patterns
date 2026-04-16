@@ -32,13 +32,11 @@ cd core-concepts/sharding
 # Start 3 PostgreSQL shards + Adminer
 docker-compose up -d
 
-# Create virtual environment and install dependencies
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=sharding --display-name="Sharding (Python)"
+uv run python -m ipykernel install --user --name=sharding --display-name="Sharding (Python)"
 
 # Open the first notebook and start learning!
 ```

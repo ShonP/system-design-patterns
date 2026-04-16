@@ -75,12 +75,10 @@ cd patterns/real-time-updates
 docker-compose up -d
 
 # Install Python dependencies (using uv)
-uv pip install -r requirements.txt
+uv sync
 
 # Or create a virtual environment first
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv pip install -r requirements.txt
+uv sync
 
 # Start with the first notebook!
 ```

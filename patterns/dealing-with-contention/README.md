@@ -72,13 +72,11 @@ cd patterns/dealing-with-contention
 # Start PostgreSQL + Redis + Visualization Tools
 docker-compose up -d
 
-# Create virtual environment and install dependencies
-uv venv
-source .venv/bin/activate
-uv pip install -r requirements.txt
+# Install dependencies
+uv sync
 
 # Register Jupyter kernel
-python -m ipykernel install --user --name=contention --display-name="Contention (Python)"
+uv run python -m ipykernel install --user --name=contention --display-name="Contention (Python)"
 
 # Start with the first notebook!
 ```

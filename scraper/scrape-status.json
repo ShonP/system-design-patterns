@@ -1,8 +1,8 @@
 {
   "status": "running",
-  "last_updated": "2026-03-31T10:53:11.614Z",
-  "current_index": 37,
-  "total_pages": 37,
+  "last_updated": "2026-04-01T09:52:50.739Z",
+  "current_index": 41,
+  "total_pages": 41,
   "completed": [
     "https://www.hellointerview.com/learn/system-design/in-a-hurry/introduction",
     "https://www.hellointerview.com/learn/system-design/in-a-hurry/how-to-prepare",
@@ -40,7 +40,11 @@
     "https://www.hellointerview.com/learn/system-design/deep-dives/api-gateway",
     "https://www.hellointerview.com/learn/system-design/deep-dives/cassandra",
     "https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb",
-    "https://www.hellointerview.com/learn/system-design/deep-dives/time-series-databases"
+    "https://www.hellointerview.com/learn/system-design/deep-dives/time-series-databases",
+    "https://www.hellointerview.com/learn/system-design/core-concepts/numbers-to-know",
+    "https://www.hellointerview.com/learn/system-design/deep-dives/vector-databases",
+    "https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper",
+    "https://www.hellointerview.com/learn/system-design/deep-dives/postgres"
   ],
   "failed": [],
   "pages": [
@@ -80,6 +84,10 @@
     "https://www.hellointerview.com/learn/system-design/deep-dives/api-gateway",
     "https://www.hellointerview.com/learn/system-design/deep-dives/cassandra",
     "https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb",
-    "https://www.hellointerview.com/learn/system-design/deep-dives/time-series-databases"
+    "https://www.hellointerview.com/learn/system-design/deep-dives/time-series-databases",
+    "https://www.hellointerview.com/learn/system-design/core-concepts/numbers-to-know",
+    "https://www.hellointerview.com/learn/system-design/deep-dives/vector-databases",
+    "https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper",
+    "https://www.hellointerview.com/learn/system-design/deep-dives/postgres"
   ]
 }
