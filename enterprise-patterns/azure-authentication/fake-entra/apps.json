@@ -1,0 +1,42 @@
+{
+  "apps": [
+    {
+      "client_id": "api-a-client-id",
+      "client_secret": "api-a-secret-value",
+      "display_name": "api-a (middle tier)",
+      "identifier_uri": "api://api-a",
+      "exposed_scopes": ["access_as_user"],
+      "app_roles": [],
+      "granted_app_roles": {
+        "api://api-b": ["Files.Read.All"]
+      }
+    },
+    {
+      "client_id": "api-b-client-id",
+      "client_secret": "api-b-secret-value",
+      "display_name": "api-b (downstream resource)",
+      "identifier_uri": "api://api-b",
+      "exposed_scopes": ["Files.Read"],
+      "app_roles": ["Files.Read.All"]
+    },
+    {
+      "client_id": "daemon-client-id",
+      "client_secret": "daemon-secret-value",
+      "display_name": "daemon-app (S2S caller)",
+      "identifier_uri": "api://daemon",
+      "exposed_scopes": [],
+      "app_roles": [],
+      "granted_app_roles": {
+        "api://api-b": ["Files.Read.All"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "object_id": "00000000-0000-0000-0000-0000000000a1",
+      "upn": "alice@contoso.com",
+      "name": "Alice Example",
+      "password": "alice-password"
+    }
+  ]
+}
