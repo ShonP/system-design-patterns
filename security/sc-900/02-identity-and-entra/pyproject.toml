@@ -1,0 +1,12 @@
+[project]
+name = "sc-900-identity"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "cryptography>=44.0.0",
+    "pyjwt>=2.8.0",
+    "httpx>=0.28.0",
+    "python-jose[cryptography]>=3.3.0",
+    "jupyter>=1.1.0",
+    "ipykernel>=6.29.0",
+]
