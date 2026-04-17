@@ -1,0 +1,8 @@
+[project]
+name = "sc-100-secops"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "jupyter>=1.1.0",
+    "ipykernel>=6.29.0",
+]
