@@ -1,0 +1,7 @@
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+WORKDIR /app
+COPY siem/pyproject.toml .
+RUN uv pip install --system --no-cache -r pyproject.toml
+COPY siem/log_generator.py .
+CMD ["python", "log_generator.py"]

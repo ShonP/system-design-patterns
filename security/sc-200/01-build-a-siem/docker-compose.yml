@@ -1,0 +1,27 @@
+services:
+  siem:
+    build:
+      context: ..
+      dockerfile: siem/Dockerfile
+    container_name: sc200-siem
+    ports:
+      - "8000:8000"
+    volumes:
+      - siem_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")'"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  log-generator:
+    build:
+      context: ..
+      dockerfile: siem/Dockerfile.generator
+    container_name: sc200-log-generator
+    depends_on:
+      siem:
+        condition: service_healthy
+
+volumes:
+  siem_data:
