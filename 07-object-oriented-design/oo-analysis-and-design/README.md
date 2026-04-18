@@ -1,23 +1,31 @@
-# Oo Analysis And Design
+# OO Analysis & Design
 
-> Part of `07-object-oriented-design/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of the `07-object-oriented-design/` series. Includes runnable notebooks and references.
 
 ## Overview
 
-The OOA/OOD process and principles (SOLID).
+The design process (requirements → classes → code) and the SOLID principles, with a refactor example.
 
 ## Concepts covered
 
-- Identifying actors and use cases
-- Finding objects and responsibilities
-- Relationships (association, aggregation, composition, inheritance)
+- Requirements → noun/verb analysis
+- SOLID principles explained with short examples
+- Refactoring a bad class toward SOLID
+- Dependency injection basics
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 07-object-oriented-design/oo-analysis-and-design
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_process_and_solid.ipynb`](./notebooks/01_process_and_solid.ipynb) — Design process and SOLID principles
+- [`notebooks/02_refactor_to_solid.ipynb`](./notebooks/02_refactor_to_solid.ipynb) — Refactor a god-class step by step
 
 ## References
 
