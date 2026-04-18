@@ -24,8 +24,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_stale_replica.ipynb`](./notebooks/01_stale_replica.ipynb) — trusting the first response returns stale data when one replica is behind.
-- [`notebooks/02_read_repair.ipynb`](./notebooks/02_read_repair.ipynb) — query several, return the freshest, and repair stale replicas inline. Compared with anti-entropy.
+- [`notebooks/01_stale_replica.ipynb`](./notebooks/01_stale_replica.ipynb) — **the problem**: trusting the first response returns stale data; quantify how often with varying replica/stale counts.
+- [`notebooks/02_read_repair.ipynb`](./notebooks/02_read_repair.ipynb) — **the fix, bad → best**: read-one → quorum read → blocking read-repair → async read-repair → probabilistic read-repair (Cassandra-style).
+- [`notebooks/03_anti_entropy_and_hints.ipynb`](./notebooks/03_anti_entropy_and_hints.ipynb) — **the full picture**: hinted handoff for short outages and a tiny Merkle-tree anti-entropy sweep for cold keys — complementary to read-repair.
 
 ## References
 
