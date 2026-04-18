@@ -8,6 +8,52 @@ Data modeling is the process of defining how your application's data is structur
 
 A sloppy data model leads to painful issues later — bad performance, inconsistent data, and designs that fall apart at scale. A solid, "good enough" model lets the rest of your system stay simple. This lab walks you through the fundamentals with a real social media schema you can query and experiment with.
 
+> 🧭 **Guiding principle:** *Access patterns drive the schema.* Before designing tables, list the reads and writes your app needs (e.g. "show a user's feed", "count likes on a post"). Then choose entities, relationships, and indexes that make those operations fast.
+
+## 🗺️ The Schema At a Glance
+
+```mermaid
+erDiagram
+    USERS ||--o{ POSTS : "writes (1:N)"
+    USERS ||--o{ COMMENTS : "writes (1:N)"
+    POSTS ||--o{ COMMENTS : "has (1:N)"
+    USERS }o--o{ POSTS : "likes (N:M via likes)"
+    USERS }o--o{ USERS : "follows (N:M self-ref)"
+    POSTS }o--o{ TAGS : "tagged (N:M via post_tags)"
+
+    USERS {
+        int id PK
+        string username UK
+        string email UK
+        string display_name
+        text bio
+    }
+    POSTS {
+        int id PK
+        int user_id FK
+        text content
+        timestamp created_at
+    }
+    COMMENTS {
+        int id PK
+        int post_id FK
+        int user_id FK
+        text content
+    }
+    LIKES {
+        int user_id FK
+        int post_id FK
+    }
+    FOLLOWS {
+        int follower_id FK
+        int following_id FK
+    }
+    TAGS {
+        int id PK
+        string name UK
+    }
+```
+
 ## Notebooks in This Series
 
 | # | Notebook | What You'll Learn |
@@ -27,7 +73,7 @@ A sloppy data model leads to painful issues later — bad performance, inconsist
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/data-modeling
+cd 01-foundations/data-modeling
 
 # Start PostgreSQL + Adminer
 docker-compose up -d
