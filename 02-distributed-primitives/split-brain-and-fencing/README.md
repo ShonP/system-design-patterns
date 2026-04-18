@@ -13,12 +13,19 @@
 - Monotonic fencing tokens
 - STONITH
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/split-brain-and-fencing
+uv sync
+```
 
-- `notebooks/01_split_brain_walkthrough.ipynb`
-- `notebooks/02_fencing_tokens.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_split_brain.ipynb`](./notebooks/01_split_brain.ipynb) — partition + slow GC pause = two leaders writing at once.
+- [`notebooks/02_fencing_tokens.ipynb`](./notebooks/02_fencing_tokens.ipynb) — monotonic tokens let storage reject stale leaders' writes.
 
 ## References
 

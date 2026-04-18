@@ -13,12 +13,19 @@
 - Lease-based leadership
 - Clock drift considerations
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/lease
+uv sync
+```
 
-- `notebooks/01_lease_vs_lock.ipynb`
-- `notebooks/02_lease_based_leader.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_lock_without_expiry.ipynb`](./notebooks/01_lock_without_expiry.ipynb) — a holder crashing locks everyone out forever.
+- [`notebooks/02_time_bounded_lease.ipynb`](./notebooks/02_time_bounded_lease.ipynb) — leases with TTL and renewal; auto-recovery from crashes.
 
 ## References
 

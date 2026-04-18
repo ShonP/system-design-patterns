@@ -13,11 +13,19 @@
 - Replication offset
 - Read visibility rules
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/high-water-mark
+uv sync
+```
 
-- `notebooks/01_hwm_progress_simulation.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_no_high_water_mark.ipynb`](./notebooks/01_no_high_water_mark.ipynb) — exposing the leader's tail leads to *acknowledged* writes being lost on failover.
+- [`notebooks/02_with_high_water_mark.ipynb`](./notebooks/02_with_high_water_mark.ipynb) — track the highest quorum-replicated offset and only let clients see committed data.
 
 ## References
 

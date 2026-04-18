@@ -13,11 +13,19 @@
 - Phi value
 - Adaptive thresholds
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/phi-accrual-failure-detection
+uv sync
+```
 
-- `notebooks/01_phi_accrual_detector.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_fixed_timeout_problem.ipynb`](./notebooks/01_fixed_timeout_problem.ipynb) — short timeouts → false positives, long ones → slow detection.
+- [`notebooks/02_phi_accrual_detector.ipynb`](./notebooks/02_phi_accrual_detector.ipynb) — adaptive suspicion that learns the network's cadence (Cassandra/Akka).
 
 ## References
 

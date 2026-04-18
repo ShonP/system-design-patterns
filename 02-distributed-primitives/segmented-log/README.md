@@ -14,12 +14,19 @@
 - Log rotation and retention
 - Sparse indexes
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/segmented-log
+uv sync
+```
 
-- `notebooks/01_split_log_into_segments.ipynb`
-- `notebooks/02_segment_index_and_lookup.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_single_file_log.ipynb`](./notebooks/01_single_file_log.ipynb) — the BAD design: a single ever-growing log file. Watch deletions become O(n).
+- [`notebooks/02_segmented_log.ipynb`](./notebooks/02_segmented_log.ipynb) — split into segments, roll on size, drop old data with a single `unlink`.
 
 ## References
 
