@@ -27,6 +27,7 @@ Imagine you have 3 database servers and thousands of keys to store. How do you d
 | 1 | **Naive Hashing Problems** | BAD: modulo hashing breaks on resize · BETTER: simple hash ring · BEST: virtual nodes |
 | 2 | **Building a Hash Ring** | Build a consistent hash ring from scratch in Python, visualize key distribution |
 | 3 | **Consistent Hashing in Practice** | Real-world usage: Redis Cluster, DynamoDB, Cassandra partitioning |
+| 4 | **Beyond the Basics** | Replication on the ring, weighted nodes, rendezvous hashing (HRW), hot-key pitfalls |
 
 ## Prerequisites
 
@@ -68,6 +69,10 @@ uv run python -m ipykernel install --user --name consistent-hashing --display-na
 - **Hash ring** — circular key space minimizes data movement
 - **Virtual nodes (vnodes)** — spread load evenly across physical nodes
 - **Key redistribution** — measuring how many keys move during changes
+- **Replication on the ring** — store each key on N distinct physical nodes for fault tolerance
+- **Weighted nodes** — give bigger servers proportionally more vnodes
+- **Rendezvous hashing (HRW)** — a simpler ring-free alternative used by CDNs and load balancers
+- **Hot-key problem** — what hashing *cannot* solve, and the techniques that can
 - **Real-world implementations** — Redis Cluster hash slots, DynamoDB, Cassandra
 
 ## Real-World Examples
