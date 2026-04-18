@@ -12,7 +12,11 @@
 
 - Epidemic / push gossip
 - Fanout vs convergence time
-- Anti-entropy and membership dissemination
+- Robustness to message loss
+- Push vs pull vs push-pull gossip
+- Anti-entropy with `(generation, heartbeat)` versioning (Cassandra style)
+- Failure detection by watching heartbeat counters
+- Seed nodes and avoiding logical partitions
 
 ## Setup
 
@@ -25,7 +29,8 @@ Select the `.venv` kernel in VS Code (top-right of the notebook).
 
 ## Notebooks
 
-- [`notebooks/01_what_is_gossip.ipynb`](./notebooks/01_what_is_gossip.ipynb) — central broadcast vs gossip; convergence S-curve and fanout sweep.
+- [`notebooks/01_what_is_gossip.ipynb`](./notebooks/01_what_is_gossip.ipynb) — central broadcast vs push gossip; convergence S-curve, fanout sweep, robustness to message loss.
+- [`notebooks/02_push_pull_and_failure_detection.ipynb`](./notebooks/02_push_pull_and_failure_detection.ipynb) — push vs pull vs push-pull; Cassandra-style heartbeat/generation versioning; failure detection via gossip; seed-node bootstrap.
 
 ## References
 
