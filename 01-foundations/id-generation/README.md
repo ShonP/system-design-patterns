@@ -23,6 +23,7 @@ This lab walks through the classic progression **single-DB auto-increment → UU
 | 1 | [`01_why_id_generation_is_hard.ipynb`](notebooks/01_why_id_generation_is_hard.ipynb) | Auto-increment bottleneck, UUIDv4 randomness, B-tree locality — **BAD → BETTER → BEST** |
 | 2 | [`02_uuid_ulid_ksuid_compared.ipynb`](notebooks/02_uuid_ulid_ksuid_compared.ipynb) | Implement UUIDv4, UUIDv7 (RFC 9562), ULID, and KSUID from scratch |
 | 3 | [`03_snowflake_id_generator.ipynb`](notebooks/03_snowflake_id_generator.ipynb) | Build a Snowflake generator: bit layout, sequence overflow, clock-skew defence |
+| 4 | [`04_production_patterns.ipynb`](notebooks/04_production_patterns.ipynb) | Worker-ID strategies, DB storage, decoding a real Discord snowflake, NanoID, gotchas |
 
 ## Prerequisites
 
@@ -50,10 +51,13 @@ VS Code should then detect the new interpreter.
 
 ## Key concepts covered
 
-- UUID v4, UUID v7 (RFC 9562), ULID, KSUID, Snowflake
+- UUID v4, UUID v7 (RFC 9562), ULID, KSUID, Snowflake, NanoID
 - Monotonic vs wall-clock time; clock skew
 - Time-ordered IDs and B-tree index locality
 - Coordination-free ID generation
+- Worker-ID assignment strategies (env var, hostname hash, k8s ordinal, coordinator)
+- Database storage: native `uuid`/`BIGINT` columns vs strings
+- Decoding real-world snowflakes (Discord/Twitter)
 
 ## References
 
