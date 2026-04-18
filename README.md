@@ -10,14 +10,14 @@ Learn system design by running real code. Each lab includes Docker-based infrast
 |----------|------|-----------|-------------|
 | [01 Foundations](#-01-foundations) | 8 | 30 | Fundamental building blocks |
 | [02 Distributed Primitives](#-02-distributed-primitives) | 0 | 0 | _(planned)_ Bloom filters, replication, leader election, … |
-| [03 Technologies](#-03-technologies) | 10 | 40 | Technology-specific deep dives (databases, messaging, coordination, workflow engines) |
+| [03 Technologies](#-03-technologies) | 10 | 42 | Technology-specific deep dives (databases, messaging, coordination, workflow engines) |
 | [04 Patterns](#-04-patterns) | 7 | 42 | Cross-cutting scaling & reliability patterns |
 | [05 Microservices](#-05-microservices) | 1 | 3 | Microservices patterns (API gateway, …) |
 | [06 System Designs](#-06-system-designs) | 27 | 93 | End-to-end system design problems |
 | [07 Object-Oriented Design](#-07-object-oriented-design) | 0 | 0 | _(planned)_ OOD / LLD problems |
 | [08 Enterprise](#-08-enterprise) | 4 | 16 | Microsoft/enterprise-grade patterns |
 | [Security Certifications](#-security-certifications) | 4 tracks | – | Azure security certification labs |
-| **Total** | **57** | **220** | |
+| **Total** | **57** | **222** | |
 
 > **🚧 Restructure in progress.** The top-level folders were reorganized; the
 > old `core-concepts/`, `deep-dives/`, `patterns/`, `enterprise-patterns/`,
@@ -117,7 +117,7 @@ Technology-specific deep dives with real infrastructure.
 
 | Lab | Notebooks | Topics |
 |-----|-----------|--------|
-| [ZooKeeper](03-technologies/coordination/zookeeper/) | 3 | Distributed locks, leader election, config management |
+| [ZooKeeper](03-technologies/coordination/zookeeper/) | 5 | Distributed locks, leader election, config management, service discovery, sessions &amp; watches |
 
 ### Workflow Engines
 

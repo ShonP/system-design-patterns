@@ -44,6 +44,8 @@ Key concepts:
 | 1 | Distributed Coordination | Why you need distributed locks and how ZooKeeper provides them |
 | 2 | Leader Election | How to safely elect one leader among many servers |
 | 3 | Configuration Management | How to push config changes to all servers instantly |
+| 4 | Service Discovery | How services self-register and clients get a live, auto-updating list |
+| 5 | Sessions, Watches & When Not to Use ZooKeeper | Session semantics, watch gotchas, ZAB/quorum, and the limits of ZooKeeper |
 
 Each notebook follows a **Bad → Better → Best** pattern:
 - **🔴 Bad**: The naive approach and why it fails
