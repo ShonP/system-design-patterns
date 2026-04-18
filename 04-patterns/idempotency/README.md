@@ -13,12 +13,20 @@ Making operations safe to retry.
 - Replay protection
 - Deduplication stores
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 04-patterns/idempotency
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_double_charge.ipynb`](./notebooks/01_double_charge.ipynb) — the classic retry-causes-double-charge bug.
+- [`notebooks/02_idempotency_keys.ipynb`](./notebooks/02_idempotency_keys.ipynb) — server-side replay cache keyed on a client UUID.
+- [`notebooks/03_database_dedup.ipynb`](./notebooks/03_database_dedup.ipynb) — exactly-once via `UNIQUE` constraint inside the same transaction (SQLite, no extra services).
 
 ## References
 

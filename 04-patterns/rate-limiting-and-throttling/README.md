@@ -13,12 +13,20 @@ Controlling request rates at the edge and between services.
 - Distributed counters
 - Backpressure
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 04-patterns/rate-limiting-and-throttling
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_token_bucket.ipynb`](./notebooks/01_token_bucket.ipynb) — burst-tolerant limiter used by AWS / Stripe / NGINX.
+- [`notebooks/02_leaky_bucket.ipynb`](./notebooks/02_leaky_bucket.ipynb) — paces traffic to a constant tempo for fragile downstreams.
+- [`notebooks/03_sliding_window.ipynb`](./notebooks/03_sliding_window.ipynb) — fixed-window boundary burst vs sliding-window log; comparison table.
 
 ## References
 

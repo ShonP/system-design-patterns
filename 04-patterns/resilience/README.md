@@ -13,12 +13,20 @@ Keeping services healthy under partial failure.
 - Bulkheads and isolation
 - Graceful degradation
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 04-patterns/resilience
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_retry_with_backoff.ipynb`](./notebooks/01_retry_with_backoff.ipynb) — naive → exponential → exponential + jitter (AWS recipe).
+- [`notebooks/02_circuit_breaker.ipynb`](./notebooks/02_circuit_breaker.ipynb) — CLOSED → OPEN → HALF_OPEN; fail-fast when downstream is dead.
+- [`notebooks/03_bulkhead.ipynb`](./notebooks/03_bulkhead.ipynb) — per-dependency thread pools so one slow caller can't starve everyone else.
 
 ## References
 

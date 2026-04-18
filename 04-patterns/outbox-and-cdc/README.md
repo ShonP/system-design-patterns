@@ -13,12 +13,25 @@ Reliably publishing events from an OLTP database.
 - Log-based vs query-based CDC
 - Ordering and deduplication
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+Postgres + Adminer via Docker:
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+```bash
+cd 04-patterns/outbox-and-cdc
+docker compose up -d
+uv sync
+```
+
+Browse the database at http://localhost:8080 (server=`postgres`, user=`demo`, password=`demo`, database=`outbox_demo`).
+
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_dual_write_problem.ipynb`](./notebooks/01_dual_write_problem.ipynb) — DB committed, message bus never published — silent inconsistency.
+- [`notebooks/02_transactional_outbox.ipynb`](./notebooks/02_transactional_outbox.ipynb) — write the event into an `outbox` table inside the same transaction; polling publisher with `FOR UPDATE SKIP LOCKED`.
+- [`notebooks/03_polling_vs_cdc.ipynb`](./notebooks/03_polling_vs_cdc.ipynb) — replace polling with logical replication slots (the same trick Debezium uses).
 
 ## References
 
