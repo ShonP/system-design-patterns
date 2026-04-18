@@ -1,6 +1,6 @@
 # Load Balancing
 
-> Part of `01-foundations/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `01-foundations/`. A hands-on, code-first introduction to load balancing. Every concept is demonstrated with a small, self-contained Python simulation — no Docker, no external services.
 
 ## Learning objectives
 
@@ -22,8 +22,9 @@
 | # | Notebook | What you'll learn |
 |---|----------|-------------------|
 | 1 | [`01_intro_and_round_robin.ipynb`](./notebooks/01_intro_and_round_robin.ipynb) | What a load balancer is, why one server is a bottleneck, and how round robin fixes it |
-| 2 | [`02_algorithms_compared.ipynb`](./notebooks/02_algorithms_compared.ipynb) | Round robin vs. weighted round robin vs. least-connections vs. random, compared on an uneven workload |
+| 2 | [`02_algorithms_compared.ipynb`](./notebooks/02_algorithms_compared.ipynb) | Round robin, weighted, least-connections, random, and **power-of-two-choices** compared on an uneven workload, with real avg/p50/p95/p99 latencies |
 | 3 | [`03_health_checks_and_sticky_sessions.ipynb`](./notebooks/03_health_checks_and_sticky_sessions.ipynb) | Liveness vs. readiness checks, draining an unhealthy backend, and the trade-offs of sticky sessions |
+| 4 | [`04_consistent_hashing.ipynb`](./notebooks/04_consistent_hashing.ipynb) | Why naive `hash % N` breaks caches, how a hash ring with virtual nodes fixes it, and where you'll meet this in real systems |
 
 Each notebook is pure Python — backends are simulated in-process, so there is no Docker or external infrastructure to set up for this lab.
 
