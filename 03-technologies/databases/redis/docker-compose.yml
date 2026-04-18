@@ -61,7 +61,7 @@ services:
     container_name: redis-sentinel-1
     command: >
       sh -c '
-      echo "port 26379" > /tmp/sentinel.conf &&
+      echo "port 26379" > /tmp/sentinel.conf && echo "sentinel resolve-hostnames yes" >> /tmp/sentinel.conf && echo "sentinel announce-hostnames yes" >> /tmp/sentinel.conf &&
       echo "sentinel monitor mymaster redis-master 6379 2" >> /tmp/sentinel.conf &&
       echo "sentinel down-after-milliseconds mymaster 5000" >> /tmp/sentinel.conf &&
       echo "sentinel failover-timeout mymaster 10000" >> /tmp/sentinel.conf &&
@@ -82,7 +82,7 @@ services:
     container_name: redis-sentinel-2
     command: >
       sh -c '
-      echo "port 26379" > /tmp/sentinel.conf &&
+      echo "port 26379" > /tmp/sentinel.conf && echo "sentinel resolve-hostnames yes" >> /tmp/sentinel.conf && echo "sentinel announce-hostnames yes" >> /tmp/sentinel.conf &&
       echo "sentinel monitor mymaster redis-master 6379 2" >> /tmp/sentinel.conf &&
       echo "sentinel down-after-milliseconds mymaster 5000" >> /tmp/sentinel.conf &&
       echo "sentinel failover-timeout mymaster 10000" >> /tmp/sentinel.conf &&
@@ -103,7 +103,7 @@ services:
     container_name: redis-sentinel-3
     command: >
       sh -c '
-      echo "port 26379" > /tmp/sentinel.conf &&
+      echo "port 26379" > /tmp/sentinel.conf && echo "sentinel resolve-hostnames yes" >> /tmp/sentinel.conf && echo "sentinel announce-hostnames yes" >> /tmp/sentinel.conf &&
       echo "sentinel monitor mymaster redis-master 6379 2" >> /tmp/sentinel.conf &&
       echo "sentinel down-after-milliseconds mymaster 5000" >> /tmp/sentinel.conf &&
       echo "sentinel failover-timeout mymaster 10000" >> /tmp/sentinel.conf &&

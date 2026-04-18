@@ -24,22 +24,27 @@ In this lab you'll explore Redis hands-on — from fundamental data structures t
 
 ```bash
 # 1. Navigate to the lab directory
-cd deep-dives/redis
+cd 03-technologies/databases/redis
 
-# 2. Start all services (Redis standalone, Sentinel cluster, RedisInsight)
+# 2. Start all services (Redis standalone, master+replicas, Sentinel cluster, RedisInsight)
 docker compose up -d
 
-
-# 3. Install dependencies
+# 3. Install dependencies into a per-lab .venv (managed by uv)
 uv sync
 
-# 4. Register the Jupyter kernel
-uv run python -m ipykernel install --user --name=redis-deep-dive --display-name="Redis Deep Dive (Python)"
-
-# 5. Open the notebooks in VS Code or Jupyter
-# In VS Code: Select the "Redis Deep Dive (Python)" kernel from the kernel picker (top-right)
-# If the kernel doesn't appear, reload the VS Code window (Cmd+Shift+P → "Reload Window")
+# 4. Open the notebooks in VS Code (or `uv run jupyter lab`)
+#    In VS Code: pick the .venv kernel from the kernel picker (top-right of the notebook).
+#    If the kernel doesn't appear, reload: Cmd+Shift+P → "Reload Window".
 ```
+
+> 🔁 **Re-running notebook 4?** It deliberately triggers a Sentinel failover.
+> If a previous run left the topology with a different node as master,
+> reset it before re-running:
+>
+> ```bash
+> docker compose restart redis-master redis-replica-1 redis-replica-2 \
+>   sentinel-1 sentinel-2 sentinel-3
+> ```
 
 ## 🔍 Visualization Tools
 
@@ -61,7 +66,7 @@ This lab runs the following Docker services:
 │                     Docker Network                        │
 │                                                           │
 │  ┌────────────┐                                           │
-│  │   Redis     │  ← Used by notebooks 1-3                 │
+│  │   Redis     │  ← Used by notebooks 1, 2, 3, 5          │
 │  │ Standalone  │                                          │
 │  │   :6379     │                                          │
 │  └────────────┘                                           │
@@ -87,10 +92,12 @@ This lab runs the following Docker services:
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | [Redis Data Structures](notebooks/01_redis_data_structures.ipynb) | Strings, hashes, lists, sets, sorted sets, geospatial indexes |
-| 2 | [Pub/Sub Patterns](notebooks/02_pubsub_patterns.ipynb) | Pub/sub messaging, Redis Streams, consumer groups, work queues |
-| 3 | [Cache vs Primary Store](notebooks/03_cache_vs_primary_store.ipynb) | TTL, eviction, distributed locks, rate limiting, leaderboards |
-| 4 | [Cluster & Replication](notebooks/04_cluster_and_replication.ipynb) | Master-replica setup, Sentinel HA, hash slots, hot key mitigation |
+| 1 | [Redis Data Structures](notebooks/01_redis_data_structures.ipynb) | Strings, hashes, lists, sets, sorted sets, streams, geospatial indexes |
+| 2 | [Pub/Sub & Streams](notebooks/02_pub_sub_patterns.ipynb) | Pub/sub messaging, Redis Streams, consumer groups, work queues |
+| 3 | [Cache vs Primary Store](notebooks/03_redis_as_cache_vs_primary.ipynb) | Cache-aside, write-through, TTL, distributed locks (safe + naive), rate limiting (fixed + sliding window), cache stampede |
+| 4 | [Cluster & Replication](notebooks/04_redis_cluster_and_replication.ipynb) | Master-replica setup, Sentinel automatic failover, hash slots, hot-key mitigation |
+| 5 | [Performance, Atomicity & Probabilistic Structures](notebooks/05_pipelines_transactions_persistence.ipynb) | Pipelines, MULTI/EXEC, WATCH, Lua scripting, RDB vs AOF, Bitmaps, HyperLogLog |
+| 5 | [Performance, Atomicity & Probabilistic Structures](notebooks/05_pipelines_transactions_persistence.ipynb) | Pipelines, MULTI/EXEC + WATCH, Lua scripts, RDB vs AOF, Bitmaps, HyperLogLog |
 
 ## 🌍 Real-World Applications
 

@@ -1,5 +1,5 @@
 [project]
-name = "redis"
+name = "redis-deep-dive"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
