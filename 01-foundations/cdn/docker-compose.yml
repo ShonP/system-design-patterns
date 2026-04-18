@@ -7,6 +7,11 @@ services:
       ORIGIN_DELAY_MS: "500"
     ports:
       - "8000:8000"
+    volumes:
+      # Bind-mount the assets folder so notebooks can edit files on the host
+      # and have the origin serve the new bytes immediately. Without this,
+      # files baked into the image at build time would never change.
+      - ./origin/assets:/app/assets
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
       interval: 5s

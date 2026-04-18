@@ -32,6 +32,7 @@ happen live — with real HTTP headers and real latency numbers.
 | 1 | [`notebooks/01_what_is_a_cdn.ipynb`](./notebooks/01_what_is_a_cdn.ipynb) | Origin vs edge vs client; bad/better/best scaling; `MISS` → `HIT` |
 | 2 | [`notebooks/02_push_vs_pull_cdn.ipynb`](./notebooks/02_push_vs_pull_cdn.ipynb) | Pull CDN (lazy fetch) vs Push CDN (pre-uploaded); when to choose each |
 | 3 | [`notebooks/03_cache_headers_and_invalidation.ipynb`](./notebooks/03_cache_headers_and_invalidation.ipynb) | `Cache-Control`, `ETag`, TTL, stale content, versioned URLs, cache purging |
+| 4 | [`notebooks/04_real_world_pitfalls.ipynb`](./notebooks/04_real_world_pitfalls.ipynb) | Cache stampede, stale-while-revalidate, `Vary`, `Cache-Control` cheat-sheet, the auth-caching security bug |
 
 ## Prerequisites
 
