@@ -1,6 +1,6 @@
 # Saga
 
-> Part of `05-microservices/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of the `05-microservices/` series. Includes runnable notebooks and references.
 
 ## Overview
 
@@ -12,12 +12,20 @@ Multi-service transactions without 2PC.
 - Compensating actions
 - Failure scenarios
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 05-microservices/saga
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` -> **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Distributed transactions without 2PC
+- [`notebooks/02_choreography_vs_orchestration.ipynb`](./notebooks/02_choreography_vs_orchestration.ipynb) -- Two saga styles compared
+- [`notebooks/03_compensation_on_failure.ipynb`](./notebooks/03_compensation_on_failure.ipynb) -- Compensating actions when a step fails
 
 ## References
 
