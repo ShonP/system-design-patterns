@@ -24,7 +24,15 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_quorum_basics.ipynb`](./notebooks/01_quorum_basics.ipynb) — implement W/R quorums, see why W+R>N gives strong consistency, and watch eventual consistency surface stale reads.
+1. [`notebooks/01_quorum_basics.ipynb`](./notebooks/01_quorum_basics.ipynb) —
+   bad→best progression: single node → `W=R=1` (stale reads) → `W+R>N`
+   (strong consistency). Includes the pigeonhole intuition.
+2. [`notebooks/02_tuning_and_tradeoffs.ipynb`](./notebooks/02_tuning_and_tradeoffs.ipynb) —
+   availability vs quorum size (binomial model + matplotlib plot) and a small
+   tail-latency simulation.
+3. [`notebooks/03_sloppy_quorum_and_repair.ipynb`](./notebooks/03_sloppy_quorum_and_repair.ipynb) —
+   Dynamo-style sloppy quorum, hinted handoff, read repair, and a note on
+   LWW vs vector clocks vs CRDTs.
 
 ## References
 
