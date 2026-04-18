@@ -1,30 +1,67 @@
 # Distributed ID Generation
 
-> Part of `01-foundations/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+📖 **Source**: [DesignGurus — Grokking Scalable Systems & Grokking System Design Interview II](./references/designgurus.md)
+
+## Overview
+
+Every record in a database needs a unique identifier — a user ID, an order ID, a tweet ID.
+With one database it's easy (`id SERIAL PRIMARY KEY`). With **many servers** generating IDs at the same time, it gets interesting.
+
+This lab walks through the classic progression **single-DB auto-increment → UUIDv4 → time-ordered IDs (UUIDv7 / ULID / KSUID / Snowflake)** and implements each format from scratch in plain Python so nothing feels like magic.
 
 ## Learning objectives
 
-- Compare UUID, ULID, KSUID, and Snowflake IDs on uniqueness, sortability, and size.
-- Understand Snowflake's timestamp + worker + sequence structure and its clock-skew pitfalls.
-- Know the difference between wall-clock time and monotonic time and why clock skew is a real-world problem.
+- Compare UUID, ULID, KSUID, and Snowflake on uniqueness, sortability, and size.
+- Understand Snowflake's `timestamp + worker + sequence` structure and its clock-skew pitfalls.
+- See why random primary keys hurt B-tree index locality (with a tiny demo).
+- Build intuition for coordination-free ID generation in distributed systems.
 
-## Concepts covered
+## Notebooks in this series
 
-- UUID v1/v4/v7, ULID, KSUID, Snowflake
+| # | Notebook | What you'll learn |
+|---|----------|-------------------|
+| 1 | [`01_why_id_generation_is_hard.ipynb`](notebooks/01_why_id_generation_is_hard.ipynb) | Auto-increment bottleneck, UUIDv4 randomness, B-tree locality — **BAD → BETTER → BEST** |
+| 2 | [`02_uuid_ulid_ksuid_compared.ipynb`](notebooks/02_uuid_ulid_ksuid_compared.ipynb) | Implement UUIDv4, UUIDv7 (RFC 9562), ULID, and KSUID from scratch |
+| 3 | [`03_snowflake_id_generator.ipynb`](notebooks/03_snowflake_id_generator.ipynb) | Build a Snowflake generator: bit layout, sequence overflow, clock-skew defence |
+
+## Prerequisites
+
+- Python 3.10+
+- [uv](https://docs.astral.sh/uv/) for dependency management
+- No Docker, no database — this lab uses only the Python standard library + `pydantic`
+
+## Setup
+
+```bash
+# From the repo root
+cd 01-foundations/id-generation
+
+# Install dependencies into a local .venv
+uv sync
+
+# Open any notebook in VS Code and select the .venv kernel
+#   (kernel picker is top-right of the notebook)
+```
+
+### If the `.venv` kernel doesn't appear in VS Code
+
+Reload the window: `Cmd+Shift+P` → **"Reload Window"**.
+VS Code should then detect the new interpreter.
+
+## Key concepts covered
+
+- UUID v4, UUID v7 (RFC 9562), ULID, KSUID, Snowflake
 - Monotonic vs wall-clock time; clock skew
-- Time-ordered IDs and index locality
+- Time-ordered IDs and B-tree index locality
 - Coordination-free ID generation
-
-## Planned notebooks
-
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
-
-- `notebooks/01_id_format_comparison.ipynb`
-- `notebooks/02_snowflake_from_scratch.ipynb`
-- `notebooks/03_clock_skew_and_monotonic_time.ipynb`
 
 ## References
 
 - [`references/designgurus.md`](./references/designgurus.md) — scraped lessons that feed this lab
-- [`../../docs/restructure-proposal.md`](../../docs/restructure-proposal.md) — overall repo structure
+- [`CHANGELOG.md`](./CHANGELOG.md) — what changed and when
 - [`../../docs/content-map.md`](../../docs/content-map.md) — lesson → lab mapping
+
+## License
+
+Educational content — feel free to use and modify for learning purposes.
+
