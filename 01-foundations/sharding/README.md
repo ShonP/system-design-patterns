@@ -27,7 +27,7 @@ Your app is taking off. Traffic is growing and your database keeps getting bigge
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/sharding
+cd 01-foundations/sharding
 
 # Start 3 PostgreSQL shards + Adminer
 docker-compose up -d
@@ -84,10 +84,13 @@ uv run python -m ipykernel install --user --name=sharding --display-name="Shardi
 - **Directory-Based** — lookup table maps keys to shards — maximum flexibility
 
 ### Challenges
-- **Hot Spots** — one shard gets more traffic than others (celebrity problem)
-- **Cross-Shard Queries** — queries spanning multiple shards are expensive
+- **Hot Spots** — one shard gets more traffic than others (celebrity problem). Fix with **key bucketing** (Notebook 1, Step 8).
+- **Cross-Shard Queries** — queries spanning multiple shards are expensive (scatter-gather)
 - **Consistency** — transactions across shards require sagas or 2PC
-- **Rebalancing** — adding shards means moving data
+- **Rebalancing** — adding shards means moving data. Production systems use a **dual-write → backfill → verify → cutover** pattern for zero-downtime migrations (Notebook 4, Step 8).
+
+### Geo-Sharding
+Shard by the user's region so data lives close to them. Great for latency and data-residency rules like GDPR. Covered in Notebook 2, Step 7.
 
 ## Real-World Examples
 
