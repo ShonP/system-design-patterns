@@ -14,10 +14,10 @@ This lab walks you through Elasticsearch from zero — indexing documents, writi
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Indexing and Full-Text Search | Documents, indices, CRUD operations, match queries, bool queries |
-| 2 | Analyzers and Mappings | How text is tokenized, custom analyzers, keyword vs text, mapping design |
-| 3 | Aggregations and Faceted Search | Bucket aggregations, metric aggregations, building faceted search like e-commerce filters |
-| 4 | Scaling Elasticsearch Clusters | Shards, replicas, node types, cluster architecture, Lucene internals |
+| 1 | Indexing and Full-Text Search | Documents, indices, CRUD, `match` vs `term`, bool queries, `search_after` deep pagination |
+| 2 | Analyzers and Mappings | Tokenization, custom analyzers, synonyms, keyword vs text, mapping design |
+| 3 | Aggregations and Faceted Search | Bucket + metric aggs, cardinality & percentiles, faceted e-commerce search |
+| 4 | Scaling Elasticsearch Clusters | Shards, replicas, node types, segments, aliases, index templates, ILM |
 
 ## Prerequisites
 
@@ -63,18 +63,22 @@ uv run python -m ipykernel install --user --name=elasticsearch --display-name="E
 
 ### Search Features
 - **Full-Text Search** — Find documents by matching words in text fields
+- **`match` vs `term`** — Analyzed full-text search vs exact-match lookups
 - **Bool Queries** — Combine multiple conditions with must, should, filter
 - **Range Queries** — Filter by numeric or date ranges
 - **Nested Queries** — Search within nested objects
+- **Deep Pagination** — `search_after` for scaling past the 10,000-result limit
 
 ### Analyzers
 - **Standard Analyzer** — Default tokenizer + lowercase filter
 - **Custom Analyzers** — Build your own text processing pipeline
+- **Synonyms** — Make "laptop" also match "notebook computer"
 - **Keyword vs Text** — When to use exact match vs full-text search
 
 ### Aggregations
 - **Bucket Aggregations** — Group documents (like SQL GROUP BY)
 - **Metric Aggregations** — Calculate stats (avg, sum, min, max)
+- **Cardinality & Percentiles** — Unique-counts (HyperLogLog++) and price distributions
 - **Faceted Search** — Build filter panels like Amazon's sidebar
 
 ### Cluster Architecture
@@ -82,6 +86,11 @@ uv run python -m ipykernel install --user --name=elasticsearch --display-name="E
 - **Replicas** — Copies of shards for high availability and read throughput
 - **Node Types** — Master, Data, Coordinating, Ingest nodes
 - **Lucene Segments** — Immutable storage units inside each shard
+
+### Operating Indices
+- **Aliases** — Stable names over changing indices → zero-downtime reindexing
+- **Index Templates** — Auto-apply mappings/settings to new indices matching a pattern
+- **Index Lifecycle Management (ILM)** — Hot → Warm → Cold → Delete phases for time-series data
 
 ## Real-World Examples
 
