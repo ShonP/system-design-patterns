@@ -6,3 +6,6 @@ New content is **added**, never destructively replaced.
 ## 2026-04-18
 - Scaffolded `Hotel Management` lab: `README.md`, `references/designgurus.md`, `CHANGELOG.md`.
 - No notebooks yet — see README for planned notebooks.
+
+## 2026-04-18
+- Added `pyproject.toml` and notebooks: 01_class_design.ipynb, 02_implementation.ipynb.
