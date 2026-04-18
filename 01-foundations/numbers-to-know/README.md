@@ -26,7 +26,7 @@ This lab teaches you the numbers that actually matter in 2026 — **by measuring
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/numbers-to-know
+cd 01-foundations/numbers-to-know
 
 # Start PostgreSQL + Redis + Visualization Tools
 docker-compose up -d
