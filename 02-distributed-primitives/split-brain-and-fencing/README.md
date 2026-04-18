@@ -24,8 +24,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_split_brain.ipynb`](./notebooks/01_split_brain.ipynb) — partition + slow GC pause = two leaders writing at once.
-- [`notebooks/02_fencing_tokens.ipynb`](./notebooks/02_fencing_tokens.ipynb) — monotonic tokens let storage reject stale leaders' writes.
+- [`notebooks/01_split_brain.ipynb`](./notebooks/01_split_brain.ipynb) — 🟥 **BAD**: partition + slow GC pause = two leaders writing at once. Reproduces the bug with a config store and a bank-balance example.
+- [`notebooks/02_fencing_tokens.ipynb`](./notebooks/02_fencing_tokens.ipynb) — 🟧 **BETTER** (in-memory token) → 🟩 **BEST** (token persisted on the resource, `≤` check). Monotonic tokens let storage reject stale leaders' writes even across restarts.
+- [`notebooks/03_stonith_and_resource_fencing.ipynb`](./notebooks/03_stonith_and_resource_fencing.ipynb) — 🔫 When tokens aren't enough: resource fencing (NFS ACL revoke) and STONITH (IPMI power-off). How HDFS HA, Pacemaker and Patroni combine all three layers.
 
 ## References
 
