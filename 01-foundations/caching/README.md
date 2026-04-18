@@ -19,6 +19,7 @@ But caching also introduces new challenges: **invalidation**, **consistency**, a
 | 3 | Write-Through & Write-Behind | Keeping the cache in sync with writes |
 | 4 | Cache Invalidation & TTL | Eviction policies, TTL strategies, keeping data fresh |
 | 5 | Cache Stampede & Hot Keys | Thundering herd prevention, hot key mitigation |
+| 6 | Advanced Patterns | Negative caching, soft/hard TTL, cache warming, read-through wrapper |
 
 ## Prerequisites
 
@@ -30,7 +31,7 @@ But caching also introduces new challenges: **invalidation**, **consistency**, a
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/caching
+cd 01-foundations/caching
 
 # Start PostgreSQL + Redis + Visualization Tools
 docker-compose up -d
