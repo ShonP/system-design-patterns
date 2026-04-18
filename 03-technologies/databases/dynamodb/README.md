@@ -16,6 +16,7 @@ In this lab you'll work with **DynamoDB Local** — an offline version of Dynamo
 | 2 | Secondary Indexes (GSI & LSI) | Querying by non-key attributes, GSI vs LSI trade-offs |
 | 3 | Single-Table Design | Modeling multiple entities in one table, access-pattern-driven design |
 | 4 | DynamoDB Streams and CDC | Change Data Capture, reacting to data changes in real time |
+| 5 | Capacity, TTL, Transactions & Hot Partitions | On-demand vs provisioned, TTL, conditional writes, transactions, write sharding, DAX |
 
 ## Prerequisites
 
@@ -27,18 +28,17 @@ In this lab you'll work with **DynamoDB Local** — an offline version of Dynamo
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/dynamodb
+cd 03-technologies/databases/dynamodb
 
 # Start DynamoDB Local + Admin GUI
 docker-compose up -d
 
-# Install dependencies
+# Install dependencies (creates .venv managed by uv)
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=dynamodb --display-name="DynamoDB (Python)"
-
-# Open the first notebook and start learning!
+# Open any notebook in VS Code.
+# When prompted, select the `.venv` kernel in the kernel picker (top-right).
+# If it doesn't appear, reload the window: Cmd+Shift+P → "Reload Window".
 ```
 
 ## 🔍 Visualization Tools (Included in Docker)
@@ -72,6 +72,17 @@ uv run python -m ipykernel install --user --name=dynamodb --display-name="Dynamo
 - **DAX** — in-memory cache for microsecond read latency
 - **Global Tables** — multi-region replication
 - **Transactions** — ACID operations across up to 100 items
+- **TTL (Time To Live)** — auto-delete items at a specified timestamp (free, no writes)
+- **Conditional Writes** — atomic "compare-and-set" for optimistic concurrency control
+
+### Capacity Modes
+- **On-demand** — pay per request, auto-scales instantly (good default for unpredictable traffic)
+- **Provisioned** — you set RCU/WCU, cheaper at steady high load, can throttle if exceeded
+
+### Hot Partitions & Write Sharding
+- Each physical partition is limited to **3,000 RCU / 1,000 WCU**
+- If one partition key gets all the traffic (e.g., `status = "active"`), you get throttled
+- Fix: **write sharding** — append a random suffix to the partition key (e.g., `active#7`)
 
 ### CAP Theorem Position
 - **Eventually consistent reads** (default) — lower latency, 0.5 RCU per 4KB
@@ -85,6 +96,10 @@ uv run python -m ipykernel install --user --name=dynamodb --display-name="Dynamo
 | E-commerce | Product catalog with GSI on category for browse pages |
 | Gaming | Player profiles with leaderboard GSI on score |
 | IoT | Device data partitioned by device_id, sorted by timestamp |
+| Session Store | User sessions with TTL to auto-expire after 24h (no cleanup job needed) |
+| Shopping Cart | Conditional write on `version` attribute prevents "lost update" when two tabs check out |
+| Bank Transfer | `TransactWriteItems` debits one account and credits another atomically |
+| Trending Feed | Write-sharded partition key (`trending#<0-9>`) spreads hot write traffic |
 
 ## License
 
