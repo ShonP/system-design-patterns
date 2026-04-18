@@ -1,0 +1,58 @@
+services:
+  origin:
+    build: ./origin
+    container_name: cdn-origin
+    hostname: origin
+    environment:
+      ORIGIN_DELAY_MS: "500"
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  edge1:
+    image: nginx:1.27-alpine
+    container_name: cdn-edge1
+    hostname: edge1
+    depends_on:
+      origin:
+        condition: service_healthy
+    ports:
+      - "8081:80"
+    volumes:
+      - ./edge/nginx.conf:/etc/nginx/nginx.conf:ro
+      - edge1_cache:/var/cache/nginx/edge
+      # Mount the "push" drop-zone. Files placed here appear as if
+      # someone uploaded them directly to the edge (simulating a push CDN).
+      - ./edge/edge1_pushed:/usr/share/nginx/pushed
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  edge2:
+    image: nginx:1.27-alpine
+    container_name: cdn-edge2
+    hostname: edge2
+    depends_on:
+      origin:
+        condition: service_healthy
+    ports:
+      - "8082:80"
+    volumes:
+      - ./edge/nginx.conf:/etc/nginx/nginx.conf:ro
+      - edge2_cache:/var/cache/nginx/edge
+      - ./edge/edge2_pushed:/usr/share/nginx/pushed
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  edge1_cache:
+  edge2_cache:

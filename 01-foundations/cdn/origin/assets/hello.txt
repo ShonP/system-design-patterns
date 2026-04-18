@@ -1,0 +1,3 @@
+Hello from the origin server in New York! 🗽
+This file is served with a 500ms artificial delay.
+Edges should cache it so users don't pay that cost every time.

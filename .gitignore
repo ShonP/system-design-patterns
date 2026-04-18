@@ -1,3 +1,5 @@
 .venv
 scraper
 .playwright-cli
+.venv/
+uv.lock
