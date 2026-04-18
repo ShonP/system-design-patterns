@@ -16,6 +16,7 @@ Originally built by Facebook for inbox search, Cassandra is now used by Discord,
 | 2 | Wide Rows and Clustering Columns | Clustering keys, sort order, wide rows, the Ticketmaster example |
 | 3 | Replication and Consistency Levels | Replication strategies, consistency levels (ONE, QUORUM, ALL), CAP trade-offs |
 | 4 | Compaction Strategies | LSM trees, memtables, SSTables, compaction strategies, tombstones |
+| 5 | LWT, TTL & Anti-Patterns | Lightweight transactions, TTL, counters, batches, secondary indexes, paging, production tuning |
 
 ## Prerequisites
 
@@ -89,6 +90,14 @@ Your Python code connects to `localhost:9042` (node1). The Cassandra driver auto
 - **Tunable Consistency** — choose between ONE, QUORUM, ALL per query
 - **Eventual Consistency** — all replicas converge given enough time
 - **CAP Theorem** — Cassandra favors Availability and Partition tolerance (AP)
+- **Lightweight Transactions (LWT)** — Paxos-based compare-and-set for true uniqueness
+- **TTL** — rows can auto-expire after a fixed number of seconds
+
+### Anti-Patterns to Avoid
+- `ALLOW FILTERING` in production code paths
+- Large multi-partition `BATCH` statements
+- Secondary indexes on high-traffic columns (build a second table instead)
+- Unbounded partition growth — always bucket partitions that can grow forever
 
 ## Real-World Examples
 
