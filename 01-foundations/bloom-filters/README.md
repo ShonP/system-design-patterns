@@ -14,7 +14,7 @@
 - Bit arrays and multiple hash functions
 - False positives vs false negatives (and why the latter is impossible)
 - Tradeoff: memory vs false-positive rate, sizing formulas for `m` and `k`
-- Counting / scalable bloom filters (briefly)
+- Counting bloom filters (support deletion) and scalable bloom filters (grow on demand)
 - Use cases: cache/DB load shielding, set membership, crawler dedup
 
 ## Setup
@@ -35,6 +35,7 @@ There are no external services — everything runs in-process in Python.
 - [`notebooks/01_what_is_a_bloom_filter.ipynb`](./notebooks/01_what_is_a_bloom_filter.ipynb) — build intuition with the *"have I seen this URL before?"* problem. Compare a list, a set, and a bloom filter implemented from scratch.
 - [`notebooks/02_false_positive_rates_and_sizing.ipynb`](./notebooks/02_false_positive_rates_and_sizing.ipynb) — the formulas for optimal `m` (bits) and `k` (hashes) given target FPR and expected `n`, verified with a Monte Carlo experiment and a plot.
 - [`notebooks/03_applications_cache_and_db.ipynb`](./notebooks/03_applications_cache_and_db.ipynb) — use a bloom filter to shield a slow simulated database from wasted lookups; measure the latency speedup.
+- [`notebooks/04_counting_and_scalable.ipynb`](./notebooks/04_counting_and_scalable.ipynb) — two classic variants: a **counting** bloom filter that supports `remove()` (demonstrating a real false-negative bug in naive deletion first), and a **scalable** bloom filter that grows automatically when you don't know `n` upfront.
 
 ## References
 
