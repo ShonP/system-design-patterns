@@ -22,10 +22,13 @@ if [ ! -s "/var/lib/postgresql/data/PG_VERSION" ]; then
     -Fp -Xs -P -R \
     -S replica_slot
 
-  # Ensure correct permissions
+  # The data directory must be owned by the postgres user and have 0700
+  # permissions, otherwise PostgreSQL refuses to start.
+  chown -R postgres:postgres /var/lib/postgresql/data
   chmod 0700 /var/lib/postgresql/data
   echo "✅ Base backup complete. Starting replica..."
 fi
 
-# Start PostgreSQL in standby (read-only) mode
-exec postgres -c hot_standby=on
+# PostgreSQL refuses to run as root, so we drop to the postgres user.
+# `gosu` is shipped with the official postgres image for exactly this.
+exec gosu postgres postgres -c hot_standby=on
