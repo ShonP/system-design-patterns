@@ -12,10 +12,10 @@ This lab gives you hands-on experience with the key networking concepts that com
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | DNS and Load Balancing | DNS resolution, nginx reverse proxy, round-robin / least-conn / IP-hash / weighted algorithms, health checks, L4 vs L7 |
+| 1 | DNS and Load Balancing | DNS resolution, nginx reverse proxy, round-robin / least-conn / IP-hash / weighted algorithms, health checks, L4 vs L7, forward vs reverse proxy |
 | 2 | TCP vs UDP Deep Dive | TCP 3-way handshake, reliable delivery, UDP connectionless messaging, performance comparison, connection overhead |
-| 3 | HTTP/2 and gRPC | HTTP/1.1 head-of-line blocking, HTTP/2 multiplexing, Protocol Buffers, building a gRPC service, REST vs gRPC |
-| 4 | TLS and mTLS | TLS handshake, certificates, certificate chains, HTTPS connections, mutual TLS for microservices, performance impact |
+| 3 | HTTP/2 and gRPC | HTTP/1.1 head-of-line blocking, HTTP/2 multiplexing, Protocol Buffers, building a gRPC service, REST vs gRPC, HTTP/3 + QUIC |
+| 4 | TLS and mTLS | TLS handshake, certificates, certificate chains, HTTPS connections, mutual TLS for microservices, TLS termination, performance impact |
 
 ## Prerequisites
 
