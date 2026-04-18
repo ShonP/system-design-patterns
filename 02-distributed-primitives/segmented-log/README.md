@@ -26,7 +26,8 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 ## Notebooks
 
 - [`notebooks/01_single_file_log.ipynb`](./notebooks/01_single_file_log.ipynb) — the BAD design: a single ever-growing log file. Watch deletions become O(n).
-- [`notebooks/02_segmented_log.ipynb`](./notebooks/02_segmented_log.ipynb) — split into segments, roll on size, drop old data with a single `unlink`.
+- [`notebooks/02_segmented_log.ipynb`](./notebooks/02_segmented_log.ipynb) — BETTER: split into segments, roll on size, drop old data with a single `unlink`, read across segments.
+- [`notebooks/03_sparse_index_and_recovery.ipynb`](./notebooks/03_sparse_index_and_recovery.ipynb) — BEST: add a sparse index for fast offset lookup, and recover from a crash that left a torn write at the tail.
 
 ## References
 
