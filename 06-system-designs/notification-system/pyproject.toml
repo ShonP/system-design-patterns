@@ -1,0 +1,9 @@
+[project]
+name = "notification-system"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.28.0",
+    "pydantic>=2.0",
+]

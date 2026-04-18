@@ -1,24 +1,34 @@
 # Netflix
 
-> Part of `06-system-designs/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of the `06-system-designs/` series. Includes runnable notebooks and references.
 
 ## Overview
 
-Video streaming at global scale — ingest, encode, CDN, recommendations.
+Global video streaming: CDN-heavy architecture, encoding pipeline, recommendations.
 
 ## Concepts covered
 
-- Functional & non-functional requirements
-- High-level architecture
-- Data model and storage
-- Scaling bottlenecks and tradeoffs
+- Back-of-envelope numbers for a streaming service
+- Origin vs CDN responsibilities
+- HLS / DASH manifests + ABR
+- Parallel encoding pipeline
+- Item-based collaborative filtering
+- Precomputed recs cache
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 06-system-designs/netflix
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: Encoding, Recs, CDN math
 
 ## References
 
