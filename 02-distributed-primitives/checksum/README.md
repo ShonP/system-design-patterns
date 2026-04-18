@@ -13,11 +13,19 @@
 - ETag and HTTP conditional requests
 - End-to-end integrity
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/checksum
+uv sync
+```
 
-- `notebooks/01_checksum_comparison.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_no_checksum.ipynb`](./notebooks/01_no_checksum.ipynb) — silent corruption when bytes are trusted blindly.
+- [`notebooks/02_checksums_compared.ipynb`](./notebooks/02_checksums_compared.ipynb) — CRC32 vs MD5 vs SHA-256 — detection, performance, when to use each.
 
 ## References
 

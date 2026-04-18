@@ -13,11 +13,19 @@
 - Last-write-wins vs vector-clock merge
 - Anti-entropy repair
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/read-repair
+uv sync
+```
 
-- `notebooks/01_read_repair_walkthrough.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_stale_replica.ipynb`](./notebooks/01_stale_replica.ipynb) — trusting the first response returns stale data when one replica is behind.
+- [`notebooks/02_read_repair.ipynb`](./notebooks/02_read_repair.ipynb) — query several, return the freshest, and repair stale replicas inline. Compared with anti-entropy.
 
 ## References
 

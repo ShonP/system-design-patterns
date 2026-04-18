@@ -13,11 +13,18 @@
 - Strict vs sloppy quorum
 - Consistency/availability trade-offs
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/quorum
+uv sync
+```
 
-- `notebooks/01_quorum_tradeoffs.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_quorum_basics.ipynb`](./notebooks/01_quorum_basics.ipynb) — implement W/R quorums, see why W+R>N gives strong consistency, and watch eventual consistency surface stale reads.
 
 ## References
 

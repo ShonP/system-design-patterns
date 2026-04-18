@@ -13,11 +13,19 @@
 - Hint log
 - Hint TTL
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/hinted-handoff
+uv sync
+```
 
-- `notebooks/01_hinted_handoff_simulation.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_writes_lost_when_node_down.ipynb`](./notebooks/01_writes_lost_when_node_down.ipynb) — forward-and-forget loses every write a downed replica missed.
+- [`notebooks/02_hinted_handoff.ipynb`](./notebooks/02_hinted_handoff.ipynb) — coordinator queues hints and replays them when the replica recovers.
 
 ## References
 
