@@ -1,23 +1,32 @@
 # Heartbeat
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
 - Implement heartbeat-based liveness detection.
-- Reason about missed-heartbeat thresholds vs false-positive rates.
+- Reason about the false-positive vs detection-delay trade-off of fixed timeouts.
+- Replace the hard threshold with a smooth, adaptive **phi accrual** suspicion score.
 
 ## Concepts covered
 
 - Heartbeat interval & timeout
-- Push vs pull heartbeats
-- Heartbeat vs lease
+- False positives vs detection delay
+- Phi accrual failure detector (Hayashibara) — used by Cassandra, Akka
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/heartbeat
+uv sync
+```
 
-- `notebooks/01_heartbeat_liveness.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook).
+
+## Notebooks
+
+- [`notebooks/01_fixed_heartbeat.ipynb`](./notebooks/01_fixed_heartbeat.ipynb) — fixed-interval heartbeat with a hard timeout; sweep timeouts to feel the trade-off.
+- [`notebooks/02_phi_accrual.ipynb`](./notebooks/02_phi_accrual.ipynb) — phi accrual detector that learns the network's cadence; plot suspicion over time.
 
 ## References
 

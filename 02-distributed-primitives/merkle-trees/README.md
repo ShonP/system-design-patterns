@@ -1,24 +1,32 @@
 # Merkle Trees
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
-- Build a merkle tree over a key range and identify differences between two replicas.
-- Understand the link to anti-entropy and why Dynamo/Cassandra use it.
+- Build a Merkle tree from scratch and feel why one bit changes the root.
+- Detect data differences between two replicas with `O(K log N)` traffic.
+- Understand why anti-entropy systems (Cassandra, DynamoDB, Git) reach for Merkle.
 
 ## Concepts covered
 
-- Hash trees
-- Anti-entropy
-- Efficient range reconciliation
+- Hash trees and root hashes
+- Anti-entropy / replica reconciliation
+- Comparing full-scan vs Merkle-tree diffing
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/merkle-trees
+uv sync
+```
 
-- `notebooks/01_build_a_merkle_tree.ipynb`
-- `notebooks/02_replica_diff_via_merkle.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook).
+
+## Notebooks
+
+- [`notebooks/01_build_a_merkle_tree.ipynb`](./notebooks/01_build_a_merkle_tree.ipynb) — build a Merkle tree with `hashlib`; show one bit-flip moves the root.
+- [`notebooks/02_replica_diff.ipynb`](./notebooks/02_replica_diff.ipynb) — full scan vs per-key hashes vs Merkle diff on two near-identical replicas; measure bytes sent.
 
 ## References
 
