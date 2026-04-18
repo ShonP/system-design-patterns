@@ -15,9 +15,9 @@
 
 | # | Notebook | What you'll learn |
 |---|----------|-------------------|
-| 1 | [`01_leader_follower_basics.ipynb`](./notebooks/01_leader_follower_basics.ipynb) | What replication is, why it matters, and a real Postgres 16 primary + streaming replica running in Docker. Write to the primary, read from both, inspect `pg_stat_replication`. |
-| 2 | [`02_sync_vs_async_replication.ipynb`](./notebooks/02_sync_vs_async_replication.ipynb) | Pure-Python simulation of sync / semi-sync / async replication. Feel the stale-read problem and measure the latency and durability tradeoffs. |
-| 3 | [`03_quorum_reads_writes.ipynb`](./notebooks/03_quorum_reads_writes.ipynb) | N/W/R quorum model (Dynamo / Cassandra style). Simulate a 3-node leaderless cluster and show empirically that `W + R > N` guarantees reading the latest write. |
+| 1 | [`01_leader_follower_basics.ipynb`](./notebooks/01_leader_follower_basics.ipynb) | What replication is, why it matters, and a real Postgres 16 primary + streaming replica running in Docker. Write to the primary, read from both, inspect `pg_stat_replication`, watch lag grow under load, and learn about failover and split-brain. |
+| 2 | [`02_sync_vs_async_replication.ipynb`](./notebooks/02_sync_vs_async_replication.ipynb) | Pure-Python simulation of sync / semi-sync / async replication. Feel the stale-read problem, measure latency and durability tradeoffs, and implement the **read-your-own-writes** pattern as an explicit bad-practice → best-practice fix. |
+| 3 | [`03_quorum_reads_writes.ipynb`](./notebooks/03_quorum_reads_writes.ipynb) | N/W/R quorum model (Dynamo / Cassandra style). Simulate a 3-node leaderless cluster, prove `W + R > N` empirically, see last-write-wins lose data on concurrent writes, and add **read repair** in a few lines. |
 
 ## Prerequisites
 
@@ -81,11 +81,18 @@ docker compose down -v   # -v also removes the Postgres data volumes
 - **Semi-synchronous replication** — primary waits for *at least one* replica.
   Pragmatic default for production.
 - **Replication lag** — the time window where replicas don't yet have the latest
-  write.
+  write. Notebook 1 measures it live under load.
+- **Failover & split-brain** — how a replica is promoted, what gets lost, and why
+  fencing matters.
+- **Read-your-own-writes consistency** — the most common UX bug caused by async
+  replication, and a sticky-router fix (notebook 2).
 - **Leaderless / quorum replication** — no designated writer; a write is "done" when
   **W** of **N** replicas ack, and a read is "done" when **R** of **N** answer.
 - **The quorum rule**: if `W + R > N`, reads are guaranteed to overlap with the
   latest successful write.
+- **Last-write-wins & read repair** — how Dynamo-style systems resolve concurrent
+  writes and self-heal stale replicas (notebook 3).
+- **Multi-leader replication** — a brief tour of when and why teams reach for it.
 
 ## References
 
