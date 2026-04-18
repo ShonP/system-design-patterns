@@ -17,14 +17,36 @@
 - Health checks: liveness vs readiness
 - Load balancer vs API gateway vs reverse proxy
 
-## Planned notebooks
+## Notebooks in this series
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+| # | Notebook | What you'll learn |
+|---|----------|-------------------|
+| 1 | [`01_intro_and_round_robin.ipynb`](./notebooks/01_intro_and_round_robin.ipynb) | What a load balancer is, why one server is a bottleneck, and how round robin fixes it |
+| 2 | [`02_algorithms_compared.ipynb`](./notebooks/02_algorithms_compared.ipynb) | Round robin vs. weighted round robin vs. least-connections vs. random, compared on an uneven workload |
+| 3 | [`03_health_checks_and_sticky_sessions.ipynb`](./notebooks/03_health_checks_and_sticky_sessions.ipynb) | Liveness vs. readiness checks, draining an unhealthy backend, and the trade-offs of sticky sessions |
 
-- `notebooks/01_intro_round_robin_vs_least_conn.ipynb`
-- `notebooks/02_layer4_vs_layer7.ipynb`
-- `notebooks/03_sticky_sessions_tradeoffs.ipynb`
-- `notebooks/04_liveness_vs_readiness.ipynb`
+Each notebook is pure Python — backends are simulated in-process, so there is no Docker or external infrastructure to set up for this lab.
+
+## Setup
+
+```bash
+# From the repo root
+cd 01-foundations/load-balancing
+
+# Install Python dependencies into a local .venv
+uv sync
+```
+
+### Kernel selection (VS Code)
+
+1. Open any notebook under `notebooks/`.
+2. Click the **kernel picker** at the top-right of the notebook.
+3. Choose the `.venv` interpreter for this folder.
+
+If the `.venv` kernel doesn't appear:
+
+- Open the command palette: `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux).
+- Run **"Developer: Reload Window"** and try again.
 
 ## References
 
