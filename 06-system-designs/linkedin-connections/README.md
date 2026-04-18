@@ -1,24 +1,32 @@
-# Linkedin Connections
+# LinkedIn Connections
 
-> Part of `06-system-designs/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `06-system-designs/`. Runnable notebooks + references.
 
 ## Overview
 
-People-you-may-know / connections graph at scale.
+Social graph: connections, people-you-may-know, graph traversal.
 
 ## Concepts covered
 
-- Functional & non-functional requirements
-- High-level architecture
-- Data model and storage
-- Scaling bottlenecks and tradeoffs
+- Graph storage patterns
+- BFS for degrees of separation
+- People-you-may-know via 2nd-degree overlap
+- Hot-user fan-out problem
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 06-system-designs/linkedin-connections
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive (runnable code)
 
 ## References
 
