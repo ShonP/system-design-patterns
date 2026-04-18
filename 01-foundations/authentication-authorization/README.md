@@ -12,9 +12,13 @@
 ## Concepts covered
 
 - AuthN vs AuthZ
-- Password hashing: plain → SHA-256 → bcrypt with cost factor
-- Sessions vs JWTs; revocation; expiry
+- Password hashing: plain → SHA-256 → salted SHA-256 → bcrypt with cost factor
+  - live dictionary-crack demo, pepper, constant-time compare, Argon2/scrypt
+- Sessions vs JWTs; revocation via deny-list; expiry; tamper-proofing
+  - cookie flags (HttpOnly/Secure/SameSite), `alg:none` footgun, HS256 vs RS256
 - OAuth 2.0 Authorization Code flow with two tiny FastAPI apps
+  - `state` (CSRF), redirect-URI allow-list, scopes, access/refresh tokens
+  - PKCE and OpenID Connect (id_token) explained
 
 ## Setup
 
