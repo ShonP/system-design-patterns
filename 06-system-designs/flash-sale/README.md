@@ -1,24 +1,33 @@
 # Flash Sale
 
-> Part of `06-system-designs/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of the `06-system-designs/` series. Includes runnable notebooks and references.
 
 ## Overview
 
-Ecommerce flash-sale — bursty traffic, inventory hot-keys, fairness.
+Handling a short window of massive concurrency without overselling.
 
 ## Concepts covered
 
-- Functional & non-functional requirements
-- High-level architecture
-- Data model and storage
-- Scaling bottlenecks and tradeoffs
+- Waiting-room pattern at the edge
+- Token-bucket rate limiting
+- Atomic stock reservation via Redis / Lua
+- Bounded admission queue for backpressure
+- Reserve-now-pay-later flow
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 06-system-designs/flash-sale
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: Atomic stock, rate limit, admission queue
 
 ## References
 

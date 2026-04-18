@@ -1,24 +1,32 @@
 # Gmail
 
-> Part of `06-system-designs/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of the `06-system-designs/` series. Includes runnable notebooks and references.
 
 ## Overview
 
-Webmail at scale — storage, search, delivery, spam.
+Web email at scale: SMTP/IMAP, mailbox storage, threading, and full-text search.
 
 ## Concepts covered
 
-- Functional & non-functional requirements
-- High-level architecture
-- Data model and storage
-- Scaling bottlenecks and tradeoffs
+- SMTP send/receive protocol
+- Message / thread / label data model
+- Per-user inverted search index
+- Hot/warm/cold storage tiers
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 06-system-designs/gmail
+uv sync
+```
 
-- `notebooks/01_introduction.ipynb`
-- `notebooks/02_worked_example.ipynb`
+Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: SMTP, Search, Storage tiers
 
 ## References
 
