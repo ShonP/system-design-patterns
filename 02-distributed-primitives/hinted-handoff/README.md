@@ -1,17 +1,21 @@
 # Hinted Handoff
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. A hands-on walkthrough of how distributed databases (Cassandra, DynamoDB, Riak, ScyllaDB) keep writes from being lost when a replica is briefly unreachable.
 
 ## Learning objectives
 
-- Explain how writes survive brief node outages via hints on other nodes.
-- Reason about hint expiry and the risk of data loss.
+- Explain, in plain English, how writes survive brief node outages via hints stored on the coordinator.
+- Implement a tiny coordinator with a per-target hint queue and last-write-wins timestamps.
+- Reason about hint TTL, coordinator crashes, sloppy quorum, and when anti-entropy repair is still required.
 
 ## Concepts covered
 
 - Temporary replica substitution
-- Hint log
-- Hint TTL
+- Hint log (per-target FIFO, timestamped)
+- Hint TTL / expiry window
+- Coordinator crash as a single point of failure for hints
+- Sloppy quorum vs strict quorum
+- Relationship with read-repair and Merkle-tree anti-entropy repair
 
 ## Setup
 
@@ -24,8 +28,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_writes_lost_when_node_down.ipynb`](./notebooks/01_writes_lost_when_node_down.ipynb) — forward-and-forget loses every write a downed replica missed.
-- [`notebooks/02_hinted_handoff.ipynb`](./notebooks/02_hinted_handoff.ipynb) — coordinator queues hints and replays them when the replica recovers.
+- [`notebooks/01_writes_lost_when_node_down.ipynb`](./notebooks/01_writes_lost_when_node_down.ipynb) — the **bad** baseline: forward-and-forget silently loses every write a downed replica missed.
+- [`notebooks/02_hinted_handoff.ipynb`](./notebooks/02_hinted_handoff.ipynb) — the **good** version: coordinator queues hints and replays them in timestamp order when the replica recovers. Includes a last-write-wins edge case.
+- [`notebooks/03_limits_and_sloppy_quorum.ipynb`](./notebooks/03_limits_and_sloppy_quorum.ipynb) — **limits** of hinted handoff: hint TTL, coordinator crashes, sloppy quorum (Dynamo-style), and when you still need anti-entropy repair.
 
 ## References
 
