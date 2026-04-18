@@ -1,23 +1,32 @@
 # Vector Clocks
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
-- Construct vector clocks for a small set of processes and detect concurrent updates.
+- Implement Lamport clocks and see why they lose information about concurrency.
+- Implement vector clocks and detect concurrent updates.
 - Explain how Dynamo-style systems use vector clocks to surface conflicts.
 
 ## Concepts covered
 
-- Lamport clocks vs vector clocks
 - Happens-before relation
-- Conflict detection
+- Lamport clocks vs vector clocks
+- Concurrency detection and conflict surfacing
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/vector-clocks
+uv sync
+```
 
-- `notebooks/01_vector_clock_walkthrough.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook).
+
+## Notebooks
+
+- [`notebooks/01_lamport_clocks.ipynb`](./notebooks/01_lamport_clocks.ipynb) — Lamport's scalar clock and where it falls short.
+- [`notebooks/02_vector_clocks.ipynb`](./notebooks/02_vector_clocks.ipynb) — vector clocks: full causal order and concurrency detection.
 
 ## References
 

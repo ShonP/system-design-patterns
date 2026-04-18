@@ -1,23 +1,31 @@
 # Gossip Protocol
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
 - Simulate an epidemic-style gossip protocol and observe convergence time.
-- Know where gossip is used in real systems (Cassandra, DynamoDB, Consul).
+- Understand why gossip scales as `O(log N)` rounds regardless of cluster size.
+- Know where gossip is used in real systems (Cassandra, DynamoDB, Consul, Serf).
 
 ## Concepts covered
 
-- Epidemic broadcast
-- Anti-entropy
-- Convergence and fan-out
+- Epidemic / push gossip
+- Fanout vs convergence time
+- Anti-entropy and membership dissemination
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/gossip-protocol
+uv sync
+```
 
-- `notebooks/01_gossip_convergence_simulation.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook).
+
+## Notebooks
+
+- [`notebooks/01_what_is_gossip.ipynb`](./notebooks/01_what_is_gossip.ipynb) — central broadcast vs gossip; convergence S-curve and fanout sweep.
 
 ## References
 

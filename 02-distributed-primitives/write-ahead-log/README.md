@@ -1,26 +1,33 @@
 # Write-Ahead Log (WAL)
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
 - Explain why a WAL is the foundation of crash-safe durability.
-- Implement a minimal append-only log with fsync and replay after crash.
-- Understand the ordering property: log entry persisted before state change.
+- Implement a minimal append-only log with `fsync` and replay after crash.
+- Compare a WAL-based store with a snapshot-only store under simulated crashes.
 
 ## Concepts covered
 
 - Append-only log
-- fsync & durability
+- `fsync` and durability
 - Crash recovery via replay
-- WAL vs redo/undo log
+- WAL vs whole-file snapshot
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 02-distributed-primitives/write-ahead-log
+uv sync
+```
 
-- `notebooks/01_build_a_minimal_wal.ipynb`
-- `notebooks/02_crash_and_replay.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). Reload the window if it doesn't appear: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_what_is_a_wal.ipynb`](./notebooks/01_what_is_a_wal.ipynb) — bad/better/best for a tiny key-value store: in-memory → snapshot file → WAL with replay.
+- [`notebooks/02_crash_and_recovery.ipynb`](./notebooks/02_crash_and_recovery.ipynb) — actually crash a child process with `SIGKILL` and see how much each store loses.
 
 ## References
 
