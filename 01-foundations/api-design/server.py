@@ -12,15 +12,38 @@ from typing import Optional
 
 import psycopg2
 import psycopg2.extras
-from fastapi import FastAPI, HTTPException, Query, Request, Header
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+
+# Deprecation headers attached to every /v1/* response. These follow the
+# IETF "Deprecation" and "Sunset" HTTP header conventions — clients can
+# detect them and warn developers to migrate.
+V1_DEPRECATION_HEADERS = {
+    "Deprecation": "true",
+    "Sunset": "Wed, 01 Jan 2025 00:00:00 GMT",
+    "Link": '</v2/events>; rel="successor-version"',
+}
 
 # ---------------------------------------------------------------------------
 # App setup
 # ---------------------------------------------------------------------------
 
 app = FastAPI(title="Event Ticketing API", version="2.0.0")
+
+
+@app.middleware("http")
+async def attach_v1_deprecation_headers(request: Request, call_next):
+    """Tag every response from /v1/* with standard deprecation headers.
+
+    Well-designed HTTP clients read these and log a migration warning
+    instead of surprising developers when V1 is eventually retired.
+    """
+    response = await call_next(request)
+    if request.url.path.startswith("/v1/"):
+        for k, v in V1_DEPRECATION_HEADERS.items():
+            response.headers[k] = v
+    return response
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql://demo:demo@localhost:5432/api_design_demo"
@@ -78,19 +101,25 @@ def check_rate_limit(client_id: str) -> tuple[bool, dict]:
     # prune old entries
     hits[:] = [t for t in hits if t > window_start]
     remaining = RATE_LIMIT - len(hits)
+    reset_ts = int(window_start + RATE_WINDOW)
 
     if remaining <= 0:
+        # Retry-After is the standard IETF header (RFC 6585). Seconds until
+        # the client is allowed to retry.  It is the one header well-behaved
+        # HTTP clients (and proxies) already know how to respect.
+        retry_after = max(1, reset_ts - int(now))
         return False, {
             "X-RateLimit-Limit": str(RATE_LIMIT),
             "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": str(int(window_start + RATE_WINDOW)),
+            "X-RateLimit-Reset": str(reset_ts),
+            "Retry-After": str(retry_after),
         }
 
     hits.append(now)
     return True, {
         "X-RateLimit-Limit": str(RATE_LIMIT),
         "X-RateLimit-Remaining": str(remaining - 1),
-        "X-RateLimit-Reset": str(int(window_start + RATE_WINDOW)),
+        "X-RateLimit-Reset": str(reset_ts),
     }
 
 
@@ -100,8 +129,18 @@ def check_rate_limit(client_id: str) -> tuple[bool, dict]:
 
 @app.get("/limited/events")
 def list_events_rate_limited(request: Request):
-    """Same as GET /events but with rate limiting enforced."""
-    client_id = request.client.host if request.client else "unknown"
+    """Same as GET /events but with rate limiting enforced.
+
+    If the caller sends an ``X-API-Key`` header, the limiter counts per API
+    key (so two different keys from the same IP each get their own quota).
+    Otherwise it falls back to the client IP — which is what most public APIs
+    do for anonymous traffic.
+    """
+    api_key = request.headers.get("x-api-key")
+    if api_key:
+        client_id = f"key:{api_key}"
+    else:
+        client_id = f"ip:{request.client.host}" if request.client else "ip:unknown"
     allowed, headers = check_rate_limit(client_id)
     if not allowed:
         return JSONResponse(

@@ -81,11 +81,13 @@ uv run python -m ipykernel install --user --name=api-design --display-name="API 
 ### Rate Limiting
 - Protects your API from abuse and overload
 - Fixed-window algorithm (simplest approach)
-- Standard headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+- Standard `Retry-After` header (RFC 6585) plus vendor `X-RateLimit-*` headers
+- Per-client quotas via `X-API-Key` (so shared IPs don't get collectively punished)
 
 ### API Versioning
 - **URL versioning** (`/v1/events` vs `/v2/events`) — explicit and easy to understand
 - Backward compatibility — old clients keep working on v1
+- Standard `Deprecation` / `Sunset` / `Link: rel="successor-version"` response headers
 - Migration path — gradual rollout of breaking changes
 
 ## Real-World Examples
