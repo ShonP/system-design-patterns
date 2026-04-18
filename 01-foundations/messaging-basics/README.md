@@ -1,30 +1,44 @@
 # Messaging Basics
 
-> Part of `01-foundations/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `01-foundations/`. Pure-Python notebooks (1 and 2) plus an optional Redis demo (notebook 3) using Docker Compose.
 
 ## Learning objectives
 
-- Distinguish point-to-point queues from pub/sub topics and from brokered service buses.
+- Distinguish point-to-point queues from pub/sub topics.
 - Define at-most-once, at-least-once, exactly-once delivery semantics and which are practically achievable.
-- Reason about message ordering guarantees and why partition keys matter.
-- Compare synchronous request/response with asynchronous messaging.
+- Use idempotent consumers and dead-letter queues to make at-least-once safe.
+- Use Redis Pub/Sub and feel its fire-and-forget limitations.
 
 ## Concepts covered
 
-- Queues vs pub/sub vs service bus
-- Delivery semantics: at-most/at-least/exactly-once
-- Idempotent producers/consumers; de-duplication keys
-- Message ordering and partition keys
-- Sync vs async communication patterns
+- Queues vs pub/sub
+- Delivery semantics: at-most-/at-least-/exactly-once
+- Idempotent consumers; dedup keys
+- Dead letter queues
+- Redis Pub/Sub (and what it is **not**)
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 01-foundations/messaging-basics
+uv sync
+```
 
-- `notebooks/01_queue_vs_pubsub.ipynb`
-- `notebooks/02_delivery_semantics_demo.ipynb`
-- `notebooks/03_idempotent_consumers.ipynb`
-- `notebooks/04_partition_keys_and_ordering.ipynb`
+For notebook 3 you also need Redis:
+
+```bash
+docker compose up -d
+```
+
+Stop it with `docker compose down` when done.
+
+Open any notebook in VS Code and select the `.venv` kernel from the kernel picker (top-right of the notebook). If the kernel doesn't show up, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+## Notebooks
+
+- [`notebooks/01_queue_vs_pubsub.ipynb`](./notebooks/01_queue_vs_pubsub.ipynb) — build a queue (point-to-point) and a pub/sub bus from scratch with Python's stdlib.
+- [`notebooks/02_delivery_semantics.ipynb`](./notebooks/02_delivery_semantics.ipynb) — at-most/at-least/exactly-once with a flaky simulated broker, plus a dead letter queue.
+- [`notebooks/03_redis_pubsub.ipynb`](./notebooks/03_redis_pubsub.ipynb) — same idea over the network using Redis Pub/Sub; observe its fire-and-forget nature.
 
 ## References
 

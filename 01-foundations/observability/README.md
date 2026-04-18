@@ -1,30 +1,37 @@
-# Observability (Metrics, Logs, Traces)
+# Observability (Logs, Metrics, Traces)
 
-> Part of `01-foundations/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `01-foundations/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
 - Tell monitoring apart from observability.
-- Explain the three pillars — metrics, logs, traces — and how OpenTelemetry unifies them.
+- Explain the three pillars — metrics, logs, traces — and when to reach for each.
 - Define SLI, SLO, SLA and how an error budget guides release decisions.
-- Understand graceful degradation and the role of feature flags in keeping a system available.
+- Build a tiny in-memory metrics collector with counters, gauges, and histograms.
 
 ## Concepts covered
 
-- Metrics, logs, traces, spans
-- OpenTelemetry overview
-- SLI vs SLO vs SLA; error budgets
-- Graceful degradation and feature flags
-- Alerting on symptoms, not causes
+- Logs (structured, request-scoped) vs metrics (aggregate) vs traces (request flow)
+- SLI, SLO, SLA, error budgets
+- Counters, gauges, histograms; p50 / p95 / p99
+- Mini-Prometheus implementation
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+```bash
+cd 01-foundations/observability
+uv sync
+```
 
-- `notebooks/01_three_pillars_of_observability.ipynb`
-- `notebooks/02_sli_slo_sla.ipynb`
-- `notebooks/03_error_budget_and_release_decisions.ipynb`
-- `notebooks/04_graceful_degradation_with_feature_flags.ipynb`
+Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+There are no external services — everything runs in-process.
+
+## Notebooks
+
+- [`notebooks/01_logs_metrics_traces.ipynb`](./notebooks/01_logs_metrics_traces.ipynb) — generate logs, metrics, and traces with stdlib only; learn when to use each.
+- [`notebooks/02_sli_slo_sla.ipynb`](./notebooks/02_sli_slo_sla.ipynb) — compute an SLI from raw requests; track an error budget over 30 simulated days.
+- [`notebooks/03_metrics_collector.ipynb`](./notebooks/03_metrics_collector.ipynb) — build a mini-Prometheus registry and plot a latency histogram.
 
 ## References
 

@@ -1,0 +1,8 @@
+# Redis is used by notebook 03 (Redis pub/sub demo).
+# Start it with:  docker compose up -d
+# Stop with:      docker compose down
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

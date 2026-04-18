@@ -1,31 +1,39 @@
 # Authentication & Authorization
 
-> Part of `01-foundations/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `01-foundations/`. Uses FastAPI for the OAuth demo — runs in-process via the test client, so **no Docker required**.
 
 ## Learning objectives
 
 - Tell authentication from authorization and name canonical mechanisms for each.
 - Compare server-stored sessions vs JWTs (trade-offs on revocation, size, statelessness).
 - Explain OAuth 2.0 roles and flows at a conceptual level, plus where JWT fits in.
-- Understand mTLS and when service-to-service auth needs it.
+- Understand why password storage requires *slow*, *salted* hashing (bcrypt).
 
 ## Concepts covered
 
 - AuthN vs AuthZ
-- Sessions vs JWTs; refresh tokens; logout/revocation
-- OAuth 2.0 core flows (at a high level)
-- TLS vs mTLS
-- Secrets management (env vars, KMS, Vault)
-- Encryption at rest vs in transit
+- Password hashing: plain → SHA-256 → bcrypt with cost factor
+- Sessions vs JWTs; revocation; expiry
+- OAuth 2.0 Authorization Code flow with two tiny FastAPI apps
 
-## Planned notebooks
+## Setup
 
-> These are planned; files do not yet exist. Following the repo convention, each will be added as a separate numbered notebook (`NN_*.ipynb`) without renumbering earlier ones.
+This lab is managed with [`uv`](https://docs.astral.sh/uv/) and uses its own `.venv`.
 
-- `notebooks/01_authn_vs_authz.ipynb`
-- `notebooks/02_sessions_vs_jwt.ipynb`
-- `notebooks/03_oauth_flow_sketch.ipynb`
-- `notebooks/04_mtls_service_to_service.ipynb`
+```bash
+cd 01-foundations/authentication-authorization
+uv sync
+```
+
+Then open any notebook in VS Code and select the `.venv` kernel from the kernel picker (top-right of the notebook). If the kernel doesn't show up, reload the window: `Cmd+Shift+P` → **Reload Window**.
+
+There are no external services — everything runs in-process in Python.
+
+## Notebooks
+
+- [`notebooks/01_password_hashing.ipynb`](./notebooks/01_password_hashing.ipynb) — bad/better/best for storing passwords: plain text → SHA-256 → bcrypt with salt and cost factor.
+- [`notebooks/02_sessions_vs_jwt.ipynb`](./notebooks/02_sessions_vs_jwt.ipynb) — server-side sessions vs JWTs. See revocation, expiry, and tampering in action.
+- [`notebooks/03_oauth_flow_demo.ipynb`](./notebooks/03_oauth_flow_demo.ipynb) — full OAuth 2.0 Authorization Code flow simulated with two FastAPI apps.
 
 ## References
 
