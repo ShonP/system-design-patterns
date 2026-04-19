@@ -46,7 +46,7 @@ In this lab you'll implement the key pieces yourself — uploading multi-gigabyt
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/dropbox
+cd 06-system-designs/dropbox
 
 # Start PostgreSQL + MinIO + Redis + Visualization Tools
 docker-compose up -d
