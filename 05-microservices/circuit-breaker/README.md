@@ -9,8 +9,12 @@ Fail fast when a downstream dependency is unhealthy.
 ## Concepts covered
 
 - Closed, open, half-open states
-- Thresholds and reset timers
-- Fallbacks
+- Thresholds, cool-down timers, rolling failure windows
+- Thread-safe state transitions
+- Fallbacks (cache / default / degraded UX)
+- Combining with retry and backoff (and why order matters)
+- Observability: metrics on state transitions
+- Production libraries (pybreaker, Resilience4j, Polly, gobreaker, Istio)
 
 ## Setup
 
@@ -23,8 +27,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- CLOSED / OPEN / HALF_OPEN state machine
-- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Cascading failure prevention -- measured
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — bad → best progression: no breaker, naive counter, classic CLOSED/OPEN/HALF_OPEN, windowed + thread-safe
+- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) — cascading failure under load (with latency metrics) + fallback demo
+- [`notebooks/03_real_world_patterns.ipynb`](./notebooks/03_real_world_patterns.ipynb) — retry + breaker ordering, observability, production libraries
 
 ## References
 
