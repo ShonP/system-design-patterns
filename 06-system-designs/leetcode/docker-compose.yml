@@ -40,8 +40,10 @@ services:
     tmpfs:
       - /tmp:size=64m
     mem_limit: 256m
+    memswap_limit: 256m             # no swap — makes the memory cap a HARD limit
     cpus: 0.5
     network_mode: "none"            # no network access
+    pids_limit: 128                 # cap process count to block fork bombs
     security_opt:
       - no-new-privileges:true
 
