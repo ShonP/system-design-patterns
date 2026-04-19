@@ -14,3 +14,18 @@ New content is **added**, never destructively replaced.
   - `notebooks/02_data_and_api.ipynb`
   - `notebooks/03_deep_dive.ipynb`
 - Updated `README.md` with setup + notebook links.
+
+## 2026-04-19 (expanded content)
+- Rewrote all 3 notebooks with beginner-friendly explanations and clear
+  **bad → better → best** progressions:
+  - `01` — added runnable capacity math (QPS, storage, availability rows),
+    booking sequence diagram, clearer service rationale.
+  - `02` — added SQLite availability-table demo (DB-enforced uniqueness vs.
+    naive in-memory range scan), richer Pydantic models with validators,
+    idempotency-key demo.
+  - `03` — added four deep dives with runnable code: double-booking race
+    (no-lock → mutex → DB unique constraint), geo search (linear scan →
+    grid index → S2/H3 discussion), cache-aside with single-flight anti-
+    stampede, token-bucket rate limiter. Plus a "real-world echoes"
+    section and exploration ideas.
+- All cells execute cleanly under `uv run jupyter nbconvert --execute`.
