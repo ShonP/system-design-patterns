@@ -23,8 +23,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Sidecar pattern: cross-cutting concerns out of the app
-- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Sidecar as its own process via a local HTTP hop
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — Sidecar pattern: cross-cutting concerns out of the app (bad → better progression)
+- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) — Sidecar as its own process over a localhost HTTP hop
+- [`notebooks/03_real_world_patterns.ipynb`](./notebooks/03_real_world_patterns.ipynb) — Retry proxy, log-forwarder, config-refresher, plus trade-offs
 
 ## References
 

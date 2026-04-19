@@ -9,3 +9,8 @@ New content is **added**, never destructively replaced.
 
 ## 2026-04-18
 - Added `pyproject.toml` and notebooks: 01_introduction.ipynb, 02_worked_example.ipynb.
+
+## 2026-04-19
+- QA pass on notebooks 01 and 02: clarified in-process middleware vs out-of-process sidecar, added "when not to use" guidance, key-properties table, and ASCII topology diagram.
+- Made notebook 02 rerun-safe (idempotent server start via `ThreadingHTTPServer`), added timeout + 502 on upstream failure, explained the 127.0.0.1 bind as a bypass-prevention mechanism.
+- Added `notebooks/03_real_world_patterns.ipynb`: retry-proxy sidecar with exponential backoff + jitter, log-forwarder sidecar (tail-and-ship), config-refresher sidecar with atomic writes, real-world sidecar inventory (Envoy, linkerd-proxy, Fluent Bit, Vault Agent, OTel Collector), and trade-offs (ambient mesh, startup ordering).
