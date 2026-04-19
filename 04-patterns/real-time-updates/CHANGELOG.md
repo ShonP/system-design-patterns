@@ -3,6 +3,22 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-04-19 (evening QA pass)
+- **Re-verified** all 8 notebooks execute end-to-end against the five
+  `servers/*.py` processes + existing Redis — 0 errors.
+- **New content — Notebook 05 "🔐 Authentication & Authorization":**
+  covers the four real patterns (query-string token, token-in-first-message,
+  `Sec-WebSocket-Protocol` subprotocol, cookies) with a runnable demo
+  against the lab's existing server showing both an accepted and a
+  rejected client. Closes the biggest beginner gap in the WebSocket
+  lesson — "how do I know who's on the other side?".
+- **New content — Notebook 04 "🚧 Backpressure":** explains why an
+  unbounded `asyncio.Queue` per subscriber (what `sse_server.py` uses
+  for clarity) breaks in production when clients are slow, and shows
+  the three standard mitigations (bounded queue, drop-on-full,
+  disconnect-slow-client). Reinforces the "transport ≠ durability"
+  lesson introduced in Notebook 07.
+
 ## 2026-04-19 (follow-up QA pass)
 - **Re-verified** all 8 notebooks execute end-to-end against the running
   `servers/*.py` + existing Redis container — every cell completes with 0
