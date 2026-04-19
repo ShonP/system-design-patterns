@@ -9,3 +9,8 @@ dependencies = [
     "ipykernel>=6.29.0",
     "tqdm>=4.66.0",
 ]
+
+[dependency-groups]
+dev = [
+    "nbconvert>=7.17.1",
+]

@@ -38,7 +38,12 @@ Large files don't belong in databases or flowing through your API servers. A 2GB
 | 03 | Resumable Uploads | Multipart uploads, chunk tracking |
 | 04 | State Sync | Metadata management, event notifications |
 | 05 | Download Optimization | Range requests, parallel downloads |
-| 06 | Security & Abuse | Content validation, quarantine pattern |
+| 06 | Security & Abuse | Quarantine pattern, rate limits, magic-byte validation |
+
+Notebook 3 also shows how to **clean up abandoned multipart uploads** (parts
+that would otherwise silently accumulate and cost you money), and notebook 6
+includes a **magic-byte content check** that catches files whose claimed MIME
+type doesn't match their real contents.
 
 ## Decision Flowchart
 
