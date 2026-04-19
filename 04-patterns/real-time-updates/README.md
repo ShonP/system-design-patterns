@@ -80,14 +80,22 @@ cd 04-patterns/real-time-updates
 # Start the required services (Redis + RedisInsight)
 docker-compose up -d
 
-# Install Python dependencies (using uv)
+# Install Python dependencies into a local .venv (using uv)
 uv sync
 
-# Or create a virtual environment first
-uv sync
-
-# Start with the first notebook!
+# Open any notebook in VS Code, then:
+#   1. Click the kernel picker (top-right of the notebook)
+#   2. Choose the .venv we just created (Python 3.x .venv/bin/python)
+#   3. If the .venv doesn't appear, reload the VS Code window:
+#      Cmd+Shift+P → "Developer: Reload Window"
+#
+# Start with notebooks/01_networking_fundamentals.ipynb
 ```
+
+### Port already in use (6379)?
+If another lab is already running a Redis container on port 6379, the
+existing container will work for this lab — you can skip `docker compose up`
+and just confirm Redis answers `PING`.
 
 ## 🔍 Visualization Tools (Included in Docker)
 

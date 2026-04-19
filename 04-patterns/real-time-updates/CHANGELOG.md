@@ -3,6 +3,25 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-04-19 (follow-up QA pass)
+- **Re-verified** all 8 notebooks execute end-to-end against the running
+  `servers/*.py` + existing Redis container — every cell completes with 0
+  errors.
+- **docker-compose.yml:** removed the obsolete top-level `version: '3.8'` —
+  Docker Compose v2 warns about it on every invocation.
+- **README Quick Start:** added explicit instructions for (a) picking the
+  `.venv` kernel in VS Code, (b) reloading the window if it doesn't appear,
+  and (c) what to do when another lab is already using port 6379.
+- **New content — Notebook 01 "In Production: TLS, `https://`, `wss://`":**
+  beginners routinely ship `ws://` to a `https://` site and get blocked by
+  the browser; this new section spells out the plain-vs-encrypted twins and
+  the L7 load balancer implications.
+- **New content — Notebook 07 "Synthesis: Transport ≠ Durability":** the
+  series already showed SSE replay (NB 4) and webhook idempotency (NB 8) in
+  isolation, but never stated the cross-cutting lesson. New table pairs
+  every transport with the recovery strategy ("snapshot + stream") you need
+  to bolt on for guaranteed delivery across disconnects.
+
 ## 2026-04-19 (pm QA pass)
 - **Full notebook re-run:** executed all 8 notebooks end-to-end against the
   running `servers/*.py` + Redis; every cell completes with 0 errors.
