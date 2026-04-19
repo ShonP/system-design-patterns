@@ -111,7 +111,9 @@ CREATE TABLE short_urls (
 -- Materialized view for product ratings (will create later in notebooks)
 -- CREATE MATERIALIZED VIEW product_ratings AS ...
 
--- Generate sample users (100 for demo, in real scenario we'd have 100k+)
+-- Generate sample users
+-- We use 20,000 so sequential scans in the "without index" demos are
+-- slow enough to clearly see the difference after adding indexes.
 INSERT INTO users (email, username, display_name, bio, follower_count, following_count, post_count)
 SELECT 
     'user' || i || '@example.com',
@@ -121,26 +123,26 @@ SELECT
     floor(random() * 10000)::int,
     floor(random() * 500)::int,
     floor(random() * 100)::int
-FROM generate_series(1, 100) AS i;
+FROM generate_series(1, 20000) AS i;
 
--- Generate sample posts
+-- Generate sample posts (~50k to make feed/join queries meaningful)
 INSERT INTO posts (user_id, content, like_count, comment_count, created_at)
 SELECT 
-    (floor(random() * 100) + 1)::int,
+    (floor(random() * 20000) + 1)::int,
     'Post content ' || i || '. This is a sample post with some text.',
     floor(random() * 1000)::int,
     floor(random() * 50)::int,
     NOW() - (random() * interval '30 days')
-FROM generate_series(1, 1000) AS i;
+FROM generate_series(1, 50000) AS i;
 
 -- Generate sample comments
 INSERT INTO comments (post_id, user_id, content, created_at)
 SELECT 
-    (floor(random() * 1000) + 1)::int,
-    (floor(random() * 100) + 1)::int,
+    (floor(random() * 50000) + 1)::int,
+    (floor(random() * 20000) + 1)::int,
     'Comment ' || i,
     NOW() - (random() * interval '30 days')
-FROM generate_series(1, 5000) AS i;
+FROM generate_series(1, 30000) AS i;
 
 -- Generate sample products
 INSERT INTO products (name, description, price, category, brand, stock_quantity, rating_sum, rating_count, view_count)
@@ -154,18 +156,18 @@ SELECT
     floor(random() * 500)::int,
     floor(random() * 100 + 1)::int,
     floor(random() * 100000)::int
-FROM generate_series(1, 500) AS i;
+FROM generate_series(1, 5000) AS i;
 
 -- Generate sample reviews
 INSERT INTO reviews (product_id, user_id, rating, title, content, created_at)
 SELECT 
-    (floor(random() * 500) + 1)::int,
-    (floor(random() * 100) + 1)::int,
+    (floor(random() * 5000) + 1)::int,
+    (floor(random() * 20000) + 1)::int,
     floor(random() * 5 + 1)::int,
     'Review title ' || i,
     'Review content ' || i,
     NOW() - (random() * interval '90 days')
-FROM generate_series(1, 2000) AS i;
+FROM generate_series(1, 20000) AS i;
 
 -- Generate sample short URLs
 INSERT INTO short_urls (short_code, original_url, click_count, created_at)
@@ -174,14 +176,14 @@ SELECT
     'https://example.com/very/long/url/path/' || i,
     floor(random() * 1000000)::int,
     NOW() - (random() * interval '365 days')
-FROM generate_series(1, 100) AS i;
+FROM generate_series(1, 1000) AS i;
 
 -- Generate followers
 INSERT INTO followers (follower_id, following_id)
 SELECT DISTINCT
-    (floor(random() * 100) + 1)::int,
-    (floor(random() * 100) + 1)::int
-FROM generate_series(1, 500) AS i
+    (floor(random() * 20000) + 1)::int,
+    (floor(random() * 20000) + 1)::int
+FROM generate_series(1, 10000) AS i
 ON CONFLICT DO NOTHING;
 
 -- Table to track cache performance metrics

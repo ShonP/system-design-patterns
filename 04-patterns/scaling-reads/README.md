@@ -68,18 +68,16 @@ As reads increase, your database will struggle under the load. This isn't a soft
 
 ```bash
 # Navigate to the pattern directory
-cd patterns/scaling-reads
+cd 04-patterns/scaling-reads
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=scaling-reads --display-name="Scaling Reads (Python)"
-
-# Start with the first notebook!
+# Open a notebook in VS Code and select the `.venv` kernel from the top-right kernel picker.
+# If the kernel doesn't appear, reload the VS Code window (Cmd+Shift+P → "Developer: Reload Window").
 ```
 
 ## 🔍 Visualization Tools (Included in Docker)
