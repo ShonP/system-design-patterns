@@ -8,10 +8,14 @@ Distributed KV store: partitioning, replication, tunable consistency.
 
 ## Concepts covered
 
-- Consistent hashing with virtual nodes
-- Replication factor N with tunable W/R
-- CAP tradeoff framing
-- Merkle-tree anti-entropy
+- Naive `hash % N` vs consistent hashing (with runnable comparison)
+- Virtual nodes and load balance
+- Replication factor N with tunable W/R quorums
+- CAP tradeoff framing, with a quorum simulator
+- Versioning: silent data loss → last-write-wins → vector clocks with siblings
+- Storage engine sketch: WAL + memtable + SSTables (toy LSM-tree)
+- Anti-entropy via Merkle trees (runnable diff)
+- Hinted handoff and read repair
 
 ## Setup
 
