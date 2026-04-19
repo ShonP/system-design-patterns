@@ -1,0 +1,598 @@
+{
+    "labs": {
+        "01-foundations/api-design": {
+            "reviewed": true,
+            "notes": "Fixed NB4 bug, added bad->good examples, idempotency, 422, Retry-After, per-key rate limit, Deprecation headers demos. +390/-6 lines. All 4 notebooks execute cleanly."
+        },
+        "01-foundations/authentication-authorization": {
+            "reviewed": true,
+            "notes": "NB1: Added SHA-256 dictionary-crack demo, salt demo, pepper note, Argon2/scrypt mention. NB2: Fixed tamper demo timing bug, added deny-list revocation, cookie flags note, signed-not-encrypted clarification. NB3: Added state/CSRF, redirect URI validation, scopes, refresh tokens, PKCE appendix, OIDC note. All 3 notebooks execute cleanly. +482/-3 lines."
+        },
+        "01-foundations/bloom-filters": {
+            "reviewed": true,
+            "notes": "Added NB4: counting bloom filter (supports remove) and scalable bloom filter (grows on demand) with deterministic false-negative demo. Enhanced NB2 with optimal-k visualization plot. Updated README and CHANGELOG. All 4 notebooks execute cleanly. +414/-1 lines."
+        },
+        "01-foundations/caching": {
+            "reviewed": true,
+            "notes": "Added NB6: advanced caching patterns (negative caching, soft TTL/stale-while-revalidate, read-through wrapper, cache warming, cache observability metrics). Fixed README path (core-concepts\u219201-foundations). All 6 notebooks execute cleanly. +484/-2 lines."
+        },
+        "01-foundations/cap-theorem": {
+            "reviewed": true,
+            "notes": "Fixed replica bootstrap script (gosu for postgres user). Added PACELC theorem, Dynamo vs Spanner comparison, connection timeout handling. All 3 notebooks execute cleanly. +1170/-115 lines."
+        },
+        "01-foundations/cdn": {
+            "reviewed": true,
+            "notes": "Fixed docker-compose bind-mount for stale-content demo, fixed origin 304 conditional GET (proper ETag quoting + skip sleep on 304). Added NB4: real-world pitfalls (cache stampede with locking, stale-while-revalidate, Vary header, Cache-Control directives, auth caching pitfall). Updated README and CHANGELOG. All 4 notebooks execute cleanly. +408/-20 lines."
+        },
+        "01-foundations/consistent-hashing": {
+            "reviewed": true,
+            "notes": "Added NB4: replication on the ring (RF=3, failure survival), weighted nodes via vnodes, rendezvous hashing (HRW) with ring comparison, hot keys/bounded loads note. Updated README. All 4 notebooks execute cleanly. +474/-0 lines."
+        },
+        "01-foundations/data-modeling": {
+            "reviewed": true,
+            "notes": "Added referential actions (CASCADE/RESTRICT/SET NULL), composite indexes with left-prefix rule and EXPLAIN ANALYZE demo, 1:1 via UNIQUE FK, ER diagram in README, access-pattern-driven modeling callout. Fixed path refs (core-concepts\u219201-foundations). All 4 notebooks execute cleanly. +318/-1 lines."
+        },
+        "01-foundations/id-generation": {
+            "reviewed": true,
+            "notes": "All 3 existing notebooks verified clean. Added NB4: production patterns (worker-ID strategies via env/hostname/k8s/coordinator, Snowflake decoding, NanoID for short URLs, DB storage comparison). Added NanoID to NB2 cheat sheet. Updated README + CHANGELOG. All 4 notebooks execute cleanly. +320/-3 lines."
+        },
+        "01-foundations/load-balancing": {
+            "reviewed": true,
+            "notes": "NB1: Added L4 vs L7 explainer. NB2: Fixed fake P95 metric with real per-request latency tracking (avg+P95+P99), added Power-of-Two-Choices (weighted by active/capacity). NB3: Switched to deterministic hashlib hashing for sticky sessions. Added NB4: consistent hashing (naive modulo vs ring, virtual nodes, migration comparison). Updated README and CHANGELOG. All 4 notebooks execute cleanly. +612/-2 lines."
+        },
+        "01-foundations/messaging-basics": {
+            "reviewed": true,
+            "notes": "NB1: Added direct-sync-call bad-practice intro, thread-safe PubSub, backpressure demo with bounded queue, ordering caveat. NB2: Added idempotency-key dedup storage note, transactional outbox pattern (markdown). NB3: Added Redis Streams section (replay via XREAD, consumer groups via XREADGROUP/XACK, XPENDING/XCLAIM for recovery), updated recap. README and CHANGELOG updated. All 3 notebooks execute cleanly. +438/-10 lines."
+        },
+        "01-foundations/networking-essentials": {
+            "reviewed": true,
+            "notes": "Fixed HTTP/2 nginx config (missing http2 directive), fixed TLS overhead benchmark (was showing negative due to session reuse), hardened DNS lookup cells with retry logic, added HTTP/3+QUIC section, forward/reverse proxy demos, TLS-termination content. Updated README. All 4 notebooks execute cleanly. +392/-3 lines."
+        },
+        "01-foundations/numbers-to-know": {
+            "reviewed": true,
+            "notes": "Fixed matplotlib backend (agg\u2192inline) in NB1 to render plots properly, removed save-then-delete PNG dance. Added tail latency P99/P999 section in NB1. Added fleet sizing real-world example in NB2. Added cache hit ratio impact analysis in NB3. Fixed README path (core-concepts\u219201-foundations). All 3 notebooks execute cleanly. +314/-1 lines."
+        },
+        "01-foundations/observability": {
+            "reviewed": true,
+            "notes": "NB1: Added bad\u2192good logging, trace_id correlation. NB2: Added vanity vs user-visible SLIs, RED/USE methods, burn-rate alerting. NB3: Added labels, cardinality explosion, Prometheus histogram buckets. NB4: New capstone\u2014debugging an outage end-to-end. All 4 notebooks execute cleanly. +867/-7 lines."
+        },
+        "01-foundations/replication": {
+            "reviewed": true,
+            "notes": "Added replication lag measurement, failover simulation, read-your-writes consistency, and read-repair content across all 3 notebooks. Seeded RNG in NB3 for deterministic output. Updated README and CHANGELOG. All 3 notebooks execute cleanly. +431/-7 lines."
+        },
+        "01-foundations/sharding": {
+            "reviewed": true,
+            "notes": "Fixed path refs (core-concepts\u219201-foundations). Added hot-key bucketing (celebrity problem with sub-sharding), geo-sharding (latency-based routing with fallback), dual-write migration pattern (shadow writes with consistency checker) across NB1/NB2/NB4. Updated README. All 4 notebooks execute cleanly. +351/-3 lines."
+        },
+        "02-distributed-primitives/checksum": {
+            "reviewed": true,
+            "notes": "Expanded NB1 with deeper 'why dangerous in distributed systems' section. NB2: added BLAKE2b, chunked streaming hashing (sha256 of 20MB file). Added NB3: ETag + HMAC patterns. Updated README and CHANGELOG. All 3 notebooks execute cleanly. +584/-7 lines."
+        },
+        "02-distributed-primitives/gossip-protocol": {
+            "reviewed": true,
+            "notes": "Expanded NB1 with message-count comparison, convergence math, message-loss resilience demo. Added NB2: push vs pull vs push-pull modes, failure detection with heartbeat counters/generation numbers, seed-node bootstrapping. Updated README and CHANGELOG. All 2 notebooks execute cleanly. +715/-3 lines."
+        },
+        "02-distributed-primitives/heartbeat": {
+            "reviewed": true,
+            "notes": "Fixed bug where last_seen=-inf caused dead_at=0.0 (detection_delay always None). Rewrote NB1 with proper bad\u2192good progression. Tuned NB2 phi-accrual blip scenario for consistent narrative (phi peak 6.93 < threshold 8). Added NB3: real-world patterns (gossip protocol heartbeats, Kubernetes liveness probes, lease-based detection). Updated README and CHANGELOG. All 3 notebooks execute cleanly. +623/-15 lines."
+        },
+        "02-distributed-primitives/high-water-mark": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with bank-and-branches analogy, clearer naive_replicate walkthrough, MongoDB w:1 parallel. Expanded NB2 with quorum tracking and matplotlib visualization. Added NB3: heartbeat propagation, follower truncation, real-world systems (Kafka, Raft, MongoDB). Updated README and CHANGELOG. All 3 notebooks execute cleanly. +528/-10 lines."
+        },
+        "02-distributed-primitives/hinted-handoff": {
+            "reviewed": true,
+            "notes": "Rewrote NB1+NB2 with mail-carrier analogy, clearer bad\u2192good progression, timestamped last-write-wins. Added NB3: TTL expiry, sloppy quorum, hint store capacity limits. Updated README and CHANGELOG. All 3 notebooks execute cleanly. +647/-8 lines."
+        },
+        "02-distributed-primitives/lease": {
+            "reviewed": true,
+            "notes": "Added NB3: leader-election with auto-renewal (TTL/3 renew thread), crash simulation, fencing tokens, matplotlib timeline visualization. All 3 notebooks execute cleanly. Updated README and CHANGELOG."
+        },
+        "02-distributed-primitives/merkle-trees": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with domain separation (0x00/0x01 prefixes), canonical leaf ordering, canonical serialization, ASCII tree visualization. Added NB2: inclusion proofs (bad=send all data vs best=log(n) proof path with direction bits, 1024-leaf demo). Rewrote NB3: replica diff with non-power-of-two padding fix, deterministic ordering. Updated README with real-world mapping (Bitcoin SPV, Certificate Transparency, IPFS DAGs, Git). All 3 notebooks execute cleanly. +501/-4 lines."
+        },
+        "02-distributed-primitives/phi-accrual-failure-detection": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with timeout tradeoff visualization (DOWN bands). Rewrote NB2 with cold-start guard, matplotlib phi timeline, threshold tuning section. Added NB3: real-world cluster monitoring (GC pauses vs crash, multi-node dashboard). Updated README and CHANGELOG. All 3 notebooks execute cleanly. +776/-23 lines."
+        },
+        "02-distributed-primitives/quorum": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with clear bad\u2192better\u2192best progression (stale-read fix). Added NB2: tuning and tradeoffs (R+W>N formula, latency vs consistency, read-heavy/write-heavy configs). Added NB3: sloppy quorum and read repair (hinted handoff, anti-entropy). Fixed Node hashability bug. Updated README and CHANGELOG. All 3 notebooks execute cleanly. +724/-9 lines."
+        },
+        "02-distributed-primitives/read-repair": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with quantitative stale-rate simulation and closest-replica-behind failure mode. NB2: layered read-one\u2192quorum\u2192blocking read-repair\u2192async repair\u2192probabilistic (Cassandra-style) with benchmarks. Added NB3: anti-entropy and hinted handoff (Merkle-tree diffing, hint store with TTL). Updated README and CHANGELOG. All 3 notebooks execute cleanly. +575/-3 lines."
+        },
+        "02-distributed-primitives/segmented-log": {
+            "reviewed": true,
+            "notes": "NB2: added read_all() cross-segment reader, real-world systems section (Kafka, Raft, WiredTiger). Added NB3: sparse in-memory index for O(log N) offset lookup + torn-write crash recovery with CRC32 validation. Updated README and CHANGELOG. All 3 notebooks execute cleanly. +329/-2 lines."
+        },
+        "02-distributed-primitives/split-brain-and-fencing": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with richer bank-balance split-brain failure narrative. NB2: in-memory vs durable fencing token progression, fixed misleading example, added fencing-vs-idempotency clarification. Added NB3: STONITH (IPMI) and resource fencing (NFS ACL) with comparison table. Updated README and CHANGELOG. All 3 notebooks execute cleanly. +627/-6 lines."
+        },
+        "02-distributed-primitives/vector-clocks": {
+            "reviewed": true,
+            "notes": "Rewrote NB1 with deterministic wall-clock bad baseline showing drift breaks causal ordering, added matplotlib space-time diagram. NB2: added add-only Dynamo shopping cart merge demo, LWW vs vector clock tradeoff note, concurrent-event visualization, prediction exercises. Updated README and CHANGELOG. All 2 notebooks execute cleanly. +488/-6 lines."
+        },
+        "02-distributed-primitives/write-ahead-log": {
+            "reviewed": true,
+            "notes": "NB1: Added torn-write demo showing partial line detection. Added NB3: checkpoints & log compaction (fsync snapshot, atomic rename, fsync dir, truncate log). Added NB4: fsync and group commit performance tradeoffs. Updated README and CHANGELOG. All 4 notebooks execute cleanly. +567/-2 lines."
+        },
+        "03-technologies/coordination/zookeeper": {
+            "reviewed": true,
+            "notes": "Added NB04 (Service Discovery: ephemeral children + ChildrenWatch, crash demo, Kafka/HBase/Solr refs) and NB05 (Sessions/Watches/When Not to Use ZK: CONNECTED/SUSPENDED/LOST lifecycle, one-shot watch rules, ZAB/quorum sizing, etcd/Consul alternatives). Enhanced NB02 with watch-predecessor cell (thundering herd avoidance). Enhanced NB03 with watches-are-re-read-signals gotcha. Fixed Kafka history accuracy. Updated README and CHANGELOG. +948/-3 lines. All 5 notebooks parse clean (not executed\u2014Docker-dependent)."
+        },
+        "03-technologies/databases/cassandra": {
+            "reviewed": true,
+            "notes": "Added NB5: LWT (IF NOT EXISTS, Paxos/SERIAL), TTL and tombstones, anti-patterns (secondary indexes, large partitions, logged batches, allow filtering). Added production notes to NB1 (SimpleStrategy warning) and NB2 (partition size limits). Updated README and CHANGELOG. All 5 notebooks parse and syntax-check cleanly. +235/-0 lines."
+        },
+        "03-technologies/databases/dynamodb": {
+            "reviewed": true,
+            "notes": "Added NB5: on-demand vs provisioned capacity, TTL, conditional writes (optimistic locking), TransactWriteItems, hot-partition write sharding, DAX caching. Fixed stale paths (deep-dives\u219203-technologies). Updated README with new notebook listing and missing concepts. All code cells pass syntax validation. +755/-6 lines."
+        },
+        "03-technologies/databases/elasticsearch": {
+            "reviewed": true,
+            "notes": "NB1: Added term vs match query section, search_after pagination. NB2: Added synonym analyzer example. NB3: Added cardinality aggregation. NB4: Fixed _shard agg bug, added aliases, index templates, ILM sections. Polished ES 8.x API patterns. Updated README and CHANGELOG. All 4 notebooks syntax-clean. +996/-4 lines."
+        },
+        "03-technologies/databases/postgres": {
+            "reviewed": true,
+            "notes": "Fixed connection overhead in benchmarks (persistent connections for timing). Restructured NB2 join demos (fixed row-explosion bug in LEFT JOIN + GROUP BY). Added BRIN index section to NB1 for time-series data. Fixed replica entrypoint script. All 4 notebooks execute cleanly. +361/-258 lines."
+        },
+        "03-technologies/databases/redis": {
+            "reviewed": true,
+            "notes": "Fixed NB4 master auto-detection (resilient to failover topology changes). Fixed stale paths (deep-dives/redis\u219203-technologies/databases/redis) in all notebooks. Fixed README notebook filenames and added NB5 listing. All 5 notebooks execute cleanly against live Docker stack. +33/-15 lines."
+        },
+        "03-technologies/databases/time-series-databases": {
+            "reviewed": true,
+            "notes": "Fixed stale deep-dives paths. Added NB1: COPY bulk ingestion bad\u2192best progression, cardinality-explosion demo. NB2: gap-filling (time_bucket_gapfill/locf), first()/last() accessors, LAG() change detection. NB3: native compression (segmentby/orderby), compression stats query. Updated README and CHANGELOG. +429/-4 lines."
+        },
+        "03-technologies/databases/vector-databases": {
+            "reviewed": true,
+            "notes": "Fixed path bug in README+3 notebooks (deep-dives\u219203-technologies). Added NB4: RAG & Re-Ranking (text\u2192vector via hashing trick, over-fetch+exact rerank, domain-aware rerank, full RAG pipeline). Added production notes to README (quantization, curse of dimensionality, monitoring, dedicated vs embedded). Updated CHANGELOG. All 4 notebooks syntax-check clean. +506/-6 lines."
+        },
+        "03-technologies/messaging/kafka": {
+            "reviewed": true,
+            "notes": "Fixed stale deep-dives/kafka paths in all notebooks and README. Fixed Zookeeper mention in NB1 (uses KRaft). Fixed NB4 recap table (NB3 description). Added NB5: Production Best Practices (schema validation, producer batching/compression, DLQ for poison messages, log retention & compaction, replication/ISR/min.insync.replicas, consumer lag monitoring) with bad\u2192best progression. All notebooks pass syntax validation. +526/-1 lines."
+        },
+        "03-technologies/workflow-engines/temporal": {
+            "reviewed": true,
+            "notes": "Fixed stale path refs (enterprise-patterns\u219203-technologies). Fixed RPCError\u2192WorkflowAlreadyStartedError in NB2. Added NB5: queries, heartbeats, and testing patterns. Updated README and CHANGELOG. +578/-3 lines. Docker not available so notebooks not execution-verified."
+        },
+        "04-patterns/dealing-with-contention": {
+            "reviewed": true,
+            "notes": "NB02: Added atomic single-statement UPDATE WHERE section with 50-user stress test. NB05: Added Redlock caveats and fencing token section, fixed RedisInsight host instruction. Fixed README path refs (patterns\u219204-patterns). All 5 notebooks execute cleanly. +231/-25 lines."
+        },
+        "04-patterns/idempotency": {
+            "reviewed": true,
+            "notes": "NB1: Added HTTP-method idempotency primer + flaky-network retry simulation. NB2: Added request-body fingerprint check (rejects key reuse with different body). NB3: Fixed uncommitted transaction bug in no-transaction demo. Added NB4: concurrent retries (threading race condition demo, DB locking solution). Updated README and CHANGELOG. All 4 notebooks execute cleanly. +700/-3 lines."
+        },
+        "04-patterns/large-blobs": {
+            "reviewed": true,
+            "notes": "Fixed NB05 Content-Length bug (presigned URLs signed for get_object). Added multipart upload cleanup (abort stale uploads) to NB03. Added magic-byte content validation to NB06. Updated README and CHANGELOG. All 6 notebooks execute cleanly. +203/-1 lines."
+        },
+        "04-patterns/long-running-tasks": {
+            "reviewed": true,
+            "notes": "Fixed NB5 DLQ bugs (poison_jobs UUID key, moved_at column ref, jsonb extras casting). Added setup/kernel cells to all 6 notebooks. Added real-world use case notes. Added progress reporting pattern to NB6 (webhook + SSE + polling). All 6 notebooks execute cleanly. +218/-12 lines."
+        },
+        "04-patterns/multi-step-processes": {
+            "reviewed": true,
+            "notes": "Fixed workflow.RetryPolicy bug in NB4+NB5 (correct: from temporalio.common import RetryPolicy). Added Saga pattern naming in NB2. Updated README with missing services (Redis, Adminer, RedisInsight). Updated CHANGELOG. NB1 verified clean. +26/-6 lines."
+        },
+        "04-patterns/outbox-and-cdc": {
+            "reviewed": true,
+            "notes": "All 4 notebooks execute cleanly. Kept pre-existing enhancements (dual-write with 3 bad attempts, transactional outbox with event_id/aggregate_id/partial index, rollback demo, idempotent consumer, retention, CDC via logical replication slots with peek-vs-get & slot-lag monitoring, gotchas notebook covering ordering, poison-message DLQ, schema evolution, at-least-once). Added Why-not-2PC aside to NB1 and refreshed README overview."
+        },
+        "04-patterns/rate-limiting-and-throttling": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "04-patterns/real-time-updates": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "04-patterns/resilience": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "04-patterns/scaling-reads": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "04-patterns/scaling-writes": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/api-gateway": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/bff": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/bulkhead": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/circuit-breaker": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/configuration-externalization": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/cqrs": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/event-driven-architecture": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/retry": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/saga": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/service-discovery": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/sidecar": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "05-microservices/strangler": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/ad-click-aggregator": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/airbnb": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/amazon-lambda": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/bitly": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/code-deployment": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/collaborative-whiteboard": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/discord": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/distributed-cache": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/distributed-lock-manager": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/dropbox": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/fb-live-comments": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/fb-news-feed": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/fb-post-search": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/flash-sale": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/gmail": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/google-calendar": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/google-docs": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/google-search": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/gopuff": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/instagram": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/job-scheduler": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/key-value-store": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/leetcode": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/linkedin-connections": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/metrics-monitoring": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/netflix": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/news-aggregator": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/notification-system": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/online-auction": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/payment-system": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/rate-limiter": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/reddit": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/reminder-alert": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/robinhood": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/s3": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/shopping-cart": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/stock-exchange": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/strava": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/ticketmaster": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/tinder": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/top-k": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/typeahead-autocomplete": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/uber": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/web-crawler": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/whatsapp": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/yelp": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "06-system-designs/youtube": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/airline-management": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/amazon-shopping": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/atm": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/blackjack": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/car-rental": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/chess": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/cricinfo": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/facebook": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/hotel-management": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/library-management": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/linkedin": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/movie-ticket-booking": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/online-stock-brokerage": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/oo-analysis-and-design": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/parking-lot": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/restaurant": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/stack-overflow": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "07-object-oriented-design/uml-basics": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "08-enterprise/azure-authentication": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "08-enterprise/bcdr": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "08-enterprise/gdpr-paired-regions": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "08-enterprise/privacy-review": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "08-enterprise/security-review": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/az-500/01-identity-and-access": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/az-500/02-networking": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/az-500/03-compute-storage-databases": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/az-500/04-defender-and-sentinel": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-100/01-best-practices": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-100/02-secops-identity-compliance": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-100/03-infrastructure": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-100/04-applications-and-data": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-200/01-build-a-siem": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-200/02-incident-response": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-200/03-threat-hunting": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-900/01-security-concepts": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-900/02-identity-and-entra": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-900/03-azure-security-solutions": {
+            "reviewed": false,
+            "notes": ""
+        },
+        "security-certs/sc-900/04-compliance-and-purview": {
+            "reviewed": false,
+            "notes": ""
+        }
+    },
+    "totalLabs": 148,
+    "reviewed": 46
+}
