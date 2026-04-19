@@ -18,6 +18,7 @@ This lab walks you through Kafka hands-on — from sending your first message to
 | 2 | Partitioning and Consumer Groups | Partition keys, parallel consumption, rebalancing, hot partitions |
 | 3 | Exactly-Once Semantics | Delivery guarantees, idempotent producers, transactional messaging |
 | 4 | Kafka Streams Intro | Real-time stream processing patterns: filtering, aggregation, windowing |
+| 5 | Production Best Practices | Bad → best progression: schema validation, batching & compression, DLQ, retention & compaction, replication, consumer lag |
 
 ## Prerequisites
 
@@ -29,7 +30,7 @@ This lab walks you through Kafka hands-on — from sending your first message to
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/kafka
+cd 03-technologies/messaging/kafka
 
 # Start Kafka + Kafka UI
 docker-compose up -d
