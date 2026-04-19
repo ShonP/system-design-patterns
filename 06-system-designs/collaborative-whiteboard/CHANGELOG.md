@@ -14,3 +14,10 @@ New content is **added**, never destructively replaced.
   - `notebooks/02_data_and_api.ipynb`
   - `notebooks/03_deep_dive.ipynb`
 - Updated `README.md` with setup + notebook links.
+
+## 2026-04-19 (review + expansion)
+- Expanded all three notebooks with beginner-friendly explanations and real-world references (Figma, Miro, Excalidraw, tldraw, Yjs, Automerge).
+- Notebook 1: added explicit **bad → better → best** architecture progression and a back-of-envelope table.
+- Notebook 2: added pydantic `ValidationError` demos (bad op kind, negative lamport, delete without shape_id via `model_validator`), a **bad vs good API** table, and expanded WebSocket message schema.
+- Notebook 3: added a **naive-divergence demo** contrasting with the LWW CRDT, an **offline-merge demo** (partitioned edits converge), a toy **pub/sub + WS gateway** simulation, a **snapshot + op log** example, a **presence TTL** example, and a CRDT-vs-OT note.
+- Verified every notebook runs end-to-end with `jupyter nbconvert --execute`.
