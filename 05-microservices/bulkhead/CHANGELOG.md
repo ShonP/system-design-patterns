@@ -21,3 +21,17 @@ New content is **added**, never destructively replaced.
     (Resilience4j, Polly, Envoy, Hystrix, k8s), exercises, and "when not to
     use" guidance.
   - Verified both notebooks execute end-to-end with `jupyter nbconvert --execute`.
+
+## 2026-04-19 (QA round 2)
+- `01_introduction.ipynb`: added a **modern asyncio bulkheads** section with a
+  runnable `asyncio.Semaphore` example (payments vs. catalog) — matches what
+  most FastAPI/aiohttp services actually need.
+- `02_worked_example.ipynb`:
+  - Removed executor leak in the "bad" and "good" demos (one shared caller
+    pool + proper `shutdown(wait=True)` instead of four throwaway executors).
+  - Added a comment clarifying that `Future.cancel()` cannot stop an
+    already-running thread — it only drops queued work — so pool bounding
+    matters even with timeouts.
+  - Added an **Observability** section with saturation + rejection metrics
+    you should export from every bulkhead.
+- Re-ran both notebooks end-to-end; outputs saved in place.
