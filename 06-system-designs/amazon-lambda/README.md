@@ -8,10 +8,16 @@ Serverless compute: cold start, container pooling, event triggers.
 
 ## Concepts covered
 
-- Function vs container vs VM
-- Cold vs warm starts
-- Container pooling & reuse
-- Event-source to invocation pipeline
+- Control plane vs data plane split
+- Back-of-envelope sizing (QPS, storage, cold-start bandwidth)
+- Function registration + immutable versioning with aliases
+- Metadata cache on invokers (avoids DB on the hot path)
+- Cold start vs warm start (runnable simulation)
+- Warm pool with TTL-based eviction
+- Concurrency limits per function and per account (throttling with 429)
+- Async invocation: queue + exponential backoff + DLQ
+- Power-of-two-choices scheduling
+- Provisioned concurrency & SnapStart / snapshot restore
 
 ## Setup
 
