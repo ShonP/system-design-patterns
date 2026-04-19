@@ -24,9 +24,10 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_retry_with_backoff.ipynb`](./notebooks/01_retry_with_backoff.ipynb) — naive → exponential → exponential + jitter (AWS recipe).
-- [`notebooks/02_circuit_breaker.ipynb`](./notebooks/02_circuit_breaker.ipynb) — CLOSED → OPEN → HALF_OPEN; fail-fast when downstream is dead.
-- [`notebooks/03_bulkhead.ipynb`](./notebooks/03_bulkhead.ipynb) — per-dependency thread pools so one slow caller can't starve everyone else.
+- [`notebooks/01_retry_with_backoff.ipynb`](./notebooks/01_retry_with_backoff.ipynb) — naive → exponential → exponential + jitter (AWS recipe), with a matplotlib visualization of the thundering-herd effect.
+- [`notebooks/02_circuit_breaker.ipynb`](./notebooks/02_circuit_breaker.ipynb) — CLOSED → OPEN → HALF_OPEN; fail-fast when downstream is dead, with a BAD "keep hammering" baseline for contrast.
+- [`notebooks/03_bulkhead.ipynb`](./notebooks/03_bulkhead.ipynb) — per-dependency thread pools (and an `asyncio.Semaphore` equivalent) so one slow caller can't starve everyone else.
+- [`notebooks/04_timeouts_and_graceful_degradation.ipynb`](./notebooks/04_timeouts_and_graceful_degradation.ipynb) — hard timeouts, fallback to defaults / stale cache, and feature-flag kill switches; ends with a diagram showing how all the patterns stack.
 
 ## References
 
