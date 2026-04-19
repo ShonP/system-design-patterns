@@ -16,3 +16,8 @@ New content is **added**, never destructively replaced.
 - `02_worked_example.ipynb`: added graceful-degradation scenario (fragile vs. resilient BFF), tiny TTL cache demo, and a side-by-side latency/robustness summary.
 - Added `03_bff_vs_gateway_and_pitfalls.ipynb`: BFF vs. API Gateway, pitfalls (duplicated business rules, BFFs calling each other, auth sprawl, BFF bloat), when NOT to use a BFF, and a review checklist.
 - All notebooks verified to execute end-to-end with only the Python standard library.
+- QA review round 2:
+  - `02_worked_example.ipynb`: added explicit **timeout budget** explainer (`total page budget = call budgets + spare`) to clarify the `timeout=1.0` used in the graceful-degradation example.
+  - `03_bff_vs_gateway_and_pitfalls.ipynb`: added pitfall #5 **"Invisible BFFs"** with a runnable correlation-ID / tracing demo, and a new **GraphQL-as-alternative** section contrasting when to pick BFF vs. GraphQL.
+  - Normalized notebook cell IDs to silence `MissingIDFieldWarning`.
+  - Re-verified all notebooks execute cleanly end-to-end.
