@@ -3,6 +3,18 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-04-19 (pm QA pass)
+- **Full notebook re-run:** executed all 8 notebooks end-to-end against the
+  running `servers/*.py` + Redis; every cell completes with 0 errors.
+- **Path fix:** README and notebooks 02–05 referenced the old
+  `patterns/real-time-updates/servers` path — corrected to
+  `04-patterns/real-time-updates/servers` to match the real tree.
+- **New content — WebSocket heartbeats:** added a "💓 Keeping Connections Alive"
+  section + runnable demo to `05_websockets.ipynb` that uses
+  `websockets.connect(ping_interval=..., ping_timeout=...)` and measures
+  round-trip time via `ws.ping()`. Closes a genuine gap — nothing in the lab
+  previously covered how to detect silently-dropped WebSocket connections.
+
 ## 2026-04-19
 - **QA pass:** recreated the uv-managed `.venv` (previous one had stale shebangs
   from a moved directory).

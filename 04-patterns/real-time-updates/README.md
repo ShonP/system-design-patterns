@@ -75,7 +75,7 @@ When systems require real-time updates, the solution requires two distinct piece
 
 ```bash
 # Navigate to the pattern directory
-cd patterns/real-time-updates
+cd 04-patterns/real-time-updates
 
 # Start the required services (Redis + RedisInsight)
 docker-compose up -d
