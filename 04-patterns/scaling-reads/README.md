@@ -33,8 +33,10 @@ As reads increase, your database will struggle under the load. This isn't a soft
 
 ### Part 2: Database Optimization
 - Indexing strategies (B-tree, Hash, Composite)
+- Covering indexes (`INCLUDE`) and partial indexes
 - Using EXPLAIN to analyze queries
 - Query optimization techniques
+- Connection pooling (in-process + PgBouncer)
 
 ### Part 3: Denormalization
 - Normalized vs denormalized schemas
@@ -52,9 +54,9 @@ As reads increase, your database will struggle under the load. This isn't a soft
 - Cache invalidation approaches
 
 ### Part 6: Advanced Cache Patterns
-- Cache stampede prevention
-- Hot key problem
-- Request coalescing
+- Cache stampede prevention (distributed lock + probabilistic early refresh)
+- Hot key problem (key fanout)
+- Request coalescing / single-flight
 - Cache versioning
 
 ## Prerequisites
