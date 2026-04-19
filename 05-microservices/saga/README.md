@@ -11,6 +11,7 @@ Multi-service transactions without 2PC.
 - Orchestration vs choreography
 - Compensating actions
 - Failure scenarios
+- Durable saga log and crash recovery
 
 ## Setup
 
@@ -26,6 +27,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 - [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Distributed transactions without 2PC
 - [`notebooks/02_choreography_vs_orchestration.ipynb`](./notebooks/02_choreography_vs_orchestration.ipynb) -- Two saga styles compared
 - [`notebooks/03_compensation_on_failure.ipynb`](./notebooks/03_compensation_on_failure.ipynb) -- Compensating actions when a step fails
+- [`notebooks/04_saga_log_and_recovery.ipynb`](./notebooks/04_saga_log_and_recovery.ipynb) -- Persisting saga state so it survives crashes
 
 ## References
 

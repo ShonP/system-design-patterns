@@ -16,3 +16,7 @@ New content is **added**, never destructively replaced.
   - `02_choreography_vs_orchestration.ipynb`: class-based orchestrator, richer event-bus choreography with failure + compensation, side-by-side trade-off table, real-world tool mapping.
   - `03_compensation_on_failure.ipynb`: idempotency, retry-before-compensate with exponential backoff, semantic compensation (apology email), pivot transaction / forward-only recovery, production checklist.
 - All notebooks executed end-to-end with `jupyter nbconvert --execute`.
+
+## 2026-04-19
+- Added `04_saga_log_and_recovery.ipynb`: shows why in-memory sagas lose state on crash, builds a SQLite-backed `DurableSaga` runner that persists `(saga_id, step, status)`, demonstrates crash-then-resume for both the forward path and mid-compensation, and maps the pattern to real engines (Temporal, Step Functions, Camunda, Conductor, Kafka+outbox).
+- Executed the new notebook end-to-end with `jupyter nbconvert --execute` and updated `README.md` accordingly.
