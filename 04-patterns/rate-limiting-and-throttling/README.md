@@ -13,12 +13,14 @@ Controlling request rates at the edge and between services.
 - HTTP `429 Too Many Requests` + `Retry-After` + `X-RateLimit-*` headers
 - Token bucket (burst-tolerant) — AWS / Stripe / NGINX
 - Leaky bucket (paced output) — traffic shaping
+- **GCRA** (Generic Cell Rate Algorithm) — one-timestamp leaky bucket (Redis `redis-cell`, Shopify)
 - Fixed vs sliding-window counter — the boundary-burst bug
 - Hybrid sliding-window counter (O(1)) — Cloudflare / Kong
-- Distributed limiters with a shared store (Redis-style)
+- Distributed limiters with a shared store (atomic check-then-add, Lua-style)
 - Client-side exponential backoff **with full jitter** (AWS pattern)
 - Concurrency limiting (in-flight cap with a semaphore) vs rate limiting
 - Cost/weight-based limits, fail-open vs fail-closed, picking the limit key (IPv4 NAT, IPv6 `/64`, `X-Forwarded-For`)
+- Observability — the metrics to emit so you can actually see the limiter working
 
 ## Setup
 
