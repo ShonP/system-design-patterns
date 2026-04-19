@@ -17,6 +17,8 @@ Controlling request rates at the edge and between services.
 - Hybrid sliding-window counter (O(1)) — Cloudflare / Kong
 - Distributed limiters with a shared store (Redis-style)
 - Client-side exponential backoff **with full jitter** (AWS pattern)
+- Concurrency limiting (in-flight cap with a semaphore) vs rate limiting
+- Cost/weight-based limits, fail-open vs fail-closed, picking the limit key (IPv4 NAT, IPv6 `/64`, `X-Forwarded-For`)
 
 ## Setup
 
@@ -36,6 +38,7 @@ Each notebook shows a **bad first try**, then a **better version**, with plots s
 - [`notebooks/02_leaky_bucket.ipynb`](./notebooks/02_leaky_bucket.ipynb) — paces traffic to a constant tempo; side-by-side plot vs token bucket.
 - [`notebooks/03_sliding_window.ipynb`](./notebooks/03_sliding_window.ipynb) — fixed-window boundary burst vs sliding-window log vs O(1) hybrid counter.
 - [`notebooks/04_distributed_and_backoff.ipynb`](./notebooks/04_distributed_and_backoff.ipynb) — Redis-style shared counter across servers + client-side exponential backoff with full jitter.
+- [`notebooks/05_concurrency_and_practice.ipynb`](./notebooks/05_concurrency_and_practice.ipynb) — in-flight concurrency caps (semaphore), cost-based limits, where to enforce (edge / gateway / service), fail-open vs fail-closed, choosing the limit key.
 
 ## References
 

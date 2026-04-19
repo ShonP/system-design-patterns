@@ -4,6 +4,7 @@ All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
 ## 2026-04-19
+- QA review: verified all notebooks execute cleanly end-to-end; added `05_concurrency_and_practice.ipynb` covering concurrency limits (semaphore), cost-based limits, where to enforce (edge / gateway / service), fail-open vs fail-closed, and how to choose the limit key (IPv4 NAT, IPv6 `/64`, `X-Forwarded-For` traps).
 - QA pass: added `00_intro.ipynb` (why rate limit, 429 / Retry-After headers) and `04_distributed_and_backoff.ipynb` (Redis-style shared counter, client-side exponential backoff with full jitter).
 - Rewrote `01`, `02`, `03` to follow bad → best progression and added matplotlib visualizations (allowed/denied timelines, token-vs-leaky pacing, fixed-vs-sliding boundary burst).
 - Added per-key token bucket example and O(1) sliding-window-counter (Cloudflare-style hybrid).
