@@ -1,17 +1,21 @@
 # Outbox And Cdc
 
-> Part of `04-patterns/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `04-patterns/`. Four runnable notebooks that walk from a broken dual-write handler to a production-shaped outbox + CDC pipeline.
 
 ## Overview
 
-Reliably publishing events from an OLTP database.
+Reliably publishing events from an OLTP database: when a service has to update a row *and* publish a message, how do you keep the two in sync across crashes and network blips?
 
 ## Concepts covered
 
-- Transactional outbox
-- Change Data Capture (CDC)
-- Log-based vs query-based CDC
-- Ordering and deduplication
+- The dual-write problem (DB + message bus without a shared transaction)
+- Transactional outbox (atomic DB write + event)
+- Polling publisher with `FOR UPDATE SKIP LOCKED`
+- At-least-once delivery and consumer-side idempotency (`event_id`)
+- Change Data Capture (CDC) with Postgres logical replication slots
+- Log-based vs query-based CDC, and the hybrid outbox + CDC pattern
+- Per-entity ordering via `aggregate_id` (Kafka partition key)
+- Production gotchas: poison messages / dead-letter, schema evolution, WAL retention
 
 ## Setup
 
@@ -29,9 +33,10 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_dual_write_problem.ipynb`](./notebooks/01_dual_write_problem.ipynb) — DB committed, message bus never published — silent inconsistency.
-- [`notebooks/02_transactional_outbox.ipynb`](./notebooks/02_transactional_outbox.ipynb) — write the event into an `outbox` table inside the same transaction; polling publisher with `FOR UPDATE SKIP LOCKED`.
-- [`notebooks/03_polling_vs_cdc.ipynb`](./notebooks/03_polling_vs_cdc.ipynb) — replace polling with logical replication slots (the same trick Debezium uses).
+- [`notebooks/01_dual_write_problem.ipynb`](./notebooks/01_dual_write_problem.ipynb) — three failed attempts (DB-first, publish-first, retry loop) showing why dual writes are fundamentally broken.
+- [`notebooks/02_transactional_outbox.ipynb`](./notebooks/02_transactional_outbox.ipynb) — transactional outbox with `event_id`/`aggregate_id`, polling publisher using `FOR UPDATE SKIP LOCKED`, consumer-side idempotency, and retention.
+- [`notebooks/03_polling_vs_cdc.ipynb`](./notebooks/03_polling_vs_cdc.ipynb) — replace polling with Postgres logical replication slots (the same mechanism Debezium uses), including slot-lag monitoring and cleanup.
+- [`notebooks/04_gotchas.ipynb`](./notebooks/04_gotchas.ipynb) — production gotchas: per-entity ordering, poison messages / dead-letter, schema evolution, and the "exactly-once is a lie" rule.
 
 ## References
 
