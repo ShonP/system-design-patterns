@@ -13,3 +13,8 @@ New content is **added**, never destructively replaced.
 - Rewrote `03_bulkhead.ipynb`: added an `asyncio.Semaphore` bulkhead example for async Python.
 - **New** `04_timeouts_and_graceful_degradation.ipynb`: hard timeouts (with a threading-based demo), fallback to default / stale cache, feature-flag kill switches, and a layered diagram showing how all the patterns stack.
 - Updated `README.md` notebook listing.
+
+## 2026-04-19 (QA pass)
+- **New** `05_stacking_all_patterns.ipynb`: capstone that composes timeout + retry-with-jitter + thread-safe `CircuitBreaker` (with `Lock`) + bounded-semaphore `Bulkhead` (fast-fail admission control) + two-tier fallback into one `product_page(user)` pipeline. Includes a naive-baseline run, a broken-downstream run, and a recovered run, with per-run metrics (downstream calls, breaker fast-fails, bulkhead rejections, result mix). All cells execute in under ~3 s.
+- Verified notebooks 01–04 still run end-to-end under `jupyter nbconvert --execute`.
+- Updated `README.md` notebook listing.
