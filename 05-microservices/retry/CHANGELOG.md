@@ -19,3 +19,11 @@ New content is **added**, never destructively replaced.
   budgets, idempotency keys, and how retry composes with circuit breaker and
   bulkhead. All examples run offline using only the stdlib.
 - README: expanded concepts list and added link to the new notebook.
+- Rewrote `02_worked_example.ipynb` for a clearer thundering-herd demo:
+  added a peak-concurrency metric, ASCII histograms, a scale sweep
+  (10 / 100 / 1000 clients) showing up to 3.5× peak reduction from jitter,
+  and switched the demo to full-jitter to match the recommendation.
+- Extended `03_real_world_patterns.ipynb` with two new sections:
+  a **per-attempt timeout** demo (threaded wrapper, then retry) and
+  a **jitter variants** comparison table (no / equal / full / decorrelated).
+- Normalized cell IDs on notebook 2 to silence nbformat warning.

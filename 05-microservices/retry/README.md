@@ -9,9 +9,10 @@ Retrying transient failures — safely.
 ## Concepts covered
 
 - Bad → best retry strategies (immediate, fixed, exponential, +jitter)
-- Thundering herd and why jitter fixes it
+- Thundering herd and why jitter fixes it (with a peak-load simulation)
 - Error classification (retryable vs terminal)
 - `Retry-After` headers, deadlines, per-attempt timeouts
+- Jitter variants — full / equal / decorrelated
 - Retry budgets to prevent storms
 - Idempotency keys for safe `POST` retries
 - How retry composes with circuit breaker and bulkhead
@@ -29,7 +30,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 - [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Retry strategies, bad → best
 - [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Thundering herd and how jitter fixes it
-- [`notebooks/03_real_world_patterns.ipynb`](./notebooks/03_real_world_patterns.ipynb) -- Error classification, `Retry-After`, deadlines, retry budget, idempotency keys
+- [`notebooks/03_real_world_patterns.ipynb`](./notebooks/03_real_world_patterns.ipynb) -- Error classification, `Retry-After`, deadlines, per-attempt timeouts, jitter variants, retry budget, idempotency keys
 
 ## References
 
