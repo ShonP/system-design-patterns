@@ -12,8 +12,8 @@ This is a classic **"Scaling Writes"** problem. At peak we handle **10 000 click
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Click Event Ingestion | Produce & consume click events through Kafka, store in Postgres |
-| 2 | Real-Time Aggregation with Sliding Windows | Tumbling & sliding windows, event-time vs processing-time |
+| 1 | Click Event Ingestion | Produce & consume click events through Kafka, store in Postgres, **hot-shard mitigation** for viral ads |
+| 2 | Real-Time Aggregation with Sliding Windows | Tumbling & **sliding** windows, event-time vs processing-time, **reconciliation (Lambda architecture)** |
 | 3 | Deduplication & Fraud Detection | Impression IDs, HMAC signing, Redis-based dedup, anomaly detection |
 
 ## Architecture at a Glance
