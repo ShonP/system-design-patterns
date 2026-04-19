@@ -3,6 +3,12 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-04-19 — QA Review (round 3)
+- Fixed NB1 load-balancing demo: learners were hitting the gateway's 5 req/sec rate limiter when running the round-robin loop, which returned a plain-text 429 and crashed `r.json()`. Added a 0.25s throttle between requests plus a retry on 429 so the cell now reliably shows a clean 50/50 distribution across the two user-service instances.
+- Fixed NB1 latency comparison: same rate-limit issue. Added throttle parameter and lowered sample size from 20 → 10.
+- Fixed NB4 aggregation benchmark: the client-side vs. gateway-side composition benchmark was firing 2 requests per iteration × 10 iterations with no pause, tripping the gateway rate limiter. Added throttle, subtracted throttle time from reported latency, and lowered N from 10 → 5.
+- Re-executed all four notebooks end-to-end against the running stack (`docker-compose up -d --build` + `uv run jupyter nbconvert --execute`). All cells now complete without errors and the saved outputs reflect real runs (LB 50/50, canary ~90/10, aggregation response, etc.).
+
 ## 2026-04-19 — QA Review (round 2)
 - Added **canary / weighted routing** as a new advanced pattern in NB4 (section 3️⃣, between request aggregation and CORS). Uses nginx weighted upstream servers — no service mesh required. Renumbered CORS/Observability/SSL sections to 4/5/6 accordingly.
 - Added `upstream user_canary_backend` (weight 9:1) and `/api/canary/users` location in `nginx.conf`. Pretends `user-service-1` is stable and `user-service-2` is canary.
