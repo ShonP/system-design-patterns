@@ -23,8 +23,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Strangler fig for legacy migration
-- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Routing traffic gradually from old to new
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — Why big-bang rewrites fail, the strangler fig metaphor, facade routing by path, picking your first slice, real-world stories (Amazon, Shopify, Netflix, GitHub).
+- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) — Canary routing by percentage, dark launch / shadow traffic (GitHub's Scientist pattern), kill switches and instant rollback, a pre-ramp production checklist.
+- [`notebooks/03_end_to_end_banking.ipynb`](./notebooks/03_end_to_end_banking.ipynb) — Full worked example: strangling a banking monolith through 5 phases with dual-write data migration, per-endpoint progress tracking, and retirement.
 
 ## References
 
