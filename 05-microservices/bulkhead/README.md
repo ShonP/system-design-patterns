@@ -23,8 +23,8 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Thread-pool isolation between downstreams
-- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Payments vs. recommendations, one slow one fine
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Thread-pool, semaphore, asyncio, and per-tenant bulkheads
+- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Order Service (Inventory + Shipping): bad → good → best progression, DB connection-pool bulkheads, and how bulkheads relate to circuit breakers
 
 ## References
 

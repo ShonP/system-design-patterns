@@ -35,3 +35,18 @@ New content is **added**, never destructively replaced.
   - Added an **Observability** section with saturation + rejection metrics
     you should export from every bulkhead.
 - Re-ran both notebooks end-to-end; outputs saved in place.
+
+## 2026-04-19 (QA round 3)
+- `01_introduction.ipynb`: added **tenant isolation / noisy neighbor** section
+  with a `TenantBulkheads` registry (per-tenant bounded semaphore) and a demo
+  where Acme's burst is capped while Beta's traffic sails through unaffected.
+- `02_worked_example.ipynb`:
+  - Added a **per-workload DB connection pool bulkhead** simulation
+    (`ConnectionPool`) modelling how PgBouncer / HikariCP pool partitioning is
+    used in production — a reports stampede is load-shed while the reads
+    endpoint keeps all its connections.
+  - Added a **bulkhead vs. circuit breaker** comparison table and the typical
+    production stacking order (rate limit → circuit breaker → bulkhead →
+    timeout).
+- Updated `README.md` notebook descriptions to reflect new content.
+- Re-ran both notebooks end-to-end; outputs saved in place.
