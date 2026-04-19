@@ -34,6 +34,7 @@ As reads increase, your database will struggle under the load. This isn't a soft
 ### Part 2: Database Optimization
 - Indexing strategies (B-tree, Hash, Composite)
 - Covering indexes (`INCLUDE`) and partial indexes
+- **BRIN** (huge time-ordered tables) and **GIN** (arrays / JSONB / full-text)
 - Using EXPLAIN to analyze queries
 - Query optimization techniques
 - Connection pooling (in-process + PgBouncer)
@@ -47,6 +48,7 @@ As reads increase, your database will struggle under the load. This isn't a soft
 - Leader-follower replication
 - Synchronous vs asynchronous replication
 - Handling replication lag
+- Doing it for real: PostgreSQL streaming & logical replication, `pg_stat_replication`
 
 ### Part 5: Application Caching
 - Redis as a cache layer
@@ -58,6 +60,7 @@ As reads increase, your database will struggle under the load. This isn't a soft
 - Hot key problem (key fanout)
 - Request coalescing / single-flight
 - Cache versioning
+- CDN edge caching & sharding (the final scaling tiers)
 
 ## Prerequisites
 
