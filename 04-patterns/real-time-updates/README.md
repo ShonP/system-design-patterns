@@ -58,6 +58,12 @@ When systems require real-time updates, the solution requires two distinct piece
 - Pushing via consistent hashing
 - Pushing via Pub/Sub (Redis)
 
+### Part 8: Webhooks
+- Vendor → your-server push (the inverse of polling)
+- HMAC signature verification
+- Retries with exponential backoff
+- Idempotent handlers and fast-ACK pattern
+
 ## Prerequisites
 
 - Python 3.9+

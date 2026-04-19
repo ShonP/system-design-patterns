@@ -13,6 +13,7 @@ python simple_polling_server.py  # port 5001
 python long_polling_server.py    # port 5002
 python sse_server.py             # port 5003
 python websocket_server.py       # port 5004
+python webhook_server.py         # port 5005
 ```
 
 ## Server Overview
@@ -23,6 +24,7 @@ python websocket_server.py       # port 5004
 | long_polling_server.py | 5002 | Held requests until data available |
 | sse_server.py | 5003 | Server-Sent Events with Last-Event-ID |
 | websocket_server.py | 5004 | Bidirectional WebSocket chat |
+| webhook_server.py | 5005 | Vendor-style webhook delivery with HMAC + retries |
 
 ## 🔍 Visualization Tools
 
