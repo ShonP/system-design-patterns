@@ -319,6 +319,15 @@ async def handle_edit(ws, user_id, payload):
         await send_json(ws, {"type": "error", "message": "Document not loaded"})
         return
 
+    # Enforce role — viewers can see the doc but cannot edit
+    session = doc_sessions.get(doc_id, {}).get(user_id)
+    if session and session.get("role") == "viewer":
+        await send_json(ws, {
+            "type": "error",
+            "message": "Permission denied: your role is 'viewer' (read-only).",
+        })
+        return
+
     # Transform the operation against any ops that happened concurrently
     client_version = payload.get("version", doc["version"])
     if client_version < doc["version"]:
