@@ -9,3 +9,10 @@ New content is **added**, never destructively replaced.
 
 ## 2026-04-18
 - Added `pyproject.toml` and notebooks: 01_introduction.ipynb, 02_choreography_vs_orchestration.ipynb, 03_compensation_on_failure.ipynb.
+
+## 2026-04-19
+- QA pass: rewrote all three notebooks with a clearer bad→good progression and more beginner explanations.
+  - `01_introduction.ipynb`: added naive "no compensation" baseline, e-commerce checkout framing, vocabulary section (local/compensating transactions, backward/forward recovery, pivot).
+  - `02_choreography_vs_orchestration.ipynb`: class-based orchestrator, richer event-bus choreography with failure + compensation, side-by-side trade-off table, real-world tool mapping.
+  - `03_compensation_on_failure.ipynb`: idempotency, retry-before-compensate with exponential backoff, semantic compensation (apology email), pivot transaction / forward-only recovery, production checklist.
+- All notebooks executed end-to-end with `jupyter nbconvert --execute`.
