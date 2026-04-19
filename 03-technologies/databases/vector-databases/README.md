@@ -19,6 +19,7 @@ Each notebook follows a **BAD → BETTER → BEST** progression: we start with t
 | 1 | Embeddings & Similarity Search | What embeddings are, distance metrics, BAD linear scan → BETTER IVFFlat → BEST HNSW |
 | 2 | Vector Indexing Strategies | IVFFlat vs HNSW benchmarks at scale, parameter tuning, recall vs speed tradeoffs |
 | 3 | Hybrid Search | Combining vector similarity with traditional filters (price, category, rating) |
+| 4 | RAG & Re-Ranking | Turning text into embeddings (no external API), retrieve-then-rerank pattern, mini RAG loop |
 
 ## Prerequisites
 
@@ -30,18 +31,17 @@ Each notebook follows a **BAD → BETTER → BEST** progression: we start with t
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/vector-databases
+cd 03-technologies/databases/vector-databases
 
 # Start PostgreSQL (with pgvector) + Adminer
 docker-compose up -d
 
-# Install dependencies
+# Install dependencies (creates a .venv managed by uv)
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=vector-databases --display-name="Vector Databases (Python)"
-
-# Open the first notebook and start learning!
+# Open any notebook in VS Code, then pick the .venv kernel in the
+# top-right kernel picker. If it doesn't show up, reload the window
+# with Cmd+Shift+P → "Reload Window".
 ```
 
 ## 🔍 Visualization Tools (Included in Docker)
@@ -96,6 +96,73 @@ Combine vector similarity with traditional SQL filters (WHERE clauses). Critical
 | Amazon | Product embeddings for "Customers also bought" |
 | ChatGPT | RAG — retrieve relevant docs via vector search before generating answers |
 | Pinterest | Image embeddings for visual similarity search |
+| Shopify | Product search & "similar items" using image + text embeddings |
+| YouTube | Video recommendations based on watch-history embeddings |
+| Duolingo | Grouping learners with similar error patterns |
+| Stack Overflow | "Related questions" using question-title embeddings |
+
+## The RAG Pattern (Retrieval-Augmented Generation)
+
+This is the #1 reason vector databases exploded in popularity. LLMs have a knowledge cutoff and can't see your private data. RAG fixes this:
+
+```
+User question → embed it → vector search over YOUR docs → top-K chunks
+                                                              │
+                                                              ▼
+                                                    Stuff them into the
+                                                    LLM prompt as context
+                                                              │
+                                                              ▼
+                                                    LLM answers grounded
+                                                    in YOUR data
+```
+
+Vector databases are the "retrieval" in RAG. Notebook 3's hybrid search pattern (keyword + vector + filters) is exactly what production RAG systems use.
+
+## Production Considerations
+
+Things the notebooks don't cover in depth but matter in real systems:
+
+### Updates and Deletes
+- **IVFFlat**: Centroids are fixed at build time. Heavy churn → rebuild the index periodically.
+- **HNSW**: Supports incremental inserts. Deletes leave "tombstones" — use `VACUUM` to reclaim space.
+
+### Monitoring Recall in Production
+- Keep a small labeled ground-truth set. Run it against production daily.
+- Alert if recall drops below your threshold (e.g., 95%).
+- Recall drifts as data distribution changes — re-tune `ef_search` / `probes` over time.
+
+### Curse of Dimensionality
+As dimensions grow, the ratio between nearest and farthest neighbors approaches 1 — "similarity" becomes less meaningful. Mitigations:
+- Use **dimensionality reduction** (PCA, UMAP) when you have 3000+ dim vectors and can afford a slight accuracy drop.
+- Use models that produce lower-dim embeddings (e.g., `text-embedding-3-small` at 1536 dims instead of 3072).
+
+### Quantization (Shrinking Vectors)
+For billions of vectors, even pgvector starts to hurt. Options:
+- **Scalar quantization**: Store each float32 (4 bytes) as int8 (1 byte) — 4× storage savings, ~1% recall loss.
+- **Product Quantization (PQ)**: Split vector into subvectors, cluster each — 10–100× savings, more recall loss.
+- pgvector supports **halfvec** (float16) natively. Dedicated DBs like Milvus/Qdrant support PQ.
+
+### When to Graduate From pgvector
+
+| Situation | Tool |
+|-----------|------|
+| < 1M vectors, already on Postgres | **pgvector** (this lab) |
+| 1M–100M vectors, want managed | **Pinecone**, **Weaviate Cloud** |
+| 100M+ vectors, self-host, want PQ | **Milvus**, **Qdrant**, **Vespa** |
+| Need hybrid keyword+vector at scale | **Elasticsearch**, **OpenSearch** (with kNN plugin) |
+
+### Re-Ranking Pattern
+
+Production search systems rarely stop at ANN. The common pattern:
+
+```
+1. ANN index → fetch top 100 candidates (fast, approximate, recall ~95%)
+2. Exact rerank → score those 100 with a slower, more accurate model
+3. Return top 10 to the user
+```
+
+Why? The slow-but-accurate model (cross-encoder, reranker LLM, business-logic scoring) is too expensive to run on millions of vectors — but fine on 100. Notebook 2 touches this idea; in practice reranking is where most of the quality wins come from.
 
 ## License
 
