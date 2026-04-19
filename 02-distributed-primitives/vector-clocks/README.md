@@ -4,15 +4,20 @@
 
 ## Learning objectives
 
-- Implement Lamport clocks and see why they lose information about concurrency.
+- See why wall-clock time fails to order distributed events.
+- Implement Lamport clocks and discover why they lose information about concurrency.
 - Implement vector clocks and detect concurrent updates.
-- Explain how Dynamo-style systems use vector clocks to surface conflicts.
+- Build a Dynamo-style shopping cart that detects **and resolves** conflicting writes.
+- Know when real systems pick vector clocks, last-write-wins, or CRDTs.
 
 ## Concepts covered
 
-- Happens-before relation
+- Clock drift & why `time.time()` can't order distributed events
+- Happens-before relation (`→`)
 - Lamport clocks vs vector clocks
 - Concurrency detection and conflict surfacing
+- Detect-vs-resolve: merge policies are application-defined
+- Trade-offs: Dynamo/Riak (vector clocks) vs Cassandra (LWW) vs CRDTs
 
 ## Setup
 
@@ -25,8 +30,8 @@ Select the `.venv` kernel in VS Code (top-right of the notebook).
 
 ## Notebooks
 
-- [`notebooks/01_lamport_clocks.ipynb`](./notebooks/01_lamport_clocks.ipynb) — Lamport's scalar clock and where it falls short.
-- [`notebooks/02_vector_clocks.ipynb`](./notebooks/02_vector_clocks.ipynb) — vector clocks: full causal order and concurrency detection.
+- [`notebooks/01_lamport_clocks.ipynb`](./notebooks/01_lamport_clocks.ipynb) — Wall-clock pitfalls, Lamport's scalar clock, space-time diagram, and where it falls short.
+- [`notebooks/02_vector_clocks.ipynb`](./notebooks/02_vector_clocks.ipynb) — Vector clocks, concurrency detection, and a runnable Dynamo-style shopping-cart merge (LWW vs vector-clock).
 
 ## References
 

@@ -5,13 +5,10 @@ services:
     ports:
       - "8000:8000"
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+    user: root
     volumes:
       - dynamodb_data:/home/dynamodblocal/data
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8000/shell/ || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin:latest
@@ -24,8 +21,7 @@ services:
       AWS_ACCESS_KEY_ID: local
       AWS_SECRET_ACCESS_KEY: local
     depends_on:
-      dynamodb-local:
-        condition: service_healthy
+      - dynamodb-local
 
 volumes:
   dynamodb_data:

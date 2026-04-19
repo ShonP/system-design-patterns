@@ -106,6 +106,7 @@ Safely update workflow logic while existing workflows are still running. Critica
 | 2 | Basic Workflows | Defining workflows and activities, running a simple pipeline |
 | 3 | Saga Pattern | Multi-step transactions with compensation and rollback |
 | 4 | Advanced Patterns | Child workflows, signals, timers, versioning |
+| 5 | Queries, Heartbeats, Continue-As-New, Testing | Read live state, keep long activities alive, run forever without history bloat, unit-test without Docker |
 
 ## Prerequisites
 
@@ -117,7 +118,7 @@ Safely update workflow logic while existing workflows are still running. Critica
 
 ```bash
 # Navigate to the lab directory
-cd enterprise-patterns/long-running-jobs-temporal
+cd 03-technologies/workflow-engines/temporal
 
 # Start Temporal + PostgreSQL + UI
 docker compose up -d
