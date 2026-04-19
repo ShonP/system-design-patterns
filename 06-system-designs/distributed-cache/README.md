@@ -17,6 +17,7 @@ This lab gives you three Redis nodes in Docker and Python notebooks that let you
 | 1 | Cache Partitioning Strategies | Modulo hashing, range partitioning, why naive approaches break on resize |
 | 2 | Cache Coherence & Invalidation | Replication, write propagation, invalidation across a multi-node cluster |
 | 3 | Consistent Hashing for Cache Routing | Hash rings, virtual nodes, minimal key movement on scale-up/down |
+| 4 | Cache Patterns & Stampede Protection | Cache-aside, read-through, write-through, write-behind, thundering-herd mitigation |
 
 ## Prerequisites
 
@@ -71,6 +72,17 @@ uv run python -m ipykernel install --user --name=distributed-cache --display-nam
 ### Hot Keys
 - **Read-heavy hot keys** — replicate to spread load
 - **Write-heavy hot keys** — shard the key with random suffixes
+
+### Cache Access Patterns
+- **Cache-aside (lazy loading)** — app checks cache, loads from DB on miss
+- **Read-through** — cache wrapper transparently loads from DB on miss
+- **Write-through** — writes go to cache and DB synchronously
+- **Write-behind** — writes hit cache first, DB flush happens asynchronously
+
+### Stampede Protection
+- **Thundering herd** — when a hot key expires, N concurrent misses slam the DB
+- **Single-flight with Redis lock** — `SET NX EX` + token + Lua release so only one worker recomputes
+- **Negative caching** — store a sentinel for "not found" to avoid repeated DB misses
 
 ## Real-World Examples
 
