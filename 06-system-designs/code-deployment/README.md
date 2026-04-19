@@ -8,10 +8,11 @@ Build, test, deploy, rollback, canary.
 
 ## Concepts covered
 
-- Pipeline as a DAG
-- Artifact & image immutability
-- Blue/green vs canary vs rolling
-- Rollback strategies
+- Pipeline as a DAG (topological sort + parallel execution)
+- Artifact immutability & content-addressed storage (why `:latest` is a lie)
+- Deploy strategies: big-bang (bad) → rolling → blue/green → canary
+- SLO-gated automatic rollback with minimum-sample safeguards
+- Separation of build vs deploy, feature flags, forward-compatible migrations
 
 ## Setup
 
@@ -24,9 +25,9 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 ## Notebooks
 
-- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
-- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
-- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive (runnable code)
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements, architecture & a bad→best pipeline runner
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data model, APIs & immutable content-addressed artifacts
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Rolling / blue-green / canary + SLO-gated auto-rollback
 
 ## References
 
