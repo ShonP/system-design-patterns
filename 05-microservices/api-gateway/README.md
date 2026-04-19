@@ -46,7 +46,7 @@ This lab uses **nginx** as the API gateway, **two Flask microservices** as backe
 | 1 | Routing & Load Balancing | Why direct service calls are bad, how path-based routing and load balancing work |
 | 2 | Rate Limiting & Auth | Protecting APIs with rate limiting and API key authentication at the gateway |
 | 3 | Request Transformation | Header injection, API versioning, and request/response modification |
-| 4 | Advanced Patterns | Circuit-breaker-style failover, request aggregation (BFF), CORS, observability/logging, SSL termination |
+| 4 | Advanced Patterns | Circuit-breaker-style failover, request aggregation (BFF), canary / weighted routing, CORS, observability/logging, SSL termination |
 
 Each notebook follows the **BAD → BETTER → BEST** pattern so you can see why each concept matters.
 
@@ -95,6 +95,8 @@ uv run python -m ipykernel install --user --name=api-gateway --display-name="API
 | `GET /api/debug/headers` | See what headers the backend receives |
 | `GET /health` | Gateway health check |
 | `GET /api/users/:id/profile` | Aggregated user profile + orders (BFF pattern) |
+| `GET /api/canary/users` | Weighted canary routing (~90% stable / ~10% canary) |
+| `GET /api/cors/users` | CORS-enabled endpoint (preflight + real request) |
 
 ### Direct service access (exposed ports) — the BAD way (for learning only)
 | Endpoint | Description |
@@ -118,9 +120,10 @@ uv run python -m ipykernel install --user --name=api-gateway --display-name="API
 5. **Request/Response Transformation** — modify headers, version APIs
 6. **Resilience** — circuit-breaker-style failover (`max_fails`/`fail_timeout`)
 7. **Request Aggregation** — BFF pattern combining multiple backend calls
-8. **CORS** — cross-origin request handling at the gateway
-9. **Observability** — structured access logs with request IDs and upstream timing
-10. **SSL Termination** — TLS offloading at the gateway (concept-only in this lab)
+8. **Canary / Weighted Routing** — gradual rollouts via weighted upstream servers
+9. **CORS** — cross-origin request handling at the gateway
+10. **Observability** — structured access logs with request IDs and upstream timing
+11. **SSL Termination** — TLS offloading at the gateway (concept-only in this lab)
 
 ### When to Use an API Gateway
 - ✅ Microservices architecture (multiple backend services)
