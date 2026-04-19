@@ -12,9 +12,9 @@ This lab uses **TimescaleDB** — a PostgreSQL extension — so you get the powe
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Time-Series Data Modeling | Hypertables, tags vs. fields, chunk-based partitioning, inserts |
-| 2 | Windowed Aggregations | `time_bucket()`, moving averages, percentile detection, multi-host comparison |
-| 3 | Retention Policies & Downsampling | Auto-delete old data, continuous aggregates, tiered storage strategy |
+| 1 | Time-Series Data Modeling | Hypertables, tags vs. fields, chunk-based partitioning, cardinality explosion, bulk ingest (`INSERT` vs `executemany` vs `COPY`) |
+| 2 | Windowed Aggregations | `time_bucket()`, moving averages, percentile detection, multi-host comparison, gap-filling (`locf`/`interpolate`), `first()`/`last()`, rate-of-change with `LAG()` |
+| 3 | Retention Policies & Downsampling | Auto-delete old data, continuous aggregates, **native compression** (delta-of-delta + Gorilla), tiered storage strategy |
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ This lab uses **TimescaleDB** — a PostgreSQL extension — so you get the powe
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/time-series-databases
+cd 03-technologies/databases/time-series-databases
 
 # Start TimescaleDB + Grafana + Adminer
 docker-compose up -d
