@@ -149,13 +149,59 @@ print("file only        :", load_settings(config_file, {}))
 print("env overrides    :", load_settings(config_file, {"DB_HOST": "env-db"}))
 print("env + file merged:", load_settings(config_file, {"RATE_LIMIT": "77"}))
 """),
+md("""## 📦 Production-ready: `pydantic-settings`
+
+Writing the `from_env` / `load_settings` plumbing by hand is fine for teaching.
+In real code most Python services use [`pydantic-settings`](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) —
+same `Settings` idea, but it reads env vars, `.env` files, and secrets
+*automatically* with a clear precedence order.
+"""),
+code("""from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class AppSettings(BaseSettings):
+    # model_config tells pydantic-settings where to look and how to map names
+    model_config = SettingsConfigDict(
+        env_prefix="APP_",      # APP_DB_HOST -> db_host
+        env_file=None,          # set to ".env" in a real project
+        extra="ignore",
+    )
+    db_host: str = "localhost"
+    rate_limit: int = Field(default=10, ge=1, le=10_000)
+    debug: bool = False
+
+# Demo: pass env in-memory via _env so we don't touch the real environment.
+import os
+os.environ["APP_DB_HOST"] = "prod-db"
+os.environ["APP_RATE_LIMIT"] = "500"
+os.environ["APP_DEBUG"] = "true"
+
+s = AppSettings()
+print("loaded:", s)
+# Clean up so later cells/notebooks aren't affected.
+for k in ("APP_DB_HOST", "APP_RATE_LIMIT", "APP_DEBUG"):
+    os.environ.pop(k, None)
+"""),
+md("""### 🧭 Precedence (what overrides what)
+
+`pydantic-settings` layers sources with a well-defined order (highest wins):
+
+1. **CLI / init kwargs** you pass to `AppSettings(...)`
+2. **Environment variables** (optionally prefixed)
+3. **`.env` file** (via `env_file=".env"`)
+4. **Secrets directory** (e.g. Docker/K8s mounts in `/run/secrets/<name>`)
+5. **Field defaults** in the class
+
+That's the same *defaults < file < env* pattern we built by hand — just
+battle-tested and typed.
+"""),
 md("""## 🧠 Takeaways
 
 | Step | Where config lives | Validated? | Redeploy to change? |
 |------|--------------------|-----------|---------------------|
 | BAD  | in code            | n/a       | yes 😬              |
 | GOOD | env vars           | no        | restart only        |
-| BEST | env vars + file, typed `Settings` | yes ✅ | restart only |
+| BEST | env vars + file, typed `Settings` (or `BaseSettings`) | yes ✅ | restart only |
 
 Next notebook: **feature flags**, which let us change behaviour
 *without even restarting*.
@@ -257,6 +303,86 @@ code("""flags.update({"new_checkout": False})
 print("after kill-switch:")
 for uid in range(6):
     print(f"  user {uid}: new_checkout={flags.enabled('new_checkout', uid)}")
+"""),
+md("""## 🎯 Targeting by user *attributes* (not just id)
+
+Real flag services let you target by country, plan, device, etc.
+Same idea — extend the rule language to look at a `context` dict.
+"""),
+code("""class AttrFlagStore:
+    \"\"\"Flag values can be:
+      - bool
+      - {\"percent\": N}                           -> % rollout by stable hash of user_id
+      - {\"users\": [..]}                          -> allow-list
+      - {\"when\": {\"country\": [\"US\", \"CA\"]}}       -> match any attribute value
+      - combinations are OR'd together
+    \"\"\"
+    def __init__(self, flags: dict):
+        self.flags = dict(flags)
+
+    def enabled(self, flag: str, ctx: dict) -> bool:
+        f = self.flags.get(flag)
+        if f is True:  return True
+        if not f:      return False
+        if isinstance(f, dict):
+            uid = ctx.get(\"user_id\")
+            if uid is not None and uid in f.get(\"users\", []):
+                return True
+            when = f.get(\"when\", {})
+            if when and all(ctx.get(k) in vs for k, vs in when.items()):
+                return True
+            if \"percent\" in f and uid is not None:
+                h = int(hashlib.md5(f\"{flag}:{uid}\".encode()).hexdigest(), 16) % 100
+                if h < f[\"percent\"]:
+                    return True
+        return False
+
+store = AttrFlagStore({
+    # roll out only to paid users in the US/Canada
+    \"fast_checkout\": {\"when\": {\"country\": [\"US\", \"CA\"], \"plan\": [\"pro\", \"team\"]}},
+    # plus a separate 10% experiment everywhere
+    \"recommendations_v2\": {\"percent\": 10},
+})
+
+users = [
+    {\"user_id\": 1, \"country\": \"US\", \"plan\": \"pro\"},
+    {\"user_id\": 2, \"country\": \"US\", \"plan\": \"free\"},
+    {\"user_id\": 3, \"country\": \"DE\", \"plan\": \"pro\"},
+]
+for u in users:
+    print(u, \"=> fast_checkout=\", store.enabled(\"fast_checkout\", u),
+          \"recs_v2=\", store.enabled(\"recommendations_v2\", u))
+"""),
+md("""## 🧪 Tiny A/B test: measure the variant, don't just toggle it
+
+A feature flag is only half the story — you also want to know which
+*variant* performed better. The pattern: pick a variant from the flag, run
+the user's request, then record the outcome labelled with that variant.
+"""),
+code("""from collections import Counter
+import random
+
+variants = Counter()
+successes = Counter()
+
+def checkout_ab(user_id: int):
+    variant = \"new\" if flags.enabled(\"new_checkout\", user_id) else \"legacy\"
+    variants[variant] += 1
+    # pretend: new checkout succeeds 95% of the time, legacy 90%
+    ok = random.random() < (0.95 if variant == \"new\" else 0.90)
+    if ok:
+        successes[variant] += 1
+    return variant, ok
+
+# turn the canary back on to 50% for this demo
+flags.update({\"new_checkout\": {\"percent\": 50}})
+random.seed(0)
+for uid in range(2000):
+    checkout_ab(uid)
+
+for v in (\"legacy\", \"new\"):
+    n = variants[v] or 1
+    print(f\"{v:6s}: n={variants[v]:>4d}  success_rate={successes[v]/n:.3f}\")
 """),
 md("""## 🌍 Environment-aware flags
 
@@ -385,6 +511,56 @@ print(orders.handle_request(\"buy\"))
 # Ops bumps the timeout live — no redeploy:
 server.put(\"orders\", {\"timeout_ms\": 1500, \"retries\": 5})
 print(orders.handle_request(\"buy\"))
+"""),
+md("""## 📣 Push-based: watchers / subscribers
+
+Polling is simple but either laggy (long interval) or wasteful (short
+interval). Real tools like **etcd**, **Consul**, and **ZooKeeper** let
+clients **subscribe** — the server pushes only when something changes.
+
+Here's the same pattern with plain callbacks.
+"""),
+code("""class PushConfigServer(ConfigServer):
+    def __init__(self):
+        super().__init__()
+        self._subscribers: dict[str, list] = {}
+
+    def subscribe(self, service: str, callback):
+        self._subscribers.setdefault(service, []).append(callback)
+
+    def put(self, service: str, cfg: dict):
+        super().put(service, cfg)
+        for cb in self._subscribers.get(service, []):
+            cb(self._version, dict(cfg))
+
+push_server = PushConfigServer()
+
+class PushClient:
+    def __init__(self, name, server):
+        self.name, self.server = name, server
+        self.config: dict = {}
+        server.subscribe(name, self._on_change)
+
+    def _on_change(self, version, cfg):
+        self.config = cfg
+        print(f\"[{self.name}] pushed v{version}: {cfg}\")
+
+orders = PushClient(\"orders\", push_server)
+push_server.put(\"orders\", {\"timeout_ms\": 500})
+push_server.put(\"orders\", {\"timeout_ms\": 2000})   # arrives instantly, no polling
+"""),
+md("""### 🔁 Pull vs push — which to use?
+
+| | Pull (poll) | Push (subscribe) |
+|--|--|--|
+| Client complexity | very low | needs a persistent connection |
+| Latency to change | up to the poll interval | ~instant |
+| Server load | constant | proportional to changes |
+| Works behind strict firewalls | yes (outbound HTTP) | sometimes harder |
+
+Most real systems combine them: **long-poll / SSE / gRPC streams** so the
+client still initiates the connection (firewall-friendly) but the server
+only replies when something changes.
 """),
 md("""## 🛟 What happens if the config server is down?
 
@@ -533,6 +709,88 @@ settings = AppSettings(
 print(\"repr (safe to log):\", settings)
 print(\"masked pw         :\", settings.db_password)
 print(\"actual pw (only at use):\", settings.db_password.get_secret_value())
+"""),
+md("""## 📁 Secrets mounted as files (Docker / Kubernetes pattern)
+
+Modern orchestrators often don't use env vars for secrets at all — they
+mount each secret as a tiny file, e.g. `/run/secrets/db_password`. Benefits:
+
+- The value doesn't appear in `/proc/<pid>/environ` or `docker inspect`.
+- The orchestrator can **rotate** the file in place; the app can re-read it.
+- File permissions (mode 0400) add another layer of protection.
+"""),
+code("""import pathlib, tempfile, os
+
+# Simulate the /run/secrets/ directory you'd get in a container.
+secrets_dir = pathlib.Path(tempfile.mkdtemp(prefix=\"run_secrets_\"))
+(secrets_dir / \"db_password\").write_text(\"rotated-v1\")
+(secrets_dir / \"stripe_key\").write_text(\"sk_test_rotated_v1\")
+
+def read_secret(name: str, mount: pathlib.Path = secrets_dir) -> str:
+    # 1) prefer a mounted file (safer, rotatable)
+    p = mount / name
+    if p.exists():
+        return p.read_text().strip()
+    # 2) fall back to an env var (dev/local convenience)
+    env_key = name.upper()
+    if env_key in os.environ:
+        return os.environ[env_key]
+    raise KeyError(f\"secret {name!r} not found in {mount} or env\")
+
+print(\"db_password starts with:\", read_secret(\"db_password\")[:8] + \"...\")
+"""),
+md("""## 🔄 Rotation without restart
+
+Secrets **will** be rotated — either on schedule or in response to an
+incident. The app must pick up new values without a redeploy. One clean
+way: read the secret through a function every time you need it (or cache
+for a few seconds).
+"""),
+code("""import time
+
+# Pretend the orchestrator rotates the file.
+(secrets_dir / \"db_password\").write_text(\"rotated-v2\")
+
+print(\"after rotation  :\", read_secret(\"db_password\"))
+
+# A tiny cached reader: re-read at most once per TTL.
+class CachedSecret:
+    def __init__(self, name: str, ttl_s: float = 30.0):
+        self.name, self.ttl = name, ttl_s
+        self._value, self._loaded_at = None, 0.0
+
+    def get(self) -> str:
+        now = time.time()
+        if self._value is None or now - self._loaded_at > self.ttl:
+            self._value = read_secret(self.name)
+            self._loaded_at = now
+        return self._value
+
+pw = CachedSecret(\"db_password\", ttl_s=0.0)  # ttl=0 -> always fresh, for demo
+print(\"first read      :\", pw.get())
+(secrets_dir / \"db_password\").write_text(\"rotated-v3\")
+print(\"after another   :\", pw.get())
+"""),
+md("""### ⚠️ Accidental leaks at serialization time
+
+`SecretStr` hides its value from `repr()` and plain `print()` — but be
+careful when you dump the *whole* settings object:
+
+- `model_dump()` → secrets are **masked** as `SecretStr('**********')` ✅
+- `model_dump(mode=\"json\")` / `model_dump_json()` in older pydantic could
+  serialise the real value. Always **test** your logging and error-reporting
+  paths with a fake secret like `\"LEAKED-IF-YOU-SEE-ME\"`.
+"""),
+code("""from pydantic import BaseModel, SecretStr
+
+class Dump(BaseModel):
+    api_key: SecretStr
+
+d = Dump(api_key=\"LEAKED-IF-YOU-SEE-ME\")
+print(\"repr         :\", d)
+print(\"model_dump   :\", d.model_dump())
+print(\"dump json    :\", d.model_dump_json())
+# -> all should show ****** or similar, never the real value.
 """),
 md("""## 🏛️ Real secret stores (beyond env vars)
 

@@ -27,10 +27,10 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — bad → good → best: hardcoded vs env vars vs validated `Settings`
-- [`notebooks/02_feature_flags.ipynb`](./notebooks/02_feature_flags.ipynb) — feature flags, canary rollouts, kill-switches, env-aware flags
-- [`notebooks/03_config_server.ipynb`](./notebooks/03_config_server.ipynb) — central config server with versioning, hot reload, outage resilience
-- [`notebooks/04_secrets.ipynb`](./notebooks/04_secrets.ipynb) — secrets management: `.env`, `SecretStr`, never-log patterns, real secret stores
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — bad → good → best: hardcoded vs env vars vs validated `Settings`, plus `pydantic-settings` `BaseSettings`
+- [`notebooks/02_feature_flags.ipynb`](./notebooks/02_feature_flags.ipynb) — feature flags, canary rollouts, attribute targeting, A/B measurement, kill-switches, env-aware flags
+- [`notebooks/03_config_server.ipynb`](./notebooks/03_config_server.ipynb) — central config server with versioning, pull + push (watch) hot reload, outage resilience
+- [`notebooks/04_secrets.ipynb`](./notebooks/04_secrets.ipynb) — secrets management: `.env`, file mounts, `SecretStr`, rotation, never-log/never-serialise patterns, real secret stores
 
 ## References
 
