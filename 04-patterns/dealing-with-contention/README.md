@@ -39,6 +39,7 @@ The race condition happens because reading and writing aren't atomic. There's a 
 - Database transactions basics
 - ACID properties
 - Why transactions alone don't prevent all race conditions
+- **The simplest fix: atomic `UPDATE ... WHERE` guards**
 
 ### Part 3: Pessimistic Locking
 - `SELECT ... FOR UPDATE`
@@ -67,7 +68,7 @@ The race condition happens because reading and writing aren't atomic. There's a 
 
 ```bash
 # Navigate to the pattern directory
-cd patterns/dealing-with-contention
+cd 04-patterns/dealing-with-contention
 
 # Start PostgreSQL + Redis + Visualization Tools
 docker-compose up -d
@@ -75,10 +76,11 @@ docker-compose up -d
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
+# Register a Jupyter kernel that points at this lab's .venv
 uv run python -m ipykernel install --user --name=contention --display-name="Contention (Python)"
 
-# Start with the first notebook!
+# Open the notebooks in VS Code and pick the "Contention (Python)" kernel
+# (top-right of the notebook). If it doesn't appear: Cmd+Shift+P → "Reload Window"
 ```
 
 ## 🔍 Visualization Tools (Included in Docker)
