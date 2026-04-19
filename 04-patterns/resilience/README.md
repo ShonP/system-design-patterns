@@ -1,6 +1,6 @@
 # Resilience
 
-> Part of `04-patterns/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `04-patterns/`. Five runnable notebooks walk from a naïve baseline to a fully stacked resilience pipeline, one pattern at a time.
 
 ## Overview
 

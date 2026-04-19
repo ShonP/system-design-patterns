@@ -18,3 +18,8 @@ New content is **added**, never destructively replaced.
 - **New** `05_stacking_all_patterns.ipynb`: capstone that composes timeout + retry-with-jitter + thread-safe `CircuitBreaker` (with `Lock`) + bounded-semaphore `Bulkhead` (fast-fail admission control) + two-tier fallback into one `product_page(user)` pipeline. Includes a naive-baseline run, a broken-downstream run, and a recovered run, with per-run metrics (downstream calls, breaker fast-fails, bulkhead rejections, result mix). All cells execute in under ~3 s.
 - Verified notebooks 01–04 still run end-to-end under `jupyter nbconvert --execute`.
 - Updated `README.md` notebook listing.
+
+## 2026-04-19 (review pass)
+- `01_retry_with_backoff.ipynb`: fixed seed so the exponential / jitter cells actually demonstrate retries (seed 0 → first call succeeded, printed empty `delays: []`). Added a new **idempotency keys** section with a runnable "retry without key → alice is billed 5× for one purchase" vs "stable caller-generated key → server dedupes to 1 charge" demo, plus a `ValueError` guard showing the same-key-different-params bug.
+- `02_circuit_breaker.ipynb`: added a matplotlib per-call latency visualization contrasting **no breaker** (flat ~200 ms/call) against **with breaker** (first few at 200 ms, then ~0 ms fast-fail). Uses a long cooldown so the chart is deterministic. Final run prints total wall-time savings (~10× faster).
+- `README.md`: removed stale "scaffolded — notebooks will be added incrementally" line; all 5 notebooks are in place.
