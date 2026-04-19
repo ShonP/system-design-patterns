@@ -4,13 +4,17 @@
 
 ## Overview
 
-Keeping config out of the binary.
+Keeping configuration — and secrets — out of the binary so the same
+image can run in dev / staging / production, and so operators can change
+behaviour without a redeploy.
 
 ## Concepts covered
 
-- Config servers
-- Feature flags
-- Secret management
+- Hardcoded → env vars → typed/validated `Settings` (pydantic)
+- Precedence: defaults < config file < environment
+- Feature flags (boolean, % rollout, allow-list, kill-switch)
+- Central config server with hot reload and graceful degradation
+- Secrets management (`.env`, `SecretStr`, never-log patterns, secret stores)
 
 ## Setup
 
@@ -23,8 +27,10 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Config out of the binary
-- [`notebooks/02_feature_flags.ipynb`](./notebooks/02_feature_flags.ipynb) -- Feature flags and environment-based config
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — bad → good → best: hardcoded vs env vars vs validated `Settings`
+- [`notebooks/02_feature_flags.ipynb`](./notebooks/02_feature_flags.ipynb) — feature flags, canary rollouts, kill-switches, env-aware flags
+- [`notebooks/03_config_server.ipynb`](./notebooks/03_config_server.ipynb) — central config server with versioning, hot reload, outage resilience
+- [`notebooks/04_secrets.ipynb`](./notebooks/04_secrets.ipynb) — secrets management: `.env`, `SecretStr`, never-log patterns, real secret stores
 
 ## References
 
