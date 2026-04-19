@@ -117,6 +117,20 @@ jupyter notebook notebooks/
 | Temporal Web UI | 8080 | http://localhost:8080 |
 | Temporal Server | 7233 | (gRPC) |
 | PostgreSQL | 5432 | postgres://postgres:postgres@localhost:5432/temporal |
+| Adminer (Postgres GUI) | 8081 | http://localhost:8081 |
+| Redis | 6379 | redis://localhost:6379 |
+| RedisInsight (Redis GUI) | 5540 | http://localhost:5540 |
+
+## Notebook Dependencies
+
+| Notebook | Needs | Why |
+|----------|-------|-----|
+| 01 | Pure Python | Shows the problem without any infra |
+| 02 | PostgreSQL | Persists workflow state in a SQL table |
+| 03 | Redis | Stores the event log as a Redis Stream |
+| 04–06 | Temporal + PostgreSQL | Durable execution engine |
+
+Start everything with `docker compose up -d` before running the notebooks.
 
 ## Key Concepts
 
