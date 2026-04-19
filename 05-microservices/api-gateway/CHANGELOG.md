@@ -3,6 +3,12 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-04-19 — QA Review (round 4)
+- Fixed NB2 accuracy bug: the "How a Sliding Window Rate Limiter Works" section actually describes and implements a **fixed-window** counter (bucketed by `floor(now / window_seconds)`). Renamed the section to "How a Fixed-Window Rate Limiter Works", clarified the algorithm steps, and added a callout explaining the *burst-at-the-boundary* weakness that motivates true sliding-window counters (which are covered in the summary table).
+- Fixed the NB2 "Interview Tip" which claimed we implemented a sliding-window counter; now mentions both algorithms honestly.
+- Added a new **Real-World API Gateway Products** section to NB4 comparing nginx, Envoy, Kong, Traefik, HAProxy, AWS API Gateway, Azure APIM, Apigee, Cloudflare/Fastly, and Istio/Linkerd — with a quick heuristic for picking one. This closes the "nginx-only" gap so learners know the patterns they just learned map 1:1 to every major gateway product.
+- Re-executed NB2 and NB4 end-to-end against the live stack — all cells pass and saved outputs reflect real runs.
+
 ## 2026-04-19 — QA Review (round 3)
 - Fixed NB1 load-balancing demo: learners were hitting the gateway's 5 req/sec rate limiter when running the round-robin loop, which returned a plain-text 429 and crashed `r.json()`. Added a 0.25s throttle between requests plus a retry on 429 so the cell now reliably shows a clean 50/50 distribution across the two user-service instances.
 - Fixed NB1 latency comparison: same rate-limit issue. Added throttle parameter and lowered sample size from 20 → 10.
