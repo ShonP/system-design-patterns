@@ -7,3 +7,8 @@ dependencies = [
     "psycopg2-binary>=2.9.9",
     "ipykernel>=6.29.0",
 ]
+
+[dependency-groups]
+dev = [
+    "nbclient>=0.10.4",
+]
