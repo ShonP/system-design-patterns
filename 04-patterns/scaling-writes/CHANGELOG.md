@@ -17,6 +17,28 @@ New content is **added**, never destructively replaced.
   a composite and a GIN-on-JSONB index so the cost of maintaining indexes on
   every INSERT is clearly visible instead of getting lost in timing noise.
 
+### 2026-04-19 (QA review, round 3)
+- **`03_sharding.ipynb`**: Added a hands-on **PostgreSQL declarative
+  partitioning** section. Previously every sharding demo was in-memory
+  Python; this new section creates a `PARTITION BY HASH` table with 4
+  child partitions, inserts 10k rows, shows the near-even row count
+  per partition (~2,500 each), and uses `EXPLAIN` to demonstrate
+  **partition pruning** (a `user_id = 42` query scans only 1 of 4
+  partitions). Bridges the gap between the theory and what PostgreSQL
+  actually does on disk.
+- **`04_queues_load_shedding.ipynb`**: Fixed the bursty-traffic demo so
+  it actually triggers load shedding. It used to enqueue 500 writes
+  into a 1,000-slot queue (impossible to overflow, `dropped = 0`).
+  Now pushes 1,500 writes so the `dropped` counter climbs to 500,
+  making the whole point of the section observable.
+- **`06_hot_keys.ipynb`**: Fixed a correctness bug in `DynamicSplitter`.
+  When K=1 the original code wrote to the bare key, but once K grew
+  `get_total` only scanned suffixed sub-keys — so the early writes
+  were silently lost and the reported total was ~149 short. New
+  version always writes to `{key}_{suffix}` (suffix=0 when K=1), so
+  reads always find everything. Also swapped the hardcoded
+  `"scaled from K=1 to K=8"` message for the actual final K value.
+
 ### 2026-04-19 (QA review, round 2)
 - **`01_write_bottlenecks.ipynb`**: Setup cell now follows the repo's
   `.venv` kernel convention (uv sync + VS Code kernel picker + reload
