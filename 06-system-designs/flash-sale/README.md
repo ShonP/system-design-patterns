@@ -8,11 +8,15 @@ Handling a short window of massive concurrency without overselling.
 
 ## Concepts covered
 
+- Back-of-the-envelope sizing for spike traffic
 - Waiting-room pattern at the edge
 - Token-bucket rate limiting
-- Atomic stock reservation via Redis / Lua
+- Atomic stock reservation via Redis / Lua (simulated)
+- **Hot-key sharding** for stock counters
 - Bounded admission queue for backpressure
-- Reserve-now-pay-later flow
+- Reserve-now-pay-later flow with TTL + reaper
+- Idempotency keys for safe client retries
+- Bad → best progression: naive → locked → atomic CAS → full path
 
 ## Setup
 
