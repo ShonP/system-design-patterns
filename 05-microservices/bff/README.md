@@ -23,8 +23,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- What is a BFF -- one gateway per client type
-- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Monolith API vs. BFF: measured latency and bytes
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- What is a BFF: mobile/web/TV payloads side-by-side
+- [`notebooks/02_worked_example.ipynb`](./notebooks/02_worked_example.ipynb) -- Universal API vs. BFF: parallel fan-out, graceful degradation, tiny cache -- with measured latency
+- [`notebooks/03_bff_vs_gateway_and_pitfalls.ipynb`](./notebooks/03_bff_vs_gateway_and_pitfalls.ipynb) -- BFF vs. API Gateway, classic pitfalls, when NOT to use a BFF, review checklist
 
 ## References
 
