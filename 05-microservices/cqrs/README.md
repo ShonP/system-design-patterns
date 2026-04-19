@@ -23,8 +23,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) -- Separate read and write models
-- [`notebooks/02_event_sourced_example.ipynb`](./notebooks/02_event_sourced_example.ipynb) -- Event-sourced write, materialised read
+- [`notebooks/01_introduction.ipynb`](./notebooks/01_introduction.ipynb) — Bad → best: shared model vs. split read/write with a projection
+- [`notebooks/02_event_sourced_example.ipynb`](./notebooks/02_event_sourced_example.ipynb) — Event-sourced write side, multiple projections, snapshots
+- [`notebooks/03_when_to_use_and_tradeoffs.ipynb`](./notebooks/03_when_to_use_and_tradeoffs.ipynb) — When to use CQRS, eventual consistency demo, real-world store + analytics example
 
 ## References
 
