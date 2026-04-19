@@ -8,10 +8,13 @@ Calendar: events, reminders, recurring events, sharing.
 
 ## Concepts covered
 
-- Event vs occurrence
-- Recurring rules (RRULE / iCalendar)
-- Timezone handling
-- Sharing + ACLs
+- Event vs occurrence; store the RRULE, expand on read
+- Recurring rules (RFC 5545 iCalendar RRULE via `python-dateutil`)
+- Timezone handling (UTC in storage + IANA zone for display, DST-jump detection)
+- Invitations & RSVP, meeting rooms as resources
+- Sharing / ACLs
+- Single-occurrence overrides and cancellations (`event_exceptions` delta table)
+- Free/busy availability: bad minute-mask → best sweep-line interval merge
 
 ## Setup
 
