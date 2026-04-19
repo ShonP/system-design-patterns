@@ -12,6 +12,9 @@ load balancing.
 from flask import Flask, jsonify, request
 import os
 import time
+import json
+import urllib.request
+import urllib.error
 
 app = Flask(__name__)
 
@@ -115,6 +118,67 @@ def debug_headers():
         "received_headers": headers,
         "served_by": f"user-service-{INSTANCE_ID}"
     })
+
+
+# ---------------------------------------------------------------------------
+# Request Aggregation / BFF pattern (Notebook 4)
+# ---------------------------------------------------------------------------
+# This endpoint fetches data from TWO services (users + orders) and returns
+# a combined "profile" payload. The client makes ONE call instead of two.
+#
+# In real systems this composition logic usually lives in a dedicated BFF
+# or GraphQL gateway. We put it in user_service.py to keep the lab simple
+# (one fewer container). We use only the Python standard library so the
+# service Dockerfile doesn't need extra dependencies.
+
+ORDER_SERVICE_URL = os.environ.get("ORDER_SERVICE_URL", "http://order-service:5000")
+
+
+def _fetch_orders_for_user(user_id: str, timeout_seconds: float = 1.5):
+    """Call the order service and return (orders_list, error_message).
+
+    We keep the timeout short so a slow/dead order-service doesn't hang
+    the whole profile request — we return partial data instead.
+    """
+    url = f"{ORDER_SERVICE_URL}/orders?user_id={user_id}"
+    try:
+        with urllib.request.urlopen(url, timeout=timeout_seconds) as resp:
+            body = resp.read().decode("utf-8")
+            return json.loads(body).get("orders", []), None
+    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+        return [], str(exc)
+
+
+@app.route("/profile/<user_id>", methods=["GET"])
+def get_user_profile(user_id):
+    """Aggregated profile: user details + their orders.
+
+    This demonstrates request composition. Notice how the backend
+    gracefully degrades if the order service is unavailable: it still
+    returns user data, just with orders_unavailable=true.
+    """
+    user = users_db.get(user_id)
+    if not user:
+        return jsonify({
+            "error": "User not found",
+            "served_by": f"user-service-{INSTANCE_ID}"
+        }), 404
+
+    orders, error = _fetch_orders_for_user(user_id)
+
+    profile = {
+        "user": user,
+        "orders": orders,
+        "order_count": len(orders),
+        "served_by": f"user-service-{INSTANCE_ID}",
+    }
+
+    # Partial-failure signal — the client can still render the page
+    if error is not None:
+        profile["orders_unavailable"] = True
+        profile["orders_error"] = error
+
+    return jsonify(profile)
 
 
 if __name__ == "__main__":
