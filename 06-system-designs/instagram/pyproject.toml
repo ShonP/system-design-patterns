@@ -9,4 +9,5 @@ dependencies = [
     "Pillow>=10.2.0",
     "jupyter>=1.0.0",
     "ipykernel>=6.28.0",
+    "requests>=2.33.1",
 ]

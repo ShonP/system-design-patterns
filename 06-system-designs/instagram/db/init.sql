@@ -135,11 +135,11 @@ SELECT DISTINCT
 FROM (
     SELECT
         u.id AS follower,
-        ((u.id * prime + offset) % 50) + 1 AS followee
+        ((u.id * prime + shift) % 50) + 1 AS followee
     FROM users u
     CROSS JOIN (
         VALUES (7,3),(13,11),(19,17),(29,5),(37,23),(41,2),(43,31),(47,13),(3,7),(11,29)
-    ) AS params(prime, offset)
+    ) AS params(prime, shift)
     WHERE u.id <= 50
 ) sub
 WHERE follower <> followee;
