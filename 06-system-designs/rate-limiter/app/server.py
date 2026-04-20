@@ -108,12 +108,25 @@ def check_rate_limit(client_id, rule_name="default"):
 
     try:
         sha = get_script_sha()
-        result = redis_client.evalsha(
-            sha, 1, key,
-            rule["max_tokens"],
-            rule["refill_rate"],
-            now,
-        )
+        try:
+            result = redis_client.evalsha(
+                sha, 1, key,
+                rule["max_tokens"],
+                rule["refill_rate"],
+                now,
+            )
+        except redis.exceptions.NoScriptError:
+            # Redis was restarted or flushed its script cache — reload the script.
+            # This is a real production concern: evalsha fails if the cached SHA
+            # is gone, so we fall back to loading and evaluating by source.
+            global token_bucket_sha
+            token_bucket_sha = redis_client.script_load(TOKEN_BUCKET_SCRIPT)
+            result = redis_client.evalsha(
+                token_bucket_sha, 1, key,
+                rule["max_tokens"],
+                rule["refill_rate"],
+                now,
+            )
         allowed = bool(result[0])
         remaining = int(result[1])
         reset_seconds = int(result[2])
@@ -148,8 +161,13 @@ def rate_limit_middleware():
         return None
 
     client_id = identify_client()
-    # Use endpoint-specific rule if the path matches
-    rule_name = "search" if "/search" in request.path else "default"
+    # Map the URL path to a rate limit rule
+    if "/search" in request.path:
+        rule_name = "search"
+    elif "/premium" in request.path:
+        rule_name = "premium"
+    else:
+        rule_name = "default"
     result = check_rate_limit(client_id, rule_name)
 
     # Store for use in after_request
@@ -212,9 +230,7 @@ def search():
 
 @app.route("/api/premium")
 def premium():
-    """Premium endpoint — demonstrates tier-based limits."""
-    client_id = identify_client()
-    result = check_rate_limit(client_id, "premium")
+    """Premium endpoint — demonstrates tier-based limits (50 burst, 10/sec)."""
     return jsonify({
         "message": "Premium data access",
         "client": g.client_id,

@@ -18,10 +18,10 @@ This lab walks you through the core algorithms, distributed challenges with Redi
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Token Bucket Algorithm | How token bucket works, pure Python implementation, burst handling vs steady rate |
-| 2 | Sliding Window Counter | Fixed window boundary problem, sliding window approximation, comparing algorithms |
+| 1 | Token Bucket + Leaky Bucket | Token bucket (burst-friendly), Leaky bucket (smoothing), when to pick which |
+| 2 | Sliding Window Counter + Log | Fixed window boundary problem, sliding window counter, sliding window log (exact) |
 | 3 | Distributed Rate Limiting with Redis | Why local counters fail, Redis + Lua scripts for atomic rate limiting, race conditions |
-| 4 | Rate Limiting at API Gateway Level | Flask middleware, end-to-end rate-limited API, HTTP 429 responses with proper headers |
+| 4 | Rate Limiting at API Gateway Level | Flask middleware, end-to-end rate-limited API, tiered limits, HTTP 429 + client retry with exponential backoff |
 
 ## Prerequisites
 
