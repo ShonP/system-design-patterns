@@ -15,7 +15,11 @@ Includes normal activity AND injected attack patterns:
 import random
 import time
 import httpx
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+
+def _utcnow():
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 SIEM_URL = "http://siem:8000"
 NORMAL_USERS = ["alice@contoso.com", "bob@contoso.com", "carol@contoso.com", "dave@contoso.com", "eve@contoso.com"]
@@ -29,11 +33,11 @@ SUSPICIOUS_LOCATIONS = ["Moscow", "Beijing", "Anonymous Proxy"]
 
 
 def now_iso():
-    return datetime.utcnow().isoformat() + "Z"
+    return _utcnow().isoformat() + "Z"
 
 
 def past_iso(minutes_ago: int):
-    return (datetime.utcnow() - timedelta(minutes=minutes_ago)).isoformat() + "Z"
+    return (_utcnow() - timedelta(minutes=minutes_ago)).isoformat() + "Z"
 
 
 def generate_signin_log(user: str, success: bool, ip: str, location: str):

@@ -28,10 +28,22 @@ The mini-SIEM is a FastAPI service backed by SQLite. A log generator produces re
 ## Quick start
 
 ```bash
-cd security/sc-200/01-build-a-siem
-docker compose up -d
-uv sync
-uv run python -m ipykernel install --user --name=sc-200 --display-name="SC-200 (Python)"
+cd security-certs/sc-200/01-build-a-siem
+docker compose up -d          # start the mini-SIEM + seed attack data
+uv sync                       # install notebook dependencies
 ```
 
+Open any notebook in VS Code and pick the **`.venv` kernel** from this folder
+(top-right kernel picker). If it does not appear, reload the window
+(`Cmd+Shift+P` → `Reload Window`).
+
 The log generator automatically seeds the SIEM with normal traffic + attack patterns. Open any notebook and you'll have real data to investigate.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|--------|-----|
+| `ConnectError` on `localhost:8000` | Run `docker compose up -d`, then `docker compose ps` to confirm `sc200-siem` is **healthy**. |
+| Dashboard shows `total_logs: 0` | Wait ~10 seconds for the log generator to finish, or run `docker logs sc200-log-generator`. |
+| Want to start fresh | `docker compose down -v && docker compose up -d` — the `-v` wipes the seeded database. |
+| Notebook kernel missing | Re-run `uv sync`; pick the `.venv` kernel; reload the VS Code window. |

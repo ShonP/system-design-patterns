@@ -12,7 +12,7 @@ import sqlite3
 import time
 import threading
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -22,6 +22,15 @@ DB_PATH = "/data/siem.db"
 app = FastAPI(title="Mini-SIEM (Sentinel-like)")
 
 _lock = threading.Lock()
+
+
+def _utcnow_iso() -> str:
+    # Naive UTC ISO string so string comparisons in SQLite stay consistent.
+    return datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def _db() -> sqlite3.Connection:
@@ -103,6 +112,13 @@ def _init_db():
             run_at TEXT NOT NULL DEFAULT (datetime('now'))
         );
 
+        CREATE TABLE IF NOT EXISTS watchlists (
+            name TEXT PRIMARY KEY,
+            description TEXT,
+            items JSON NOT NULL DEFAULT '[]',
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
         CREATE INDEX IF NOT EXISTS idx_logs_table ON logs(table_name);
         CREATE INDEX IF NOT EXISTS idx_logs_ts ON logs(timestamp);
         CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status);
@@ -162,6 +178,20 @@ class IncidentUpdate(BaseModel):
     comment: str | None = None
 
 
+class Watchlist(BaseModel):
+    name: str
+    description: str | None = None
+    items: list[str]
+
+
+class WatchlistMatch(BaseModel):
+    watchlist: str
+    table_name: str
+    field: str
+    time_range_minutes: int | None = 1440
+    limit: int = 100
+
+
 # ---------------------------------------------------------------------------
 # Health
 # ---------------------------------------------------------------------------
@@ -180,7 +210,7 @@ def health():
 # ---------------------------------------------------------------------------
 @app.post("/ingest")
 def ingest_log(entry: LogEntry):
-    ts = entry.timestamp or datetime.utcnow().isoformat()
+    ts = entry.timestamp or _utcnow_iso()
     conn = _db()
     conn.execute(
         "INSERT INTO logs (table_name, timestamp, data) VALUES (?, ?, ?)",
@@ -195,7 +225,7 @@ def ingest_log(entry: LogEntry):
 def ingest_batch(batch: LogBatch):
     conn = _db()
     for entry in batch.entries:
-        ts = entry.timestamp or datetime.utcnow().isoformat()
+        ts = entry.timestamp or _utcnow_iso()
         conn.execute(
             "INSERT INTO logs (table_name, timestamp, data) VALUES (?, ?, ?)",
             (entry.table_name, ts, json.dumps(entry.data)),
@@ -215,7 +245,7 @@ def query_logs(req: QueryRequest):
     params: list[Any] = [req.table_name]
 
     if req.time_range_minutes:
-        cutoff = (datetime.utcnow() - timedelta(minutes=req.time_range_minutes)).isoformat()
+        cutoff = (_utcnow() - timedelta(minutes=req.time_range_minutes)).isoformat()
         sql += " AND timestamp >= ?"
         params.append(cutoff)
 
@@ -235,7 +265,7 @@ def query_logs(req: QueryRequest):
         """
         params_agg = [req.table_name]
         if req.time_range_minutes:
-            cutoff = (datetime.utcnow() - timedelta(minutes=req.time_range_minutes)).isoformat()
+            cutoff = (_utcnow() - timedelta(minutes=req.time_range_minutes)).isoformat()
             sql += " AND timestamp >= ?"
             params_agg.append(cutoff)
         if req.filter:
@@ -261,17 +291,39 @@ def query_logs(req: QueryRequest):
 # ---------------------------------------------------------------------------
 @app.post("/rules")
 def create_rule(rule: AnalyticsRule):
-    rule_id = str(uuid.uuid4())[:8]
+    """Upsert by rule name so re-running notebook cells stays idempotent."""
     conn = _db()
-    conn.execute(
-        "INSERT INTO analytics_rules (id, name, severity, tactic, query_table, query_filter, aggregate_by, threshold, window_minutes, description) VALUES (?,?,?,?,?,?,?,?,?,?)",
-        (rule_id, rule.name, rule.severity, rule.tactic, rule.query_table,
-         json.dumps(rule.query_filter) if rule.query_filter else None,
-         rule.aggregate_by, rule.threshold, rule.window_minutes, rule.description),
-    )
+    existing = conn.execute("SELECT id FROM analytics_rules WHERE name = ?", (rule.name,)).fetchone()
+    if existing:
+        rule_id = existing["id"]
+        conn.execute(
+            "UPDATE analytics_rules SET severity=?, tactic=?, query_table=?, query_filter=?, aggregate_by=?, threshold=?, window_minutes=?, description=? WHERE id=?",
+            (rule.severity, rule.tactic, rule.query_table,
+             json.dumps(rule.query_filter) if rule.query_filter else None,
+             rule.aggregate_by, rule.threshold, rule.window_minutes, rule.description, rule_id),
+        )
+        status = "updated"
+    else:
+        rule_id = str(uuid.uuid4())[:8]
+        conn.execute(
+            "INSERT INTO analytics_rules (id, name, severity, tactic, query_table, query_filter, aggregate_by, threshold, window_minutes, description) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (rule_id, rule.name, rule.severity, rule.tactic, rule.query_table,
+             json.dumps(rule.query_filter) if rule.query_filter else None,
+             rule.aggregate_by, rule.threshold, rule.window_minutes, rule.description),
+        )
+        status = "created"
     conn.commit()
     conn.close()
-    return {"id": rule_id, "name": rule.name, "status": "created"}
+    return {"id": rule_id, "name": rule.name, "status": status}
+
+
+@app.delete("/rules/{rule_id}")
+def delete_rule(rule_id: str):
+    conn = _db()
+    conn.execute("DELETE FROM analytics_rules WHERE id = ?", (rule_id,))
+    conn.commit()
+    conn.close()
+    return {"status": "deleted", "id": rule_id}
 
 
 @app.get("/rules")
@@ -290,7 +342,7 @@ def evaluate_all_rules():
     alerts_created = []
 
     for rule in rules:
-        cutoff = (datetime.utcnow() - timedelta(minutes=rule["window_minutes"])).isoformat()
+        cutoff = (_utcnow() - timedelta(minutes=rule["window_minutes"])).isoformat()
         sql = "SELECT data, timestamp FROM logs WHERE table_name = ? AND timestamp >= ?"
         params: list[Any] = [rule["query_table"], cutoff]
 
@@ -444,7 +496,7 @@ def update_incident(incident_id: str, update: IncidentUpdate):
         conn.execute("UPDATE incidents SET classification = ?, updated_at = datetime('now') WHERE id = ?", (update.classification, incident_id))
     if update.comment:
         comments = json.loads(inc["comments"] or "[]")
-        comments.append({"text": update.comment, "time": datetime.utcnow().isoformat()})
+        comments.append({"text": update.comment, "time": _utcnow_iso()})
         conn.execute("UPDATE incidents SET comments = ?, updated_at = datetime('now') WHERE id = ?", (json.dumps(comments), incident_id))
 
     conn.commit()
@@ -507,6 +559,71 @@ def run_playbooks_for_incident(incident_id: str):
     conn.commit()
     conn.close()
     return {"incident_id": incident_id, "playbooks_executed": runs}
+
+
+# ---------------------------------------------------------------------------
+# Watchlists (Threat Intelligence / IOC matching)
+# ---------------------------------------------------------------------------
+@app.post("/watchlists")
+def upsert_watchlist(wl: Watchlist):
+    """Create or replace a watchlist (e.g., list of known-bad IPs or VIP users)."""
+    conn = _db()
+    conn.execute(
+        "INSERT OR REPLACE INTO watchlists (name, description, items, updated_at) VALUES (?,?,?,datetime('now'))",
+        (wl.name, wl.description, json.dumps(wl.items)),
+    )
+    conn.commit()
+    conn.close()
+    return {"name": wl.name, "item_count": len(wl.items), "status": "saved"}
+
+
+@app.get("/watchlists")
+def list_watchlists():
+    conn = _db()
+    rows = conn.execute("SELECT * FROM watchlists").fetchall()
+    conn.close()
+    result = []
+    for r in rows:
+        d = dict(r)
+        d["items"] = json.loads(d["items"])
+        result.append(d)
+    return result
+
+
+@app.post("/watchlists/match")
+def match_watchlist(req: WatchlistMatch):
+    """Return log rows whose `field` value appears in the named watchlist.
+
+    Analogous to KQL:
+        let bad_ips = externaldata(...);
+        Table | where Field in (bad_ips)
+    """
+    conn = _db()
+    wl = conn.execute("SELECT items FROM watchlists WHERE name = ?", (req.watchlist,)).fetchone()
+    if not wl:
+        conn.close()
+        raise HTTPException(404, f"Watchlist '{req.watchlist}' not found")
+    items = json.loads(wl["items"])
+    if not items:
+        conn.close()
+        return {"watchlist": req.watchlist, "matches": []}
+
+    placeholders = ",".join("?" * len(items))
+    sql = (
+        f"SELECT timestamp, data FROM logs WHERE table_name = ? "
+        f"AND json_extract(data, '$.{req.field}') IN ({placeholders})"
+    )
+    params: list[Any] = [req.table_name, *items]
+    if req.time_range_minutes:
+        cutoff = (_utcnow() - timedelta(minutes=req.time_range_minutes)).isoformat()
+        sql += " AND timestamp >= ?"
+        params.append(cutoff)
+    sql += " ORDER BY timestamp DESC LIMIT ?"
+    params.append(req.limit)
+    rows = conn.execute(sql, params).fetchall()
+    conn.close()
+    results = [{"timestamp": r["timestamp"], **json.loads(r["data"])} for r in rows]
+    return {"watchlist": req.watchlist, "field": req.field, "match_count": len(results), "matches": results}
 
 
 # ---------------------------------------------------------------------------
