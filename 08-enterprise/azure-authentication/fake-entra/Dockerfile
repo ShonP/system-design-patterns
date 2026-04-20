@@ -5,5 +5,5 @@ COPY pyproject.toml .
 RUN uv pip install --system --no-cache -r pyproject.toml
 COPY fake-entra/server.py ./server.py
 COPY fake-entra/apps.json ./apps.json
-EXPOSE 9000
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "9000"]
+EXPOSE 9100
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "9100"]

@@ -25,7 +25,7 @@ from fastapi.responses import JSONResponse
 from jose import jwk, jwt
 
 TENANT = "contoso"
-ISSUER = f"http://localhost:9000/{TENANT}/v2.0"
+ISSUER = f"http://localhost:9100/{TENANT}/v2.0"
 TOKEN_LIFETIME_SECONDS = 3600
 KEY_ID = "mock-signing-key-1"
 
@@ -81,7 +81,7 @@ def health():
 @app.get(f"/{TENANT}/v2.0/.well-known/openid-configuration")
 def discovery():
     """OIDC discovery document - SDKs fetch this to learn endpoints & keys."""
-    base = f"http://localhost:9000/{TENANT}"
+    base = f"http://localhost:9100/{TENANT}"
     return {
         "issuer": ISSUER,
         "token_endpoint": f"{base}/oauth2/v2.0/token",

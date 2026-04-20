@@ -5,9 +5,9 @@ services:
       dockerfile: fake-entra/Dockerfile
     container_name: azure-auth-entra
     ports:
-      - "9000:9000"
+      - "9100:9100"
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:9000/health\")'"]
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:9100/health\")'"]
       interval: 3s
       timeout: 3s
       retries: 10
@@ -20,8 +20,8 @@ services:
     ports:
       - "8002:8002"
     environment:
-      JWKS_URI: http://fake-entra:9000/contoso/discovery/v2.0/keys
-      EXPECTED_ISSUER: http://localhost:9000/contoso/v2.0
+      JWKS_URI: http://fake-entra:9100/contoso/discovery/v2.0/keys
+      EXPECTED_ISSUER: http://localhost:9100/contoso/v2.0
       EXPECTED_AUDIENCE: api://api-b
     depends_on:
       fake-entra:
@@ -35,10 +35,10 @@ services:
     ports:
       - "8001:8001"
     environment:
-      JWKS_URI: http://fake-entra:9000/contoso/discovery/v2.0/keys
-      EXPECTED_ISSUER: http://localhost:9000/contoso/v2.0
+      JWKS_URI: http://fake-entra:9100/contoso/discovery/v2.0/keys
+      EXPECTED_ISSUER: http://localhost:9100/contoso/v2.0
       EXPECTED_AUDIENCE: api://api-a
-      AUTHORITY_INTERNAL: http://fake-entra:9000
+      AUTHORITY_INTERNAL: http://fake-entra:9100
       TENANT_ID: contoso
       API_A_CLIENT_ID: api-a-client-id
       API_A_CLIENT_SECRET: api-a-secret-value

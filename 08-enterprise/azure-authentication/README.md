@@ -85,7 +85,7 @@ Then open any notebook and select the `Azure Auth (Python)` kernel (top-right of
 
 ```bash
 # Mock Entra discovery document
-curl http://localhost:9000/contoso/v2.0/.well-known/openid-configuration | jq .
+curl http://localhost:9100/contoso/v2.0/.well-known/openid-configuration | jq .
 
 # API-B health
 curl http://localhost:8002/health
@@ -103,6 +103,7 @@ These mirror what you'd create in the Entra portal. See [`fake-entra/apps.json`]
 | App registration | `api-a`       | `api-a-client-id`             | Middle-tier API. Has a client secret.     |
 | App registration | `api-b`       | `api-b-client-id`             | Resource API. Exposes scopes & app roles. |
 | App registration | `daemon-app`  | `daemon-client-id`            | Background job doing S2S calls.           |
+| App registration | `reporting-daemon` | `reporting-daemon-client-id` | Daemon with **no** granted app roles (for 403 demo). |
 | User             | `alice`       | user principal                | Human user for OBO demos.                 |
 
 API-B exposes:
