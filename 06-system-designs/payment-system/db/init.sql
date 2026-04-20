@@ -119,7 +119,7 @@ INSERT INTO payment_intents (id, merchant_id, amount_cents, currency, descriptio
     ('pi_007', 'merch_003', 3499, 'usd', 'Order #302 - Book bundle', 'succeeded', 'order-302'),
     ('pi_008', 'merch_001', 2499, 'usd', 'Order #1004 - USB cable', 'succeeded', 'order-1004'),
     ('pi_009', 'merch_002', 15000, 'usd', 'Invoice #5003 - Widget bulk', 'succeeded', 'inv-5003'),
-    ('pi_010', 'merch_001', 4999, 'usd', 'Order #1005 - Headphones (duplicate)', 'succeeded', 'order-1001');
+    ('pi_010', 'merch_001', 4999, 'usd', 'Order #1005 - Headphones', 'succeeded', 'order-1005');
 
 -- Sample transactions
 INSERT INTO transactions (id, payment_intent_id, type, amount_cents, currency, status, card_last_four, card_brand, network_reference_id) VALUES
