@@ -21,6 +21,7 @@ This lab lets you break these problems with real code, then fix them step by ste
 | 1 | Bid Processing & Concurrency | Race conditions, row locking, optimistic concurrency control, Redis atomic operations |
 | 2 | Auction Lifecycle Management | Creating auctions, state machines, ending auctions, fault tolerance |
 | 3 | Real-Time Bid Notifications | Polling vs push, Redis Pub/Sub, building a live notification system |
+| 4 | Reserve, Increments & Proxy Bidding | Hidden reserve prices, eBay-style bid increment ladders, proxy (automatic) bidding |
 
 ## Key Concepts Covered
 
