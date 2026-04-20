@@ -15,10 +15,12 @@
 
 ## Notebooks
 
+Each notebook starts with a **glossary** and a **bad practice → best practice** table so beginners can orient themselves before the deeper design exercises.
+
 | # | Notebook | Topics |
 |---|----------|--------|
-| 1 | [Posture and endpoints](notebooks/01_posture_and_endpoints.ipynb) | Defender for Cloud, CSPM vs CWPP, Arc, EASM, endpoint strategy, LAPS |
-| 2 | [Network and services security](notebooks/02_network_and_services_security.ipynb) | Network segmentation, SSE, container security, AI security, baselines |
+| 1 | [Posture and endpoints](notebooks/01_posture_and_endpoints.ipynb) | Defender for Cloud, CSPM vs CWPP, Arc, EASM, endpoint strategy, LAPS, posture-maturity scorer |
+| 2 | [Network and services security](notebooks/02_network_and_services_security.ipynb) | Network segmentation, SSE/ZTNA, container/AKS, AI security, MCSB baselines, NSG audit + Azure Policy example |
 
 ## Quick start
 
