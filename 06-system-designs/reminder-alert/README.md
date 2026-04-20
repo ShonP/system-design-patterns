@@ -8,10 +8,18 @@ Scheduling, delivery, timezone-aware reminders at scale.
 
 ## Concepts covered
 
-- Time-wheel vs priority queue scheduling
-- At-least-once delivery
-- Idempotent receivers
-- Timezone anchoring
+- Requirements + back-of-envelope sizing (1B reminders, 100k fires/s peak)
+- Data modelling: `Reminder` (intent) vs `Delivery` (attempt)
+- Idempotency keys on `POST /reminders`
+- Timezone-aware scheduling + DST-safe recurrence (daily/weekly/monthly)
+- Scheduling algorithms, bad → best:
+  1. Thread-per-reminder (why it fails)
+  2. Polling loop over a sorted list
+  3. `heapq` min-heap priority queue with lazy cancellation
+  4. Hashed hierarchical time wheel
+- At-least-once delivery + idempotent receivers
+- Retries with exponential backoff + jitter; dead-letter queue
+- Sharding strategies and SQL "hot ring" topology
 
 ## Setup
 
