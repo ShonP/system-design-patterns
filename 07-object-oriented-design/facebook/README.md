@@ -8,10 +8,13 @@ OOD of the core of a social network: users, posts, friendships, comments, reacti
 
 ## Concepts covered
 
-- Symmetric friendship as a set
-- Post with comments and reactions (dict, one per user)
-- News feed derived from friend graph
-- ReactionType as enum, not subclass
+- Symmetric friendship as a mirrored `set` (+ blocking cuts both ways)
+- Post with comments and reactions (`dict[user_id → ReactionType]`, one per user)
+- Privacy levels (`PUBLIC / FRIENDS / ONLY_ME`) via a single `can_see` function
+- News feed derived from the friend graph (fanout-on-read)
+- Bonus: fanout-on-write variant + when each strategy wins
+- `ReactionType` as an enum, not a subclass hierarchy — with a bad→best comparison
+- Mutual friends as set intersection
 
 ## Setup
 
