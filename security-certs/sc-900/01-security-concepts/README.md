@@ -6,26 +6,27 @@
 
 This lab covers the foundational mental models that every security topic builds on. After completing it you should be able to explain:
 
+- **CIA triad** — confidentiality, integrity, availability, and which controls protect which leg
 - **Shared responsibility model** — who secures what in IaaS / PaaS / SaaS
 - **Defense in depth** — layered security (physical → network → application → data)
-- **Zero Trust** — "never trust, always verify" with the three principles
-- **Encryption & hashing** — symmetric vs asymmetric, hashing vs encryption, why salting matters
+- **Zero Trust** — "never trust, always verify" (with a bad-vs-best castle-and-moat comparison)
+- **Encryption & hashing** — symmetric vs asymmetric, hashing vs encryption, salting, digital signatures, hybrid encryption (TLS)
 - **GRC** — governance, risk, and compliance frameworks
 
 ## Notebooks
 
 | # | Notebook | Topics |
 |---|----------|--------|
-| 1 | [Security models](notebooks/01_security_models.ipynb) | Shared responsibility, defense in depth, Zero Trust |
-| 2 | [Encryption and hashing](notebooks/02_encryption_and_hashing.ipynb) | Symmetric/asymmetric encryption, hashing, salting, real-world attacks |
+| 1 | [Security models](notebooks/01_security_models.ipynb) | CIA triad, shared responsibility, defense in depth, Zero Trust (bad→best), GRC |
+| 2 | [Encryption and hashing](notebooks/02_encryption_and_hashing.ipynb) | Symmetric/asymmetric encryption, hashing, salting (bad→best), digital signatures, TLS hybrid encryption |
 
 ## Quick start
 
 ```bash
-cd security/sc-900/01-security-concepts
+cd security-certs/sc-900/01-security-concepts
 
 uv sync
 uv run python -m ipykernel install --user --name=sc-900 --display-name="SC-900 (Python)"
 ```
 
-No Docker needed — these labs are pure Python.
+No Docker needed — these labs are pure Python. Select the `SC-900 (Python)` kernel in VS Code (top-right of the notebook). If it's missing, `Cmd+Shift+P` → **Reload Window**.
