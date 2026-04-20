@@ -14,8 +14,9 @@
 
 | # | Notebook | Topics |
 |---|----------|--------|
-| 1 | [KQL hunting patterns](notebooks/01_kql_hunting_patterns.ipynb) | Core query patterns, aggregation, time analysis, entity extraction |
-| 2 | [Advanced threat hunting](notebooks/02_advanced_hunting.ipynb) | Multi-table correlation, anomaly detection, hunt hypotheses |
+| 1 | [KQL hunting patterns](notebooks/01_kql_hunting_patterns.ipynb) | Bad→good hunting, aggregation, rare/known-bad processes, client-side joins, MITRE mapping |
+| 2 | [Advanced threat hunting](notebooks/02_advanced_hunting.ipynb) | Hypothesis-driven hunts, entity pivoting, threat-intel watchlist enrichment, hunt→detection rule |
+| 3 | [Baselines & anomalies](notebooks/03_baselines_and_anomalies.ipynb) | Hour-of-day baseline, off-hours + statistical anomalies, hunting maturity model, ATT&CK coverage |
 
 ## Quick start
 
