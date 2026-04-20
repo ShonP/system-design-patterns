@@ -24,8 +24,9 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 ## Notebooks
 
-- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) — Domain model and class relationships
-- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) — Working Python implementation you can run
+- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) — Domain model, bad `if/elif` vs clean polymorphism
+- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) — Working Python brokerage: orders, cancel, stop-loss
+- [`notebooks/03_patterns_and_matching.ipynb`](./notebooks/03_patterns_and_matching.ipynb) — Price-time priority order book, Observer, Decorator risk guards
 
 ## References
 
