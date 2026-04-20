@@ -20,3 +20,7 @@ New content is **added**, never destructively replaced.
   housekeeping log, room-service extras, and a printed invoice — showing a
   realistic end-to-end hotel day.
 - Verified with `uv run jupyter nbconvert --execute` (both notebooks run clean).
+- Added `03_polymorphism_and_patterns.ipynb`: Strategy pattern for pricing
+  (composable via Decorator), Factory for room construction from config,
+  Observer for booking notifications, plus explicit SOLID framing
+  (Open/Closed, Dependency Inversion). Runs clean via nbconvert.

@@ -15,6 +15,8 @@ OOD of a hotel management system.
 - State machines via `ReservationStatus` / `RoomStatus`
 - Cancellation policy (24-hour refund rule) and housekeeping log
 - Room service extras and a tiny invoice
+- Polymorphism via `ABC` + design patterns (Strategy, Decorator, Factory, Observer)
+- SOLID principles applied: Open/Closed, Dependency Inversion, Single-Responsibility
 
 ## Setup
 
@@ -29,6 +31,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 - [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- Classes: Hotel, Room, Reservation, Guest
 - [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- Booking flow with availability check
+- [`notebooks/03_polymorphism_and_patterns.ipynb`](./notebooks/03_polymorphism_and_patterns.ipynb) -- Strategy (pricing), Factory (rooms), Observer (notifications)
 
 ## References
 
