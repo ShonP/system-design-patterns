@@ -8,10 +8,15 @@ Prefix-based suggestions at scale: trie + precomputed top-K + decaying trend.
 
 ## Concepts covered
 
-- Trie with precomputed top-K at each node
-- Batch-rebuild strategy for safe updates
-- Ranking: frequency + trending + personalization
-- Memory/sharding tradeoffs
+- Back-of-envelope sizing for a per-keystroke service
+- Input normalization (lowercase, unicode folding, whitespace)
+- Three implementations: linear scan → sorted + bisect → trie with precomputed top-K
+- Benchmarks comparing all three on the same corpus
+- FastAPI + Pydantic `/suggest` and `/log` endpoints (exercised in-notebook via `TestClient`)
+- Freshness via a decaying counter in the aggregator (not the serving trie)
+- Optional typo tolerance via edit-distance-1 fallback
+- Memory / sharding / replication tradeoffs
+- Real-world case studies: Google, YouTube, Amazon, Elasticsearch completion suggester, and the Redis sorted-set trick (reproduced in pure Python)
 
 ## Setup
 
@@ -24,9 +29,10 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 ## Notebooks
 
-- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
-- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
-- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: Trie implementation, decay & updates
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements, capacity estimate, naïve baseline, architecture
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data model, Pydantic schemas, runnable FastAPI `/suggest` + `/log`
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — bad → best progression (scan → bisect → trie), benchmarks, decay, optional fuzzy fallback
+- [`notebooks/04_real_world.ipynb`](./notebooks/04_real_world.ipynb) — Case studies + runnable Redis-style sorted-set autocomplete
 
 ## References
 
