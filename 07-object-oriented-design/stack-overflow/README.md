@@ -8,8 +8,14 @@ OOD of Stack Overflow.
 
 ## Concepts covered
 
-- Questions, answers, tags
-- Voting and reputation
+- Clarifying questions, actors, use-cases, UML, SOLID check
+- `User`, `Post`, `Question`, `Answer`, `Comment`, `Vote`
+- Bad → Good → Best progression (god class → proper classes → enums/statuses)
+- Tags + search (inverted index)
+- Badges via the **observer** pattern
+- Moderation (close / reopen / delete)
+- Thread-safe voting (race reproduction + lock fix)
+- Pluggable reputation rules via the **strategy** pattern
 
 ## Setup
 
@@ -22,8 +28,9 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- User, Question, Answer, Vote, Comment
-- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- Post, vote, accept answer, reputation
+- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- clarifying questions, actors, entities, UML, SOLID
+- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- Bad → Good → Best implementation walkthrough
+- [`notebooks/03_extensions.ipynb`](./notebooks/03_extensions.ipynb) -- tags/search, badges (observer), moderation, concurrency, strategy
 
 ## References
 
