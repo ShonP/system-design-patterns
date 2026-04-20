@@ -15,8 +15,8 @@
 
 | # | Notebook | Topics |
 |---|----------|--------|
-| 1 | [Security operations design](notebooks/01_security_operations_design.ipynb) | SIEM vs XDR, Sentinel architecture, SOAR automation, MITRE ATT&CK coverage |
-| 2 | [Identity and compliance design](notebooks/02_identity_and_compliance_design.ipynb) | Enterprise access model, Conditional Access, PIM, Purview, Azure Policy |
+| 1 | [Security operations design](notebooks/01_security_operations_design.ipynb) | Glossary, bad→best practices, SIEM vs XDR, Sentinel architecture, SOAR, MITRE ATT&CK, **runnable detection engine**, SolarWinds case study |
+| 2 | [Identity and compliance design](notebooks/02_identity_and_compliance_design.ipynb) | Glossary, bad→best practices, Enterprise access model, **runnable Conditional Access evaluator**, PIM, **Zero Trust maturity scorer**, Purview, Azure Policy, Midnight Blizzard case study |
 
 ## Quick start
 
