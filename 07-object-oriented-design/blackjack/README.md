@@ -8,10 +8,15 @@ Object-oriented design of the classic card game, with correct Ace handling and a
 
 ## Concepts covered
 
-- Card, Deck, Hand classes
-- Polymorphic Player vs Dealer strategy
-- Soft-vs-hard Ace rule in `Hand.value()`
+- Bad (one-function) design → clean OO design (bad→best progression)
+- `Card`, `Deck`, `Hand` classes with clear single responsibilities
+- Polymorphic `Player` vs `Dealer` decision-making
+- Soft-vs-hard Ace rule encapsulated in `Hand.value()`
 - Game loop and settlement
+- **Strategy Pattern** — swap playing styles without subclassing
+- **Composition over inheritance** — `Player` *has a* `Strategy` and `Chips`
+- Betting with a `Chips` class, blackjack 3:2 payout, pushes
+- Discussion of splits / Open-Closed Principle for future extensions
 
 ## Setup
 
@@ -24,8 +29,9 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 ## Notebooks
 
-- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) — Domain model and class relationships
-- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) — Working Python implementation you can run
+- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) — Bad design → clean OO design, domain model, class relationships
+- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) — Working Python implementation, built class by class, with inline assertions
+- [`notebooks/03_extensions.ipynb`](./notebooks/03_extensions.ipynb) — Strategy Pattern, betting with `Chips`, and a discussion of splits (Open/Closed)
 
 ## References
 
