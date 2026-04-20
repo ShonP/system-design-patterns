@@ -4,13 +4,18 @@
 
 ## What you'll implement
 
-- Bastion and JIT VM access
-- AKS security — network policies, workload identity, ACR integration
-- Container security — ACI, Container Apps, ACR
-- Disk encryption — ADE, encryption at host, confidential disk
-- Storage access control — SAS, access keys, RBAC, firewall rules
-- Storage protection — soft delete, versioning, immutable storage, BYOK
-- SQL security — Entra auth, auditing, dynamic masking, TDE, Always Encrypted
+- Bastion and JIT VM access (with a full NSG-rule lifecycle simulator)
+- AKS security — private clusters, workload identity, network policy, Azure Policy add-on, ACR attach
+- Container registry security — admission control, content trust, vulnerability scanning
+- Disk encryption — SSE, ADE, encryption at host, confidential disk; Trusted Launch & Confidential VMs
+- Storage access control — Entra RBAC, SAS (with live HMAC signing), stored access policies
+- Storage network protection — firewall, private endpoints, "allow trusted Azure services"
+- Storage encryption — BYOK (CMK), infrastructure encryption (double encryption)
+- Storage data protection — soft delete, versioning, PITR, immutable storage (WORM)
+- SQL security — Entra-only auth, firewall vs private endpoint, auditing, Defender for SQL
+- Data protection — TDE (BYOK), Always Encrypted, Dynamic Data Masking, Row-Level Security
+- Cosmos DB / PostgreSQL / MySQL security patterns
+- Bad → best progression for every topic
 
 ## Notebooks
 
