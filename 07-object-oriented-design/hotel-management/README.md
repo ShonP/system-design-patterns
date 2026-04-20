@@ -8,9 +8,13 @@ OOD of a hotel management system.
 
 ## Concepts covered
 
-- Rooms, reservations, guests
-- Search and booking flows
-- Billing
+- Picking classes from requirements (nouns → classes, verbs → methods)
+- Bad → better → best design progression
+- `Enum` and `@dataclass` for typo-proof, low-boilerplate domain types
+- Interval-overlap math for reservations and double-booking prevention
+- State machines via `ReservationStatus` / `RoomStatus`
+- Cancellation policy (24-hour refund rule) and housekeeping log
+- Room service extras and a tiny invoice
 
 ## Setup
 
