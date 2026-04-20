@@ -1,27 +1,27 @@
 services:
   fake-entra:
     build:
-      context: ../../../enterprise-patterns/azure-authentication
+      context: ../../../08-enterprise/azure-authentication
       dockerfile: fake-entra/Dockerfile
     container_name: sc900-entra
     ports:
-      - "9000:9000"
+      - "9100:9100"
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:9000/health\")'"]
+      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:9100/health\")'"]
       interval: 3s
       timeout: 3s
       retries: 10
 
   api-b:
     build:
-      context: ../../../enterprise-patterns/azure-authentication
+      context: ../../../08-enterprise/azure-authentication
       dockerfile: api-b/Dockerfile
     container_name: sc900-api-b
     ports:
       - "8002:8002"
     environment:
-      JWKS_URI: http://fake-entra:9000/contoso/discovery/v2.0/keys
-      EXPECTED_ISSUER: http://localhost:9000/contoso/v2.0
+      JWKS_URI: http://fake-entra:9100/contoso/discovery/v2.0/keys
+      EXPECTED_ISSUER: http://localhost:9100/contoso/v2.0
       EXPECTED_AUDIENCE: api://api-b
     depends_on:
       fake-entra:
