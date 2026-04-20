@@ -9,9 +9,13 @@ OOD of a cricket match: teams, innings, overs, balls, and score computation.
 ## Concepts covered
 
 - Team / Player / Match / Innings / Over / Ball hierarchy
-- Encoding cricket rules (legal balls, extras, wickets)
-- Innings state and termination conditions
-- Winner determination
+- Bad → best progression: from one dict-juggling function to a clean class design
+- Single Responsibility: each rule lives in exactly one class
+- Enums instead of magic strings (catching typos at write-time)
+- Encoding cricket rules (legal balls, extras, wickets, over-limit termination)
+- Winner reporting in cricket's own language (by runs / by wickets / tied)
+- Observer pattern via a live `Commentary` feed
+- Assertion-based mini test suite
 
 ## Setup
 
