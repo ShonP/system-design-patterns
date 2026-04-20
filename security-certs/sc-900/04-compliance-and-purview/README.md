@@ -6,26 +6,29 @@
 
 - Service Trust Portal and Microsoft's privacy principles
 - Microsoft Purview portal and Compliance Manager (compliance score)
+- Microsoft Priva and Subject Rights Requests (GDPR/CCPA)
 - Data classification — sensitive info types, trainable classifiers
 - Sensitivity labels and Data Loss Prevention (DLP)
 - Records management and retention policies
-- Insider risk management, eDiscovery, and audit
+- Insider Risk Management and Communication Compliance
+- eDiscovery (Standard and Premium) and Audit
 
 ## Notebooks
 
 | # | Notebook | Topics |
 |---|----------|--------|
-| 1 | [Compliance fundamentals](notebooks/01_compliance_fundamentals.ipynb) | Service Trust Portal, Compliance Manager, compliance score, Priva |
-| 2 | [Information protection and DLP](notebooks/02_information_protection_and_dlp.ipynb) | Data classification, sensitivity labels, DLP, retention |
-| 3 | [Insider risk and eDiscovery](notebooks/03_insider_risk_and_ediscovery.ipynb) | Insider risk, eDiscovery, audit |
+| 1 | [Compliance fundamentals](notebooks/01_compliance_fundamentals.ipynb) | Service Trust Portal, shared responsibility, Compliance Manager scoring, Priva + Subject Rights Requests |
+| 2 | [Information protection and DLP](notebooks/02_information_protection_and_dlp.ipynb) | Sensitive info types, auto-labeling, DLP (bad → best), retention, end-to-end scenario |
+| 3 | [Insider risk, Communication Compliance, eDiscovery, and Audit](notebooks/03_insider_risk_and_ediscovery.ipynb) | Insider risk scoring, Communication Compliance, legal holds, audit log search |
 
 ## Quick start
 
 ```bash
-cd security/sc-900/04-compliance-and-purview
+cd security-certs/sc-900/04-compliance-and-purview
 
 uv sync
-uv run python -m ipykernel install --user --name=sc-900 --display-name="SC-900 (Python)"
 ```
 
-No Docker needed.
+Then open any notebook in VS Code and select the `.venv` kernel from the kernel picker (top-right of the notebook). If the `.venv` kernel doesn't show up, reload the VS Code window (`Cmd+Shift+P` → *Developer: Reload Window*).
+
+No Docker needed — all Purview features are simulated in Python.
