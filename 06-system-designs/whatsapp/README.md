@@ -12,8 +12,8 @@ You will work with a live **WebSocket chat server**, **PostgreSQL** for durable 
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Message Delivery & Storage | WebSocket messaging, inbox pattern, offline delivery, Redis pub/sub |
-| 2 | Read Receipts & Presence | Delivered/read status, online/offline tracking, heartbeats |
+| 1 | Message Delivery & Storage | Bad→best progression (polling vs WebSocket), WebSocket messaging, inbox pattern, offline delivery, Redis pub/sub |
+| 2 | Read Receipts & Presence | Delivered/read status, online/offline tracking, heartbeats, typing indicators, media handling with signed URLs |
 | 3 | Group Messaging | Fan-out to participants, partitioning strategies, admin controls |
 | 4 | End-to-End Encryption Basics | Public/private keys, encrypting messages, why the server can't read them |
 
