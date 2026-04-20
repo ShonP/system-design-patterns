@@ -24,7 +24,7 @@
 ## Quick start
 
 ```bash
-cd security/sc-100/04-applications-and-data
+cd security-certs/sc-100/04-applications-and-data
 uv sync
 uv run python -m ipykernel install --user --name=sc-100 --display-name="SC-100 (Python)"
 ```
