@@ -98,13 +98,12 @@ cd enterprise-patterns/bcdr
 # Start all services (PostgreSQL primary + standby, Redis primary + replica, etc.)
 docker-compose up -d
 
-# Install dependencies
+# Install dependencies (creates .venv automatically)
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=bcdr --display-name="BCDR (Python)"
-
-# Open the first notebook and start learning!
+# Open any notebook in VS Code and pick the `.venv` kernel from the
+# kernel picker (top-right). If it does not appear, reload the window:
+# Cmd+Shift+P → "Reload Window".
 ```
 
 ## 🔍 Visualization Tools (Included in Docker)
@@ -160,6 +159,25 @@ uv run python -m ipykernel install --user --name=bcdr --display-name="BCDR (Pyth
 | **Epic (Healthcare)** | Real-time replication, RPO near-zero for patient records |
 | **Netflix** | Chaos Engineering (Chaos Monkey), multi-region active-active |
 | **NYSE** | Hot standby in separate building, <30 second failover |
+
+## 📰 Famous Outages That Shaped BCDR Practice
+
+These incidents each cost their companies millions and changed how the
+industry thinks about resilience. They map directly to the concepts in this lab.
+
+| Year | Incident | What happened | BCDR lesson |
+|------|----------|--------------|--------------|
+| 2017 | **GitLab db1 deletion** | An engineer ran `rm -rf` on the wrong primary; 5 of 6 backup mechanisms were broken | Untested backups = hope. Restore was ~18h, and some data was lost forever. → Notebooks 3 & 4 |
+| 2017 | **Maersk NotPetya** | Ransomware encrypted ~50,000 machines globally; recovered only because a single DC in Ghana was offline during the attack | Off-site + air-gapped copies (3-2-1-1 rule). → Notebook 3 |
+| 2017 | **British Airways IT outage** | Power supply failure at a London DC caused a 3-day disruption; ~$100M loss | Redundant power, tested failover, multi-region. → Notebook 4 |
+| 2016 | **Delta Air Lines** | A single power-control module failed, 2,000 flights cancelled, ~$150M loss | Don't assume "the DC has backup power" — test it. → Notebook 4 |
+| 2021 | **Facebook 6-hour outage** | A BGP config push cut FB off the internet; even internal tools used FB auth | BCDR includes your *recovery tools* too. → Notebook 4 |
+| 2019 | **Salesforce permission bug** | A script gave all users admin rights; forced global read-only for ~15 hours | Logical errors replicate instantly. Backups + PITR are the only recovery. → Notebook 3 |
+| 2022 | **Rogers (Canada) outage** | Routing change knocked out the entire network for ~19h — including 911 | Change-management + staged rollouts are part of BCDR. |
+
+**Pattern across all of these**: the technology to prevent the outage
+already existed. What failed was **testing the recovery plan under realistic
+conditions** — exactly what Notebook 4 (Disaster Recovery Drill) teaches.
 
 ## License
 

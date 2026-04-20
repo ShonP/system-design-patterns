@@ -12,22 +12,31 @@ set -e
 
 PGDATA="/var/lib/postgresql/data"
 
+# Make sure the data directory exists and is owned by the postgres user.
+# (pg_basebackup and postgres must run as 'postgres', never as root.)
+mkdir -p "$PGDATA"
+chown -R postgres:postgres "$PGDATA"
+
 # Only do the base backup if this is a fresh container (no existing data)
 if [ ! -f "$PGDATA/PG_VERSION" ]; then
     echo "============================================"
     echo "Standby: No data found. Cloning from primary..."
     echo "============================================"
 
-    # pg_basebackup copies the entire database from the primary
+    # pg_basebackup copies the entire database from the primary.
+    # We run it as the 'postgres' OS user via gosu so that all files
+    # created inside $PGDATA are owned by postgres (required by the server).
+    #
     # -h pg-primary   : connect to the primary container
     # -U replicator   : use the replication user
     # -D $PGDATA      : write data to this directory
-    # -Fp              : plain format (not tar)
-    # -Xs              : stream WAL during backup (most reliable)
-    # -P               : show progress
-    # -R               : create standby.signal + write primary_conninfo
-    #                    (this tells PostgreSQL "you are a standby")
-    pg_basebackup \
+    # -Fp             : plain format (not tar)
+    # -Xs             : stream WAL during backup (most reliable)
+    # -P              : show progress
+    # -R              : create standby.signal + write primary_conninfo
+    #                   (this tells PostgreSQL "you are a standby")
+    # -S standby_slot : use the replication slot created on the primary
+    gosu postgres pg_basebackup \
         -h pg-primary \
         -p 5432 \
         -U replicator \
@@ -45,9 +54,10 @@ else
     echo "Standby: Existing data found. Resuming replication..."
 fi
 
-# Fix permissions (PostgreSQL requires 700 on data directory)
+# PostgreSQL requires 0700 permissions on the data directory.
 chmod 700 "$PGDATA"
+chown -R postgres:postgres "$PGDATA"
 
-# Start PostgreSQL — it will automatically enter standby mode
-# because standby.signal exists in the data directory
-exec postgres
+# Start PostgreSQL as the 'postgres' user — running as root is forbidden.
+# standby.signal in $PGDATA will put the server into hot-standby mode.
+exec gosu postgres postgres
