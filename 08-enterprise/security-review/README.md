@@ -17,7 +17,7 @@ We've built an **intentionally vulnerable Flask web app** that you'll attack and
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
 | 1 | Threat Modeling (STRIDE) | How to systematically identify threats before writing code |
-| 2 | Common Vulnerabilities | SQL injection, XSS, CSRF, SSRF — attack and fix each one |
+| 2 | Common Vulnerabilities | SQL injection, XSS, CSRF, SSRF, missing security headers — attack and fix each one |
 | 3 | Secrets Management | Why hardcoded secrets are dangerous and how to fix it |
 | 4 | Security Gates in CI/CD | Automated SAST/DAST scanning, dependency checks, sign-off |
 

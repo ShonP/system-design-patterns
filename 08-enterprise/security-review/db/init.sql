@@ -72,12 +72,12 @@ CREATE TABLE api_keys (
 
 -- Users (passwords are bcrypt hashes of simple passwords for demo purposes)
 -- Password for all users: "password123"
--- $2b$12$ hash of "password123"
+-- The hash below is a real bcrypt($2b$12) hash of "password123".
 INSERT INTO users (username, email, password_hash, role) VALUES
-    ('admin', 'admin@example.com', '$2b$12$LJ3m4ys3Lg3LuEAPkVg5M.Q1cFjKnEcBsYhS2fS7.oPIpF.LqCPC.', 'admin'),
-    ('alice', 'alice@example.com', '$2b$12$LJ3m4ys3Lg3LuEAPkVg5M.Q1cFjKnEcBsYhS2fS7.oPIpF.LqCPC.', 'user'),
-    ('bob', 'bob@example.com', '$2b$12$LJ3m4ys3Lg3LuEAPkVg5M.Q1cFjKnEcBsYhS2fS7.oPIpF.LqCPC.', 'user'),
-    ('charlie', 'charlie@example.com', '$2b$12$LJ3m4ys3Lg3LuEAPkVg5M.Q1cFjKnEcBsYhS2fS7.oPIpF.LqCPC.', 'editor');
+    ('admin', 'admin@example.com', '$2b$12$xMdy/.AUFBirgZpJo72GSuRLEjo2w25UrCL2yf5U2CavEK6T.r1a2', 'admin'),
+    ('alice', 'alice@example.com', '$2b$12$xMdy/.AUFBirgZpJo72GSuRLEjo2w25UrCL2yf5U2CavEK6T.r1a2', 'user'),
+    ('bob', 'bob@example.com', '$2b$12$xMdy/.AUFBirgZpJo72GSuRLEjo2w25UrCL2yf5U2CavEK6T.r1a2', 'user'),
+    ('charlie', 'charlie@example.com', '$2b$12$xMdy/.AUFBirgZpJo72GSuRLEjo2w25UrCL2yf5U2CavEK6T.r1a2', 'editor');
 
 -- Products
 INSERT INTO products (name, description, price, category, stock) VALUES

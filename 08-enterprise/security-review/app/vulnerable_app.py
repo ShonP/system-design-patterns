@@ -16,6 +16,7 @@ Used by the Jupyter notebooks to demonstrate:
 import os
 import jwt
 import hashlib
+import bcrypt
 import requests as http_requests
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template_string, redirect, make_response
@@ -290,8 +291,13 @@ def login_vulnerable():
     if not user:
         return jsonify({"error": "User not found"}), 404  # 🚨 reveals user existence
 
-    # 🚨 BAD: Using MD5 for password comparison (weak hash)
-    md5_hash = hashlib.md5(password.encode()).hexdigest()
+    # 🚨 BAD: Also computes MD5 (weak hash) — but the seed data is bcrypt, so we
+    # fall back to bcrypt for the actual comparison. The point is: even when the
+    # password is WRONG we still need to reject it, and the JWT/rate-limit
+    # weaknesses below remain.
+    _md5_hash = hashlib.md5(password.encode()).hexdigest()  # noqa: F841 (weak hash demo)
+    if not bcrypt.checkpw(password.encode(), user[1].encode()):
+        return jsonify({"error": "Invalid password"}), 401  # 🚨 still leaks which field was wrong
 
     # 🚨 BAD: JWT with no expiration, weak secret
     token = jwt.encode(
@@ -348,6 +354,47 @@ def login_safe():
         algorithm="HS256",
     )
     return jsonify({"token": token})
+
+
+# ============================================================
+# 🚨 VULNERABILITY 6: Missing Security Headers
+# ============================================================
+
+@app.route("/page/profile")
+def profile_page_vulnerable():
+    """VULNERABLE: No security headers. Browser has no extra protection."""
+    html = """
+    <h1>My Profile</h1>
+    <p>Welcome back!</p>
+    <!-- imagine a rich page here -->
+    """
+    # 🚨 BAD: No Content-Security-Policy, no HSTS, no X-Frame-Options,
+    # no X-Content-Type-Options. The browser is flying blind.
+    return html
+
+
+@app.route("/page/profile/safe")
+def profile_page_safe():
+    """FIXED: Returns recommended security headers."""
+    html = """
+    <h1>My Profile</h1>
+    <p>Welcome back!</p>
+    <!-- imagine a rich page here -->
+    """
+    response = make_response(html)
+    # ✅ GOOD: Tell the browser which scripts/styles are allowed
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'"
+    # ✅ GOOD: Force HTTPS for future requests (only meaningful over HTTPS)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    # ✅ GOOD: Block clickjacking via iframes
+    response.headers["X-Frame-Options"] = "DENY"
+    # ✅ GOOD: Prevent MIME sniffing
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    # ✅ GOOD: Limit how much info the Referer header leaks
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    # ✅ GOOD: Disable powerful APIs the page doesn't need
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    return response
 
 
 # ============================================================
