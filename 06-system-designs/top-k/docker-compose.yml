@@ -18,7 +18,9 @@ services:
       retries: 5
 
   redis:
-    image: redis:7
+    # Redis Stack bundles the Bloom/CMS/TopK/HyperLogLog-friendly modules
+    # (RedisBloom) out of the box — needed for the CMS.* and TOPK.* demos.
+    image: redis/redis-stack-server:latest
     container_name: topk-redis
     ports:
       - "6379:6379"

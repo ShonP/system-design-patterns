@@ -54,6 +54,11 @@ uv run python -m ipykernel install --user --name=top-k --display-name="Top-K (Py
 - **First time setup**: Click "Add Redis Database" → Host `redis`, Port `6379`
 - **Use for**: Watch sorted sets update in real time, inspect Count-Min Sketch keys
 
+> ℹ️ This lab uses the **Redis Stack** image (`redis/redis-stack-server`) because
+> it bundles the **RedisBloom** module. That's what makes the `CMS.*` and `TOPK.*`
+> commands (used in Notebook 1) available out of the box — plain `redis:7` does
+> not have them.
+
 ## Key Concepts Covered
 
 ### The Core Problem
