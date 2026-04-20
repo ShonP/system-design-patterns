@@ -24,9 +24,10 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 ## Notebooks
 
-- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
-- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
-- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: Priority, Retries, Idempotency
+- [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements, capacity math & architecture
+- [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data model, API contract & a runnable mini pipeline
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep dive: priority, retries, idempotency (bad → better → best)
+- [`notebooks/04_production_concerns.ipynb`](./notebooks/04_production_concerns.ipynb) — Fan-out, per-provider rate limiting, circuit breakers, metrics
 
 ## References
 
