@@ -1,6 +1,7 @@
 services:
   postgres:
-    image: postgres:16
+    # PostGIS-enabled Postgres image — needed for the GIS extension used in db/init.sql
+    image: postgis/postgis:16-3.4
     container_name: yelp-postgres
     environment:
       POSTGRES_USER: demo

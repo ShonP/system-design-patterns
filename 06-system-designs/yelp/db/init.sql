@@ -2,9 +2,10 @@
 -- Businesses, users, and reviews for a Yelp-like system
 
 -- ============================================================
--- Enable PostGIS for geospatial queries
+-- Enable PostGIS for geospatial queries and pg_trgm for fuzzy text search
 -- ============================================================
 CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- ============================================================
 -- Tables

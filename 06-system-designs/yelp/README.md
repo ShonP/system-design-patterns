@@ -19,7 +19,7 @@ This lab walks you through all three with real, runnable code.
 |---|----------|-------------------|
 | 1 | Geospatial Search | PostGIS spatial indexes, Elasticsearch geo_distance, Redis caching, why B-trees fail for 2D data |
 | 2 | Review & Rating Aggregation | Running average formula, optimistic locking for concurrent updates, database constraints |
-| 3 | Search Ranking & Relevance | BM25 text scoring, fuzzy matching, multi-signal ranking with function_score |
+| 3 | Search Ranking & Relevance | BM25 text scoring, fuzzy matching, autocomplete (search-as-you-type), multi-signal ranking with function_score |
 
 ## Prerequisites
 
@@ -77,6 +77,7 @@ uv run python -m ipykernel install --user --name=yelp --display-name="Yelp (Pyth
 ### Search Ranking
 - **BM25 / TF-IDF** — how Elasticsearch scores text relevance
 - **Fuzzy matching** — handles typos using edit distance
+- **Autocomplete (search-as-you-type)** — `match_phrase_prefix` for instant suggestions
 - **Multi-signal ranking** — combine text match + distance + rating + review count
 - **`function_score`** — Elasticsearch's custom ranking query
 
