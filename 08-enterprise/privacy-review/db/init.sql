@@ -55,7 +55,9 @@ CREATE TABLE users (
 -- =============================================================================
 CREATE TABLE payment_methods (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    -- ON DELETE CASCADE: card data must die with the account (PCI DSS + retention policy
+    -- "Deleted immediately when user removes card")
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
 
     -- RESTRICTED: payment card data (PCI DSS scope)
     card_number_encrypted VARCHAR(255),
@@ -74,7 +76,9 @@ CREATE TABLE payment_methods (
 -- =============================================================================
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    -- ON DELETE SET NULL: unlink the user but keep the order row for 7-year tax retention.
+    -- Shipping PII fields will be anonymized by the retention engine.
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     order_number VARCHAR(20) UNIQUE NOT NULL,
 
     -- CONFIDENTIAL: shipping details duplicate user PII
@@ -100,7 +104,9 @@ CREATE TABLE orders (
 -- =============================================================================
 CREATE TABLE support_tickets (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    -- ON DELETE SET NULL: keep the ticket for the 1-year retention window but unlink
+    -- the author once the user is hard-deleted.
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     subject VARCHAR(255),
 
     -- CONFIDENTIAL: free-text often contains PII accidentally
@@ -120,7 +126,9 @@ CREATE TABLE support_tickets (
 -- =============================================================================
 CREATE TABLE activity_log (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
+    -- ON DELETE SET NULL: activity rows are hard-deleted after 90 days anyway, but we
+    -- unlink on user deletion so the FK does not block erasure.
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
 
     -- CONFIDENTIAL: behavioral data tied to a user
     action VARCHAR(100),
