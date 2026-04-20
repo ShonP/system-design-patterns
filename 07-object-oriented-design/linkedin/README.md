@@ -8,9 +8,13 @@ OOD of a professional network: profiles, connection request/accept flow, jobs, a
 
 ## Concepts covered
 
-- Profile with experiences, education, skills
-- Connection request state machine
-- Jobs & applications with skill-match scoring
+- Profile with experiences, education, and skills (with normalization)
+- Connection request as a first-class object with a guarded state machine (PENDING → ACCEPTED/REJECTED)
+- `ConnectionService` that prevents duplicate pending requests and self-connections
+- Application state machine (SUBMITTED → REVIEWED → OFFER/REJECTED) with skill-match scoring
+- Endorsements as `(endorser, endorsee, skill)` graph edges
+- Messaging restricted to connections (InMail concept)
+- A simple `JobRecommender` combining skill match with an "in-company connection" signal
 
 ## Setup
 
