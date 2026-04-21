@@ -1,264 +1,547 @@
 # 🏗️ System Design Labs
 
-**57 hands-on labs · 220 Jupyter notebooks · Real Docker infrastructure**
+> **Learn system design by running real code.** Every lab is a self-contained
+> sandbox with Docker-based infrastructure, Jupyter notebooks, and a
+> **bad → better → best** teaching progression so you can *see why* the naive
+> solution breaks before learning the production one.
 
-Learn system design by running real code. Each lab includes Docker-based infrastructure, Python notebooks with working examples, and follows a **bad → better → best** teaching pattern.
+![Labs](https://img.shields.io/badge/labs-148-blue)
+![Notebooks](https://img.shields.io/badge/notebooks-510-orange)
+![Categories](https://img.shields.io/badge/categories-8-green)
+![Security Certs](https://img.shields.io/badge/cert%20tracks-4-red)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![Stack](https://img.shields.io/badge/stack-Python%20%7C%20Docker%20%7C%20uv-purple)
+
+This repo is **educational, not production-grade**. The code is intentionally
+simple, well-commented, and optimized for learning — not performance or
+hardening. Use it to experiment, break things, and build intuition.
+
+---
+
+## 📚 Table of Contents
+
+1. [What's Inside](#-whats-inside)
+2. [Getting Started](#-getting-started)
+3. [Learning Roadmap](#-learning-roadmap-8-weeks)
+4. [Full Lab Index](#-full-lab-index)
+5. [How Each Lab Works](#-how-each-lab-works)
+6. [Contributing](#-contributing)
+7. [License](#-license)
+
+---
 
 ## 🎯 What's Inside
 
-| Category | Labs | Notebooks | Description |
-|----------|------|-----------|-------------|
-| [01 Foundations](#-01-foundations) | 8 | 30 | Fundamental building blocks |
-| [02 Distributed Primitives](#-02-distributed-primitives) | 0 | 0 | _(planned)_ Bloom filters, replication, leader election, … |
-| [03 Technologies](#-03-technologies) | 10 | 42 | Technology-specific deep dives (databases, messaging, coordination, workflow engines) |
-| [04 Patterns](#-04-patterns) | 7 | 42 | Cross-cutting scaling & reliability patterns |
-| [05 Microservices](#-05-microservices) | 1 | 3 | Microservices patterns (API gateway, …) |
-| [06 System Designs](#-06-system-designs) | 27 | 93 | End-to-end system design problems |
-| [07 Object-Oriented Design](#-07-object-oriented-design) | 0 | 0 | _(planned)_ OOD / LLD problems |
-| [08 Enterprise](#-08-enterprise) | 4 | 16 | Microsoft/enterprise-grade patterns |
-| [Security Certifications](#-security-certifications) | 4 tracks | – | Azure security certification labs |
-| **Total** | **57** | **222** | |
+| # | Category | Labs | Notebooks | What you'll learn |
+|---|----------|-----:|----------:|-------------------|
+| 01 | [Foundations](01-foundations/) | 16 | 61 | Core building blocks: caching, sharding, replication, load balancing, CAP, consistent hashing, IDs, observability, messaging basics, CDN, DNS, auth |
+| 02 | [Distributed Primitives](02-distributed-primitives/) | 14 | 41 | Low-level mechanics: WAL, gossip, vector clocks, quorum, merkle trees, heartbeats, leases, hinted handoff, read repair, fencing |
+| 03 | [Technologies](03-technologies/) | 10 + 6 refs | 45 | Deep dives: Postgres, Redis, Kafka, ZooKeeper, Cassandra, DynamoDB, Elasticsearch, vector/time-series DBs, Temporal + reference papers (GFS, HDFS, Bigtable, Dynamo, Chubby, S3) |
+| 04 | [Patterns](04-patterns/) | 11 | 62 | Scaling & reliability: read/write scaling, contention, real-time, large blobs, rate limiting, resilience, idempotency, outbox/CDC, sagas |
+| 05 | [Microservices](05-microservices/) | 12 | 39 | Service patterns: API gateway, BFF, service discovery, sidecar, circuit breaker, bulkhead, retry, saga, CQRS, EDA, strangler, config externalization |
+| 06 | [System Designs](06-system-designs/) | 47 | 156 | End-to-end: Bitly, Uber, WhatsApp, Instagram, YouTube, Dropbox, Netflix, Discord, Tinder, Stock Exchange, Payment, Ticketmaster, +35 more |
+| 07 | [Object-Oriented Design](07-object-oriented-design/) | 18 | 43 | Classic LLD/OOD interview problems: parking lot, elevator, chess, library, ATM, hotel, airline, +more |
+| 08 | [Enterprise](08-enterprise/) | 5 | 21 | Process patterns: BCDR, GDPR paired regions, privacy review, security review, Azure auth |
+| — | [Security Certifications](security-certs/) | 4 tracks · 15 modules | 42 | Azure study labs: SC-900, SC-100, SC-200, AZ-500 |
+| | **Total** | **148** | **510** | |
 
-> **🚧 Restructure in progress.** The top-level folders were reorganized; the
-> old `core-concepts/`, `deep-dives/`, `patterns/`, `enterprise-patterns/`,
-> `system-designs/`, `security/`, and `scraper/` directories moved to new
-> numbered homes. See [`docs/restructure-proposal.md`](docs/restructure-proposal.md)
-> for the full rationale and plan.
+> Numbers reflect labs that contain runnable notebooks. Some labs in
+> `03-technologies/reference-systems/` and a few in `06-system-designs/`
+> (e.g. `chatgpt/`) are currently documentation-only.
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Python 3.10+
-- Docker & Docker Compose
-- [uv](https://github.com/astral-sh/uv) (recommended) or pip
+| Tool | Why | Install |
+|------|-----|---------|
+| **Python 3.10+** | Notebooks use modern typing / pattern matching | [python.org](https://www.python.org/downloads/) |
+| **Docker + Compose** | Every lab ships real infra (Postgres, Redis, Kafka, …) | [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
+| **[uv](https://github.com/astral-sh/uv)** | Fast, reproducible Python env per lab (recommended) | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| **VS Code** (optional) | Best notebook experience; pick the per-lab `.venv` kernel | [code.visualstudio.com](https://code.visualstudio.com/) |
 
-### Quick Start
+### Quick Start — your first lab in 3 minutes
 
 ```bash
-# Clone the repository
+# 1. Clone
 git clone https://github.com/ShonP/system-design-patterns.git
-cd system-design-labs
+cd system-design-patterns
 
-# Pick a lab to explore
+# 2. Pick a lab (caching is a great first one)
 cd 01-foundations/caching
 
-# Start the infrastructure
+# 3. Start the infrastructure (Redis + RedisInsight)
 docker compose up -d
 
-# Install dependencies
+# 4. Install dependencies into a local .venv
 uv sync
 
-# Open notebooks
-jupyter notebook notebooks/
+# 5. Open notebooks
+#    In VS Code: open the folder, click the kernel picker (top-right of
+#    any notebook), and select `.venv (Python 3.1x)`. If it doesn't appear,
+#    Cmd/Ctrl+Shift+P → "Reload Window" and try again.
+#    Or launch classic Jupyter:
+uv run jupyter notebook notebooks/
+
+# 6. When you're done, clean up
+docker compose down -v
 ```
 
-### Visualization Tools
+### Web UIs you'll use
 
-Each lab includes web UIs for observing what's happening:
+Most labs expose a GUI on `localhost` so you can *watch* what your code is
+doing (not just read about it):
 
-| Tool | Purpose | Common Port |
-|------|---------|-------------|
-| Adminer | PostgreSQL GUI | 8080 |
-| RedisInsight | Redis GUI | 5540 |
-| Kibana | Elasticsearch GUI | 5601 |
+| UI | What it shows | Typical port |
+|---|---|---|
+| Adminer / pgAdmin | Postgres tables, query plans | 8080 / 5050 |
+| RedisInsight | Redis keys, streams, pub/sub | 5540 |
+| Kibana | Elasticsearch indices & queries | 5601 |
+| kafka-ui | Kafka topics, partitions, lag | 8080 |
+| Temporal UI | Workflow executions & history | 8080 |
 | Grafana | Metrics dashboards | 3000 |
-| Temporal UI | Workflow visualization | 8080 |
-| MinIO Console | Object storage GUI | 9001 |
-| pgAdmin | Advanced PostgreSQL GUI | 5050 |
-| kafka-ui | Kafka cluster GUI | 8080 |
+| MinIO Console | S3-compatible object storage | 9001 |
 
 ---
 
-## 📘 01 Foundations
+## 🗺️ Learning Roadmap (~8 weeks)
 
-Fundamental building blocks every engineer needs to know.
+If you're new, don't try to run everything. Here's a suggested path. Each week
+is 3–5 labs at ~1–2 hours each.
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [API Design](01-foundations/api-design/) | 4 | REST principles, pagination, rate limiting, versioning |
-| [Caching](01-foundations/caching/) | 5 | Cache-aside, write-through, invalidation, TTL, stampede |
-| [CAP Theorem](01-foundations/cap-theorem/) | 3 | Consistency vs availability, partition tolerance |
-| [Consistent Hashing](01-foundations/consistent-hashing/) | 3 | Modulo → hash ring → virtual nodes (bad→better→best) |
-| [Data Modeling](01-foundations/data-modeling/) | 4 | Relational, denormalization, NoSQL, schema evolution |
-| [Networking Essentials](01-foundations/networking-essentials/) | 4 | DNS, load balancing, TCP/UDP, HTTP/2, TLS |
-| [Numbers to Know](01-foundations/numbers-to-know/) | 3 | Latency benchmarks, throughput, back-of-envelope estimation |
-| [Sharding](01-foundations/sharding/) | 4 | Hash-based, range-based, consistent hashing, rebalancing |
+### Week 1–2 · Foundations
 
-## 🧩 02 Distributed Primitives
+Build intuition for the pieces that show up in *every* design.
 
-_Planned._ Low-level building blocks of distributed systems (bloom filters,
-replication, id-generation, leader election, consensus). See
-[`docs/restructure-proposal.md`](docs/restructure-proposal.md) section 4.
+1. [`01-foundations/numbers-to-know`](01-foundations/numbers-to-know/) — latency & throughput gut-feel
+2. [`01-foundations/caching`](01-foundations/caching/) — cache-aside, write-through, stampede
+3. [`01-foundations/sharding`](01-foundations/sharding/) — hash vs range vs consistent
+4. [`01-foundations/replication`](01-foundations/replication/) — leader/follower, lag, failover
+5. [`01-foundations/load-balancing`](01-foundations/load-balancing/) — L4 vs L7, round-robin vs least-conn
+6. [`01-foundations/consistent-hashing`](01-foundations/consistent-hashing/) — modulo → ring → vnodes
+7. [`01-foundations/cap-theorem`](01-foundations/cap-theorem/) — CP vs AP in practice
+8. [`01-foundations/data-modeling`](01-foundations/data-modeling/) — relational, NoSQL, evolution
+9. [`01-foundations/networking-essentials`](01-foundations/networking-essentials/) — DNS, TCP, HTTP/2, TLS
+10. [`01-foundations/id-generation`](01-foundations/id-generation/), [`cdn/`](01-foundations/cdn/), [`observability/`](01-foundations/observability/), [`messaging-basics/`](01-foundations/messaging-basics/), [`bloom-filters/`](01-foundations/bloom-filters/), [`api-design/`](01-foundations/api-design/), [`authentication-authorization/`](01-foundations/authentication-authorization/)
 
-## 🔬 03 Technologies
+### Week 3 · Distributed Primitives
 
-Technology-specific deep dives with real infrastructure.
+The *how* behind replication, consensus, and failure detection.
 
-### Databases
+- [`write-ahead-log`](02-distributed-primitives/write-ahead-log/)
+- [`segmented-log`](02-distributed-primitives/segmented-log/)
+- [`heartbeat`](02-distributed-primitives/heartbeat/), [`phi-accrual-failure-detection`](02-distributed-primitives/phi-accrual-failure-detection/)
+- [`gossip-protocol`](02-distributed-primitives/gossip-protocol/)
+- [`quorum`](02-distributed-primitives/quorum/), [`read-repair`](02-distributed-primitives/read-repair/), [`hinted-handoff`](02-distributed-primitives/hinted-handoff/)
+- [`vector-clocks`](02-distributed-primitives/vector-clocks/), [`merkle-trees`](02-distributed-primitives/merkle-trees/)
+- [`lease`](02-distributed-primitives/lease/), [`split-brain-and-fencing`](02-distributed-primitives/split-brain-and-fencing/)
+- [`checksum`](02-distributed-primitives/checksum/), [`high-water-mark`](02-distributed-primitives/high-water-mark/)
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [Cassandra](03-technologies/databases/cassandra/) | 4 | Partition keys, wide rows, consistency levels, compaction |
-| [DynamoDB](03-technologies/databases/dynamodb/) | 4 | Partition/sort keys, GSI/LSI, single-table design, Streams |
-| [Elasticsearch](03-technologies/databases/elasticsearch/) | 4 | Full-text search, analyzers, aggregations, scaling |
-| [PostgreSQL](03-technologies/databases/postgres/) | 4 | Indexing (bad→best), query optimization, replication, partitioning |
-| [Redis](03-technologies/databases/redis/) | 4 | Data structures, pub/sub, cache vs primary, cluster |
-| [Time-Series Databases](03-technologies/databases/time-series-databases/) | 3 | TimescaleDB, windowed aggregations, retention policies |
-| [Vector Databases](03-technologies/databases/vector-databases/) | 3 | pgvector, linear scan → IVFFlat → HNSW (bad→best) |
+### Week 4 · Technologies
 
-### Messaging
+Go deep on the tools you'll actually use.
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [Kafka](03-technologies/messaging/kafka/) | 4 | Producers/consumers, partitioning, exactly-once, Streams |
+1. [`databases/postgres`](03-technologies/databases/postgres/) — indexing bad→best, MVCC, replication
+2. [`databases/redis`](03-technologies/databases/redis/) — data structures, pub/sub, streams, cluster
+3. [`messaging/kafka`](03-technologies/messaging/kafka/) — partitions, exactly-once, Streams
+4. [`coordination/zookeeper`](03-technologies/coordination/zookeeper/) — locks, leader election, watches
+5. [`databases/cassandra`](03-technologies/databases/cassandra/), [`dynamodb`](03-technologies/databases/dynamodb/), [`elasticsearch`](03-technologies/databases/elasticsearch/)
+6. [`databases/vector-databases`](03-technologies/databases/vector-databases/), [`time-series-databases`](03-technologies/databases/time-series-databases/)
+7. [`workflow-engines/temporal`](03-technologies/workflow-engines/temporal/) — durable workflows
 
-### Coordination
+### Week 5 · Scaling & Reliability Patterns
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [ZooKeeper](03-technologies/coordination/zookeeper/) | 5 | Distributed locks, leader election, config management, service discovery, sessions &amp; watches |
+Recurring problems and the menu of solutions.
 
-### Workflow Engines
+- [`scaling-reads`](04-patterns/scaling-reads/), [`scaling-writes`](04-patterns/scaling-writes/)
+- [`dealing-with-contention`](04-patterns/dealing-with-contention/)
+- [`real-time-updates`](04-patterns/real-time-updates/) — polling → SSE → WebSockets → pub/sub
+- [`long-running-tasks`](04-patterns/long-running-tasks/), [`multi-step-processes`](04-patterns/multi-step-processes/)
+- [`large-blobs`](04-patterns/large-blobs/), [`rate-limiting-and-throttling`](04-patterns/rate-limiting-and-throttling/)
+- [`idempotency`](04-patterns/idempotency/), [`resilience`](04-patterns/resilience/), [`outbox-and-cdc`](04-patterns/outbox-and-cdc/)
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [Temporal](03-technologies/workflow-engines/temporal/) | 4 | Workflow engines, saga pattern, signals, versioning |
+### Week 6 · Microservices Patterns
 
-## 🔄 04 Patterns
+How services talk, degrade, and evolve.
 
-Cross-cutting scaling & reliability patterns.
+- [`api-gateway`](05-microservices/api-gateway/), [`bff`](05-microservices/bff/), [`service-discovery`](05-microservices/service-discovery/)
+- [`circuit-breaker`](05-microservices/circuit-breaker/), [`bulkhead`](05-microservices/bulkhead/), [`retry`](05-microservices/retry/)
+- [`saga`](05-microservices/saga/), [`cqrs`](05-microservices/cqrs/), [`event-driven-architecture`](05-microservices/event-driven-architecture/)
+- [`sidecar`](05-microservices/sidecar/), [`strangler`](05-microservices/strangler/), [`configuration-externalization`](05-microservices/configuration-externalization/)
 
-| Pattern | Notebooks | Topics |
-|---------|-----------|--------|
-| [Real-Time Updates](04-patterns/real-time-updates/) | 7 | Polling, SSE, WebSockets, pub/sub |
-| [Dealing with Contention](04-patterns/dealing-with-contention/) | 5 | Locks, optimistic concurrency, CRDTs |
-| [Scaling Reads](04-patterns/scaling-reads/) | 6 | Caching, read replicas, materialized views |
-| [Scaling Writes](04-patterns/scaling-writes/) | 6 | Sharding, partitioning, write buffering |
-| [Handling Large Blobs](04-patterns/large-blobs/) | 6 | Chunked uploads, presigned URLs, CDN |
-| [Long Running Tasks](04-patterns/long-running-tasks/) | 6 | Queues, workers, DLQ, backpressure |
-| [Multi-Step Processes](04-patterns/multi-step-processes/) | 6 | Workflows, sagas, Temporal |
+### Week 7–8 · System Design Problems
 
-## 🕸️ 05 Microservices
+Start small, build up. Each design reuses pieces from weeks 1–6.
 
-Microservices design patterns.
+**Warm-ups (pick 2–3):**
+[`bitly`](06-system-designs/bitly/) ·
+[`rate-limiter`](06-system-designs/rate-limiter/) ·
+[`top-k`](06-system-designs/top-k/) ·
+[`typeahead-autocomplete`](06-system-designs/typeahead-autocomplete/) ·
+[`key-value-store`](06-system-designs/key-value-store/)
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [API Gateway](05-microservices/api-gateway/) | 3 | Routing, load balancing, rate limiting, auth (nginx) |
+**Intermediate (pick 3–4):**
+[`uber`](06-system-designs/uber/) ·
+[`web-crawler`](06-system-designs/web-crawler/) ·
+[`dropbox`](06-system-designs/dropbox/) ·
+[`instagram`](06-system-designs/instagram/) ·
+[`ticketmaster`](06-system-designs/ticketmaster/) ·
+[`yelp`](06-system-designs/yelp/) ·
+[`payment-system`](06-system-designs/payment-system/)
 
-## 🏛️ 06 System Designs
+**Advanced (pick 2–3):**
+[`netflix`](06-system-designs/netflix/) ·
+[`youtube`](06-system-designs/youtube/) ·
+[`whatsapp`](06-system-designs/whatsapp/) ·
+[`discord`](06-system-designs/discord/) ·
+[`google-docs`](06-system-designs/google-docs/) ·
+[`stock-exchange`](06-system-designs/stock-exchange/)
 
-Complete system design problems with hands-on implementations.
+### Optional tracks
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [Ad Click Aggregator](06-system-designs/ad-click-aggregator/) | 3 | Click ingestion, real-time aggregation, deduplication |
-| [Bitly (URL Shortener)](06-system-designs/bitly/) | 3 | URL encoding, redirect caching, analytics |
-| [Distributed Cache](06-system-designs/distributed-cache/) | 3 | Cache partitioning, coherence, consistent hashing |
-| [Distributed Rate Limiter](06-system-designs/distributed-rate-limiter/) | 3 | Token bucket, sliding window, distributed |
-| [Dropbox (File Storage)](06-system-designs/dropbox/) | 4 | Chunked uploads, sync, deduplication, sharing |
-| [FB Live Comments](06-system-designs/fb-live-comments/) | 3 | Real-time streaming, ordering, scaling |
-| [FB News Feed](06-system-designs/fb-news-feed/) | 4 | Fan-out, ranking, social graph, feed caching |
-| [FB Post Search](06-system-designs/fb-post-search/) | 3 | Full-text indexing, typeahead, search ranking |
-| [Google Docs](06-system-designs/google-docs/) | 4 | OT, CRDTs, real-time collaboration, versioning |
-| [Gopuff (Local Delivery)](06-system-designs/gopuff/) | 3 | Inventory, delivery routing, demand forecasting |
-| [Instagram](06-system-designs/instagram/) | 4 | Photo pipeline, news feed, stories, explore |
-| [Job Scheduler](06-system-designs/job-scheduler/) | 3 | Job queues, distributed execution, dead letter queues |
-| [LeetCode](06-system-designs/leetcode/) | 3 | Code submission, sandboxed execution, leaderboards |
-| [Metrics Monitoring](06-system-designs/metrics-monitoring/) | 3 | Prometheus, alerting, Grafana dashboards |
-| [News Aggregator](06-system-designs/news-aggregator/) | 3 | RSS crawling, deduplication, personalized feeds |
-| [Online Auction](06-system-designs/online-auction/) | 3 | Bid processing, auction lifecycle, real-time notifications |
-| [Payment System](06-system-designs/payment-system/) | 4 | Processing pipeline, idempotency, ledger, fraud detection |
-| [Rate Limiter](06-system-designs/rate-limiter/) | 4 | Token bucket, sliding window, distributed, API gateway |
-| [Robinhood (Stock Trading)](06-system-designs/robinhood/) | 3 | Order matching, portfolio tracking, market data streaming |
-| [Strava (Fitness Tracking)](06-system-designs/strava/) | 3 | GPS tracking, activity feed, segment leaderboards |
-| [Ticketmaster](06-system-designs/ticketmaster/) | 4 | Seat locking, flash sales, reservation flow, scaling |
-| [Tinder (Dating App)](06-system-designs/tinder/) | 3 | Geolocation matching, swipe system, notifications |
-| [Top-K](06-system-designs/top-k/) | 3 | Count-min sketch, heap-based, distributed MapReduce |
-| [Uber (Ride-Sharing)](06-system-designs/uber/) | 4 | Geospatial matching, driver tracking, surge pricing |
-| [Web Crawler](06-system-designs/web-crawler/) | 4 | Basic crawler, fault tolerance, politeness, efficiency |
-| [WhatsApp (Messaging)](06-system-designs/whatsapp/) | 4 | Message delivery, read receipts, groups, E2E encryption |
-| [Yelp (Local Search)](06-system-designs/yelp/) | 3 | Geospatial search, reviews, search ranking |
-| [YouTube (Video Streaming)](06-system-designs/youtube/) | 4 | Upload, streaming, processing, resumable uploads |
+- **Object-Oriented Design** → [`07-object-oriented-design/`](07-object-oriented-design/) — LLD interview prep
+- **Enterprise / compliance** → [`08-enterprise/`](08-enterprise/) — privacy, BCDR, paired regions
+- **Azure security certs** → [`security-certs/`](security-certs/) — SC-900 → SC-200 → AZ-500 → SC-100
 
-## 🧱 07 Object-Oriented Design
+---
 
-_Planned._ OOD / LLD problems (parking-lot, elevator, library, chess, …) from
-the Grokking OOD course. See
-[`docs/restructure-proposal.md`](docs/restructure-proposal.md).
+## 📋 Full Lab Index
 
-## 🏢 08 Enterprise
+### 01 Foundations — core building blocks
 
-Production patterns used at Microsoft and large enterprises.
+| Lab | Notebooks | One-liner |
+|---|---:|---|
+| [`api-design`](01-foundations/api-design/) | 4 | REST principles, pagination, rate limiting, versioning |
+| [`authentication-authorization`](01-foundations/authentication-authorization/) | 3 | Sessions, JWT, OAuth2, RBAC vs ABAC |
+| [`bloom-filters`](01-foundations/bloom-filters/) | 4 | Probabilistic set membership |
+| [`caching`](01-foundations/caching/) | 6 | Cache-aside, write-through, invalidation, TTL, stampede |
+| [`cap-theorem`](01-foundations/cap-theorem/) | 3 | Consistency vs availability vs partitions |
+| [`cdn`](01-foundations/cdn/) | 4 | Edge caching, origin shield, cache keys |
+| [`consistent-hashing`](01-foundations/consistent-hashing/) | 4 | Modulo → hash ring → virtual nodes |
+| [`data-modeling`](01-foundations/data-modeling/) | 4 | Relational, denormalization, NoSQL, schema evolution |
+| [`id-generation`](01-foundations/id-generation/) | 4 | UUIDs, snowflake, ULID, collisions |
+| [`load-balancing`](01-foundations/load-balancing/) | 4 | L4 vs L7, algorithms, health checks |
+| [`messaging-basics`](01-foundations/messaging-basics/) | 3 | Queues, topics, delivery semantics |
+| [`networking-essentials`](01-foundations/networking-essentials/) | 4 | DNS, TCP/UDP, HTTP/2, TLS |
+| [`numbers-to-know`](01-foundations/numbers-to-know/) | 3 | Latency ladder, BOE estimation |
+| [`observability`](01-foundations/observability/) | 4 | Logs, metrics, traces, SLOs |
+| [`replication`](01-foundations/replication/) | 3 | Leader/follower, multi-leader, lag |
+| [`sharding`](01-foundations/sharding/) | 4 | Hash, range, consistent, rebalancing |
 
-| Lab | Notebooks | Topics |
-|-----|-----------|--------|
-| [Azure Authentication](08-enterprise/azure-authentication/) | – | Entra ID, managed identities, OAuth flows |
-| [BCDR](08-enterprise/bcdr/) | 4 | RPO/RTO, replication failover, backup strategies, DR drills |
-| [GDPR Paired Regions](08-enterprise/gdpr-paired-regions/) | 4 | Data residency, cross-region replication, right to erasure |
-| [Privacy Review](08-enterprise/privacy-review/) | 4 | Data classification, PIA, anonymization, retention |
-| [Security Review](08-enterprise/security-review/) | 4 | STRIDE, OWASP Top 10, secrets management, SDL |
+### 02 Distributed Primitives — low-level mechanics
 
-> **Note:** Temporal workflows moved to
-> [`03-technologies/workflow-engines/temporal/`](03-technologies/workflow-engines/temporal/).
+| Lab | Notebooks | One-liner |
+|---|---:|---|
+| [`checksum`](02-distributed-primitives/checksum/) | 3 | Integrity detection (CRC vs cryptographic) |
+| [`gossip-protocol`](02-distributed-primitives/gossip-protocol/) | 2 | Epidemic membership / state dissemination |
+| [`heartbeat`](02-distributed-primitives/heartbeat/) | 3 | Liveness signals between nodes |
+| [`high-water-mark`](02-distributed-primitives/high-water-mark/) | 3 | Last durably replicated offset |
+| [`hinted-handoff`](02-distributed-primitives/hinted-handoff/) | 3 | Writes survive brief node outages |
+| [`lease`](02-distributed-primitives/lease/) | 3 | Time-bounded ownership / leader election |
+| [`merkle-trees`](02-distributed-primitives/merkle-trees/) | 3 | Efficient replica reconciliation |
+| [`phi-accrual-failure-detection`](02-distributed-primitives/phi-accrual-failure-detection/) | 3 | Adaptive failure detection |
+| [`quorum`](02-distributed-primitives/quorum/) | 3 | Majority-based reads/writes (N, R, W) |
+| [`read-repair`](02-distributed-primitives/read-repair/) | 3 | Reconcile stale replicas on reads |
+| [`segmented-log`](02-distributed-primitives/segmented-log/) | 3 | Log split into indexed segments |
+| [`split-brain-and-fencing`](02-distributed-primitives/split-brain-and-fencing/) | 3 | Two-leader scenarios & fencing tokens |
+| [`vector-clocks`](02-distributed-primitives/vector-clocks/) | 2 | Causality and conflict detection |
+| [`write-ahead-log`](02-distributed-primitives/write-ahead-log/) | 4 | Append-only log for crash-safe state |
 
-## 🔐 Security Certifications
+### 03 Technologies — deep dives
 
-Azure security certification study labs (kept separate from system-design
-content).
+**Databases**
 
-| Track | Path |
+| Lab | Notebooks | Focus |
+|---|---:|---|
+| [`databases/cassandra`](03-technologies/databases/cassandra/) | 5 | Wide-column, tunable consistency, gossip |
+| [`databases/dynamodb`](03-technologies/databases/dynamodb/) | 5 | Partition/sort keys, GSI/LSI, single-table |
+| [`databases/elasticsearch`](03-technologies/databases/elasticsearch/) | 4 | Full-text, analyzers, aggregations |
+| [`databases/postgres`](03-technologies/databases/postgres/) | 4 | Indexing, MVCC, WAL, replication |
+| [`databases/redis`](03-technologies/databases/redis/) | 5 | Data structures, streams, pub/sub, cluster |
+| [`databases/time-series-databases`](03-technologies/databases/time-series-databases/) | 3 | TimescaleDB, aggregations, retention |
+| [`databases/vector-databases`](03-technologies/databases/vector-databases/) | 4 | pgvector, linear → IVFFlat → HNSW |
+
+**Messaging · Coordination · Workflow**
+
+| Lab | Notebooks | Focus |
+|---|---:|---|
+| [`messaging/kafka`](03-technologies/messaging/kafka/) | 5 | Producers/consumers, partitions, exactly-once, Streams |
+| [`coordination/zookeeper`](03-technologies/coordination/zookeeper/) | 5 | Locks, leader election, config, discovery, watches |
+| [`workflow-engines/temporal`](03-technologies/workflow-engines/temporal/) | 5 | Durable workflows, sagas, signals, versioning |
+
+**Reference systems (canonical papers, docs-only)**
+
+| Lab | Paper |
 |---|---|
-| SC-900 | [`security-certs/sc-900/`](security-certs/sc-900/) |
-| SC-100 | [`security-certs/sc-100/`](security-certs/sc-100/) |
-| SC-200 | [`security-certs/sc-200/`](security-certs/sc-200/) |
-| AZ-500 | [`security-certs/az-500/`](security-certs/az-500/) |
+| [`reference-systems/gfs`](03-technologies/reference-systems/gfs/) | Google File System |
+| [`reference-systems/hdfs`](03-technologies/reference-systems/hdfs/) | Hadoop Distributed File System |
+| [`reference-systems/bigtable`](03-technologies/reference-systems/bigtable/) | Google Bigtable |
+| [`reference-systems/dynamo`](03-technologies/reference-systems/dynamo/) | Amazon Dynamo |
+| [`reference-systems/chubby`](03-technologies/reference-systems/chubby/) | Google Chubby lock service |
+| [`reference-systems/s3`](03-technologies/reference-systems/s3/) | Amazon S3 |
+
+### 04 Patterns — scaling & reliability
+
+| Lab | Notebooks | Problem |
+|---|---:|---|
+| [`dealing-with-contention`](04-patterns/dealing-with-contention/) | 5 | Concurrent updates: locks, optimistic, CRDTs |
+| [`idempotency`](04-patterns/idempotency/) | 4 | Making operations safe to retry |
+| [`large-blobs`](04-patterns/large-blobs/) | 6 | Chunked uploads, presigned URLs, CDN |
+| [`long-running-tasks`](04-patterns/long-running-tasks/) | 6 | Queues, workers, DLQ, backpressure |
+| [`multi-step-processes`](04-patterns/multi-step-processes/) | 6 | Workflows, sagas, Temporal |
+| [`outbox-and-cdc`](04-patterns/outbox-and-cdc/) | 4 | Reliably publishing events from OLTP |
+| [`rate-limiting-and-throttling`](04-patterns/rate-limiting-and-throttling/) | 6 | Edge & service-to-service rate control |
+| [`real-time-updates`](04-patterns/real-time-updates/) | 8 | Polling → SSE → WebSockets → pub/sub |
+| [`resilience`](04-patterns/resilience/) | 5 | Retries, circuit breakers, bulkheads |
+| [`scaling-reads`](04-patterns/scaling-reads/) | 6 | Caching, read replicas, materialized views |
+| [`scaling-writes`](04-patterns/scaling-writes/) | 6 | Sharding, partitioning, write buffering |
+
+### 05 Microservices — service patterns
+
+| Lab | Notebooks | Pattern |
+|---|---:|---|
+| [`api-gateway`](05-microservices/api-gateway/) | 4 | Edge service fronting a set of microservices |
+| [`bff`](05-microservices/bff/) | 3 | Backend-for-Frontend per client type |
+| [`bulkhead`](05-microservices/bulkhead/) | 2 | Isolate resource pools to contain failures |
+| [`circuit-breaker`](05-microservices/circuit-breaker/) | 3 | Fail fast when a downstream is unhealthy |
+| [`configuration-externalization`](05-microservices/configuration-externalization/) | 4 | Keep config out of the binary |
+| [`cqrs`](05-microservices/cqrs/) | 3 | Split read and write models |
+| [`event-driven-architecture`](05-microservices/event-driven-architecture/) | 4 | Services communicating via events |
+| [`retry`](05-microservices/retry/) | 3 | Safely retrying transient failures |
+| [`saga`](05-microservices/saga/) | 4 | Multi-service transactions without 2PC |
+| [`service-discovery`](05-microservices/service-discovery/) | 3 | Finding healthy instances at runtime |
+| [`sidecar`](05-microservices/sidecar/) | 3 | Out-of-process helper bundled with a service |
+| [`strangler`](05-microservices/strangler/) | 3 | Incrementally replacing a legacy system |
+
+### 06 System Designs — end-to-end problems
+
+| Lab | Notebooks | Focus |
+|---|---:|---|
+| [`ad-click-aggregator`](06-system-designs/ad-click-aggregator/) | 3 | Click ingestion, real-time aggregation, dedup |
+| [`airbnb`](06-system-designs/airbnb/) | 3 | Two-sided marketplace: listings, bookings |
+| [`amazon-lambda`](06-system-designs/amazon-lambda/) | 3 | FaaS: cold starts, scheduling |
+| [`bitly`](06-system-designs/bitly/) | 3 | URL shortener with click analytics |
+| [`code-deployment`](06-system-designs/code-deployment/) | 3 | CI/CD and deployment orchestration |
+| [`collaborative-whiteboard`](06-system-designs/collaborative-whiteboard/) | 3 | Miro-style real-time canvas |
+| [`discord`](06-system-designs/discord/) | 3 | Real-time chat, voice, presence |
+| [`distributed-cache`](06-system-designs/distributed-cache/) | 4 | Partitioning, coherence, consistent hashing |
+| [`distributed-lock-manager`](06-system-designs/distributed-lock-manager/) | 3 | Chubby-style distributed locks |
+| [`distributed-rate-limiter`](06-system-designs/distributed-rate-limiter/) | 3 | Token/sliding window, distributed |
+| [`dropbox`](06-system-designs/dropbox/) | 4 | File sync, dedup, sharing |
+| [`fb-live-comments`](06-system-designs/fb-live-comments/) | 3 | Live comment streaming & ordering |
+| [`fb-news-feed`](06-system-designs/fb-news-feed/) | 4 | Fan-out, ranking, social graph |
+| [`fb-post-search`](06-system-designs/fb-post-search/) | 3 | Full-text indexing, typeahead |
+| [`flash-sale`](06-system-designs/flash-sale/) | 3 | Ecommerce flash-sale bursts |
+| [`gmail`](06-system-designs/gmail/) | 3 | Webmail at scale |
+| [`google-calendar`](06-system-designs/google-calendar/) | 3 | Calendaring and invitations |
+| [`google-docs`](06-system-designs/google-docs/) | 4 | OT, CRDTs, real-time collaboration |
+| [`google-search`](06-system-designs/google-search/) | 3 | Web-scale search |
+| [`gopuff`](06-system-designs/gopuff/) | 3 | On-demand delivery logistics |
+| [`instagram`](06-system-designs/instagram/) | 4 | Photo pipeline, feed, stories, explore |
+| [`job-scheduler`](06-system-designs/job-scheduler/) | 3 | Distributed job queue, DLQ |
+| [`key-value-store`](06-system-designs/key-value-store/) | 3 | DynamoDB-style KV store |
+| [`leetcode`](06-system-designs/leetcode/) | 3 | Sandboxed execution, leaderboards |
+| [`linkedin-connections`](06-system-designs/linkedin-connections/) | 3 | PYMK graph |
+| [`metrics-monitoring`](06-system-designs/metrics-monitoring/) | 3 | Prometheus, alerting, Grafana |
+| [`netflix`](06-system-designs/netflix/) | 3 | Streaming + recommendations |
+| [`news-aggregator`](06-system-designs/news-aggregator/) | 3 | Crawling, dedup, personalized feeds |
+| [`notification-system`](06-system-designs/notification-system/) | 4 | Multi-channel fan-out |
+| [`online-auction`](06-system-designs/online-auction/) | 4 | Bid processing, fairness |
+| [`payment-system`](06-system-designs/payment-system/) | 4 | Pipeline, idempotency, ledger, fraud |
+| [`rate-limiter`](06-system-designs/rate-limiter/) | 4 | Token/leaky bucket at the gateway |
+| [`reddit`](06-system-designs/reddit/) | 3 | Forum/feed platform |
+| [`reminder-alert`](06-system-designs/reminder-alert/) | 3 | Scheduled reminders at scale |
+| [`robinhood`](06-system-designs/robinhood/) | 3 | Brokerage backend, market data |
+| [`s3`](06-system-designs/s3/) | 3 | Object storage |
+| [`shopping-cart`](06-system-designs/shopping-cart/) | 3 | Amazon-style cart |
+| [`stock-exchange`](06-system-designs/stock-exchange/) | 3 | Order-matching engine |
+| [`strava`](06-system-designs/strava/) | 3 | GPS tracking, leaderboards |
+| [`ticketmaster`](06-system-designs/ticketmaster/) | 4 | Seat locking, flash sales, reservations |
+| [`tinder`](06-system-designs/tinder/) | 3 | Geolocation matching, swipes |
+| [`top-k`](06-system-designs/top-k/) | 3 | Count-min sketch, heap, distributed MR |
+| [`typeahead-autocomplete`](06-system-designs/typeahead-autocomplete/) | 4 | Search-as-you-type suggestions |
+| [`uber`](06-system-designs/uber/) | 4 | Geospatial matching, surge, driver tracking |
+| [`web-crawler`](06-system-designs/web-crawler/) | 4 | Politeness, fault tolerance, efficiency |
+| [`whatsapp`](06-system-designs/whatsapp/) | 4 | Delivery, receipts, groups, E2EE |
+| [`yelp`](06-system-designs/yelp/) | 3 | Geospatial search, ranking |
+| [`youtube`](06-system-designs/youtube/) | 4 | Upload, processing, streaming, resumable |
+
+Docs-only (no notebooks yet): `chatgpt/`.
+
+### 07 Object-Oriented Design — LLD interview problems
+
+| Lab | Notebooks | Problem |
+|---|---:|---|
+| [`uml-basics`](07-object-oriented-design/uml-basics/) | 3 | UML: class, sequence, activity, use-case |
+| [`oo-analysis-and-design`](07-object-oriented-design/oo-analysis-and-design/) | 2 | OOA/OOD process and SOLID |
+| [`airline-management`](07-object-oriented-design/airline-management/) | 2 | Airline management |
+| [`amazon-shopping`](07-object-oriented-design/amazon-shopping/) | 2 | Amazon-style online store |
+| [`atm`](07-object-oriented-design/atm/) | 2 | ATM |
+| [`blackjack`](07-object-oriented-design/blackjack/) | 3 | Blackjack and a deck of cards |
+| [`car-rental`](07-object-oriented-design/car-rental/) | 2 | Car rental |
+| [`chess`](07-object-oriented-design/chess/) | 2 | Chess |
+| [`cricinfo`](07-object-oriented-design/cricinfo/) | 2 | Cricket information service |
+| [`facebook`](07-object-oriented-design/facebook/) | 2 | Facebook-style social network |
+| [`hotel-management`](07-object-oriented-design/hotel-management/) | 3 | Hotel management |
+| [`library-management`](07-object-oriented-design/library-management/) | 2 | Library management |
+| [`linkedin`](07-object-oriented-design/linkedin/) | 2 | LinkedIn |
+| [`movie-ticket-booking`](07-object-oriented-design/movie-ticket-booking/) | 2 | Movie-ticket booking |
+| [`online-stock-brokerage`](07-object-oriented-design/online-stock-brokerage/) | 3 | Online stock brokerage |
+| [`parking-lot`](07-object-oriented-design/parking-lot/) | 3 | Parking-lot system |
+| [`restaurant`](07-object-oriented-design/restaurant/) | 3 | Restaurant management |
+| [`stack-overflow`](07-object-oriented-design/stack-overflow/) | 3 | Stack Overflow |
+
+### 08 Enterprise — process & compliance
+
+| Lab | Notebooks | Focus |
+|---|---:|---|
+| [`azure-authentication`](08-enterprise/azure-authentication/) | 5 | Entra ID, managed identities, OAuth flows |
+| [`bcdr`](08-enterprise/bcdr/) | 4 | RPO/RTO, failover, backups, DR drills |
+| [`gdpr-paired-regions`](08-enterprise/gdpr-paired-regions/) | 4 | Data residency, replication, right-to-erasure |
+| [`privacy-review`](08-enterprise/privacy-review/) | 4 | Data classification, PIA, anonymization |
+| [`security-review`](08-enterprise/security-review/) | 4 | STRIDE, OWASP Top 10, SDL, secrets |
+
+### 🔐 Security Certifications
+
+Azure security cert study labs (kept separate from system-design content).
+
+| Track | Modules | Path |
+|---|---:|---|
+| SC-900 (Fundamentals) | 4 | [`security-certs/sc-900/`](security-certs/sc-900/) |
+| SC-200 (Security Operations) | 3 | [`security-certs/sc-200/`](security-certs/sc-200/) |
+| AZ-500 (Security Engineer) | 4 | [`security-certs/az-500/`](security-certs/az-500/) |
+| SC-100 (Cybersecurity Architect) | 4 | [`security-certs/sc-100/`](security-certs/sc-100/) |
 
 ---
 
-## 🏛️ Repository Structure
+## 🧪 How Each Lab Works
+
+Every lab follows the same skeleton so once you've learned one, you've learned
+all of them:
 
 ```
-system-design-labs/
-├── docs/                          # Proposals, content map
-├── 01-foundations/                # Fundamental building blocks
-├── 02-distributed-primitives/     # (planned) Bloom filters, replication, …
-├── 03-technologies/               # Technology deep dives
-│   ├── databases/                 # postgres, cassandra, redis, …
-│   ├── messaging/                 # kafka
-│   ├── coordination/              # zookeeper
-│   └── workflow-engines/          # temporal
-├── 04-patterns/                   # Scaling & reliability patterns
-├── 05-microservices/              # Microservices patterns (api-gateway, …)
-├── 06-system-designs/             # End-to-end system designs
-├── 07-object-oriented-design/     # (planned) OOD / LLD problems
-├── 08-enterprise/                 # Enterprise / process patterns
-├── security-certs/                # Azure security cert labs
-└── tools/
-    └── scraper/                   # Content scraper (dev tool)
+<lab-name>/
+├── README.md              ← problem statement, architecture, learning goals
+├── docker-compose.yml     ← Postgres / Redis / Kafka / Temporal / … (if needed)
+├── pyproject.toml         ← Python deps, managed with uv
+├── uv.lock                ← locked versions for reproducibility
+├── .venv/                 ← created by `uv sync` (gitignored)
+├── db/                    ← optional SQL init scripts
+├── app/                   ← optional FastAPI service(s)
+├── references/            ← links to source material (Design Gurus, papers)
+├── CHANGELOG.md           ← what's been added over time
+└── notebooks/
+    ├── 00_setup.ipynb     ← env check + kernel instructions
+    ├── 01_bad.ipynb       ← the naive approach, and how it breaks
+    ├── 02_better.ipynb    ← a first real improvement
+    ├── 03_best.ipynb      ← the production-grade pattern
+    └── 04_*.ipynb         ← optional deeper dives
 ```
 
-Each lab follows the same structure:
-- **README.md** — Overview and learning objectives
-- **docker-compose.yml** — Infrastructure setup
-- **pyproject.toml** — Python dependencies (managed with [uv](https://docs.astral.sh/uv/))
-- **notebooks/** — Interactive Jupyter notebooks (numbered)
-- **db/** (optional) — SQL initialization scripts
+### The bad → better → best progression
 
-## 🎓 How to Learn
+Every concept is taught in three stages so you **feel** the tradeoffs instead
+of memorizing them:
 
-1. **Pick a topic** — Start with Core Concepts if new, or jump to a System Design
-2. **Read the README** — Understand the problem and architecture
-3. **Start infrastructure** — `docker compose up -d`
-4. **Run notebooks in order** — Each builds on the previous
-5. **Follow bad → better → best** — See why naive solutions fail before learning the right way
-6. **Experiment** — Change parameters, break things, observe
+1. **Bad** — the obvious first attempt. You run it, watch it fall over under
+   load / failure / contention, and understand *why* a better solution exists.
+2. **Better** — a meaningful improvement that solves the headline problem but
+   still has edge cases.
+3. **Best** — the production pattern. You see what it costs (code, infra,
+   operational burden) and understand when it's worth paying.
+
+Examples:
+- **Consistent hashing** → `modulo % N` → `hash ring` → `hash ring + virtual nodes`
+- **Postgres indexing** → full table scan → single-column B-tree → composite / partial / covering
+- **Rate limiting** → in-memory counter → Redis token bucket → distributed sliding window
+- **Vector search** → linear scan → IVFFlat → HNSW
+
+### Docker infra
+
+Every lab that needs a database or broker ships a `docker-compose.yml` that
+brings it up locally with sensible defaults and — importantly — a **web UI**
+on `localhost` so you can inspect what your code is doing.
+
+### Per-lab virtualenv
+
+Each lab has its own `.venv` managed by [uv](https://docs.astral.sh/uv/) so
+dependencies don't conflict across labs. Inside the lab:
+
+```bash
+uv sync                         # create .venv and install deps
+uv run jupyter notebook ...     # run a command in the .venv
+uv run pytest                   # if tests exist
+```
+
+In VS Code, open the lab folder and pick `.venv` from the kernel picker in the
+top-right of any notebook. If it doesn't show up, `Cmd/Ctrl+Shift+P` →
+**Reload Window**.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! The repo follows a few conventions that keep the
+labs consistent and beginner-friendly:
+
+### Principles
+
+1. **Beginner-first.** Explain like the reader has no prior knowledge. Prefer
+   plain language and analogies over jargon.
+2. **Minimal dependencies.** Use the simplest tool that demonstrates the
+   concept. Python + Docker + one database is usually enough.
+3. **Bad → better → best.** Every lab should let the reader *see* why the
+   naive approach fails before meeting the production one.
+4. **Runnable end-to-end.** Run everything yourself before opening a PR. If
+   `docker compose up -d && uv sync && uv run jupyter nbconvert --execute
+   notebooks/*.ipynb` doesn't work, neither does your lab.
+5. **Add, don't replace.** New content on an existing topic should *extend*
+   existing notebooks, not rewrite them.
+
+### Adding a new lab
+
+1. Pick the right home: foundations, primitive, technology deep dive,
+   scaling pattern, microservices pattern, or end-to-end system design.
+   See [`docs/restructure-proposal.md`](docs/restructure-proposal.md) §4 for
+   the decision tree.
+2. Copy an existing sibling lab as a template (e.g. copy
+   `01-foundations/caching/` if you're adding a foundations lab).
+3. Update: `README.md` (problem, architecture, learning goals),
+   `docker-compose.yml` (only what you need), `pyproject.toml`,
+   `notebooks/`, and `CHANGELOG.md`.
+4. Verify:
+   ```bash
+   docker compose up -d
+   uv sync
+   uv run jupyter nbconvert --execute notebooks/*.ipynb
+   docker compose down -v
+   ```
+5. Add a one-liner to the relevant category `README.md` and to this index.
+
+### Content conventions
+
+- Per-lab `.venv` (uv-managed). Don't commit `.venv/`.
+- Notebooks are numbered (`01_`, `02_`, …) and include a setup cell at the
+  top explaining how to pick the `.venv` kernel.
+- Use [Pydantic](https://docs.pydantic.dev/) for validation and
+  [FastAPI](https://fastapi.tiangolo.com/) for any HTTP services — the
+  simplest widely-adopted pair.
+- Use Adminer / pgAdmin / RedisInsight / Kibana / Grafana / Temporal UI /
+  kafka-ui instead of writing custom dashboards.
+- See [`docs/restructure-proposal.md`](docs/restructure-proposal.md) and
+  [`docs/content-map.md`](docs/content-map.md) for the full rationale.
+
+---
 
 ## 📝 License
 
-MIT License — Use freely for learning and teaching.
+MIT License — use freely for learning and teaching.
 
 ## 🙏 Acknowledgments
 
-Content inspired by [Hello Interview](https://www.hellointerview.com/) System Design course.
+Content inspired by [Hello Interview](https://www.hellointerview.com/) and
+Design Gurus' *Grokking* system-design courses. The labs are the author's
+own implementations; references to source material live in each lab's
+`references/` directory.

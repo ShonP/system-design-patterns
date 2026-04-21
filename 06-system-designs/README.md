@@ -12,7 +12,7 @@ scaling tradeoffs.
 | [`airbnb/`](./airbnb/) | Two-sided marketplace (listings, bookings) |
 | [`amazon-lambda/`](./amazon-lambda/) | Function-as-a-Service: cold starts, scheduling |
 | [`bitly/`](./bitly/) | URL shortener with click analytics |
-| [`chatgpt/`](./chatgpt/) | LLM-backed chat at scale |
+| [`chatgpt/`](./chatgpt/) | LLM-backed chat at scale _(docs-only for now)_ |
 | [`code-deployment/`](./code-deployment/) | CI/CD and deployment orchestration |
 | [`collaborative-whiteboard/`](./collaborative-whiteboard/) | Miro-style real-time canvas |
 | [`discord/`](./discord/) | Real-time chat and voice with presence |
@@ -22,7 +22,7 @@ scaling tradeoffs.
 | [`dropbox/`](./dropbox/) | File sync and sharing |
 | [`fb-live-comments/`](./fb-live-comments/) | Live comment streaming |
 | [`fb-news-feed/`](./fb-news-feed/) | News feed ranking and delivery |
-| [`fb-post-search/`](./fb-post-search/) | Search over posts |
+| [`fb-post-search/`](./fb-post-search/) | Full-text search over posts |
 | [`flash-sale/`](./flash-sale/) | Ecommerce flash-sale bursts |
 | [`gmail/`](./gmail/) | Webmail at scale |
 | [`google-calendar/`](./google-calendar/) | Calendaring and invitations |
