@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: k8s-lab
+data:
+  LOG_LEVEL: "info"
+  ENVIRONMENT: "development"
+  MAX_CONNECTIONS: "100"
+  CACHE_TTL: "300"
