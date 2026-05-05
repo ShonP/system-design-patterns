@@ -1,0 +1,21 @@
+rules:
+  - id: cmdi-from-request
+    message: |
+      User-controlled data reaches os.system / subprocess.* with shell=True — command injection.
+      Use subprocess.run([...]) with a list and no shell.
+    languages: [python]
+    severity: ERROR
+    mode: taint
+    pattern-sources:
+      - pattern: request.args.get(...)
+      - pattern: request.form.get(...)
+      - pattern: request.form[...]
+      - pattern: request.json[...]
+    pattern-sinks:
+      - pattern: os.system(...)
+      - pattern: subprocess.$F($X, ..., shell=True)
+      - patterns:
+          - pattern: subprocess.$F($X)
+          - metavariable-pattern:
+              metavariable: $X
+              pattern: "$_ + $_"

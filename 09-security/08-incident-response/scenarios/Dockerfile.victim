@@ -1,0 +1,25 @@
+FROM debian:12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl ca-certificates gnupg lsb-release sudo procps \
+      apache2 php-cli net-tools iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Wazuh agent and point at the manager service
+RUN curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring /usr/share/keyrings/wazuh.gpg --import \
+    && chmod 644 /usr/share/keyrings/wazuh.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" > /etc/apt/sources.list.d/wazuh.list \
+    && apt-get update \
+    && WAZUH_MANAGER="wazuh.manager" apt-get install -y wazuh-agent=4.9.0-1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash alice && echo "alice:alice" | chpasswd
+
+# Make /var/www/html exist for FIM scenario
+RUN mkdir -p /var/www/html && echo "<h1>victim</h1>" > /var/www/html/index.html
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

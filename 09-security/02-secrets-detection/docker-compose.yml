@@ -1,0 +1,14 @@
+services:
+  gitleaks:
+    image: zricethezav/gitleaks:v8.21.2
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    profiles: ["scan"]
+
+  trufflehog:
+    image: trufflesecurity/trufflehog:3.83.7
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    profiles: ["scan"]

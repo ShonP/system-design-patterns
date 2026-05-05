@@ -1,0 +1,16 @@
+services:
+  checkov:
+    image: bridgecrew/checkov:3.2.334
+    volumes: [".:/workspace"]
+    working_dir: /workspace
+    profiles: ["scan"]
+  kics:
+    image: checkmarx/kics:v2.1.5
+    volumes: [".:/workspace"]
+    working_dir: /workspace
+    profiles: ["scan"]
+  tfsec:
+    image: aquasec/tfsec:v1.28.13
+    volumes: [".:/workspace"]
+    working_dir: /workspace
+    profiles: ["scan"]

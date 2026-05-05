@@ -1,0 +1,12 @@
+services:
+  todo-insecure:
+    build:
+      context: ./insecure
+    image: securitylabs/todo-insecure:latest
+    profiles: ["build-only"]
+
+  todo-secure:
+    build:
+      context: ./secure
+    image: securitylabs/todo-secure:latest
+    profiles: ["build-only"]

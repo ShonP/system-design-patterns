@@ -1,0 +1,97 @@
+# Wazuh single-node + a "victim" container with the Wazuh agent installed.
+# Sized to fit on a laptop. NOT for production.
+
+services:
+  wazuh.manager:
+    image: wazuh/wazuh-manager:4.9.0
+    hostname: wazuh.manager
+    restart: unless-stopped
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile:  { soft: 655360, hard: 655360 }
+    environment:
+      - INDEXER_URL=https://wazuh.indexer:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
+      - SSL_KEY=/etc/ssl/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - wazuh_api_configuration:/var/ossec/api/configuration
+      - wazuh_etc:/var/ossec/etc
+      - wazuh_logs:/var/ossec/logs
+      - wazuh_queue:/var/ossec/queue
+      - wazuh_var_multigroups:/var/ossec/var/multigroups
+      - wazuh_integrations:/var/ossec/integrations
+      - wazuh_active_response:/var/ossec/active-response/bin
+      - wazuh_agentless:/var/ossec/agentless
+      - wazuh_wodles:/var/ossec/wodles
+      - filebeat_etc:/etc/filebeat
+      - filebeat_var:/var/lib/filebeat
+      - ./certs/wazuh.manager.pem:/etc/ssl/filebeat.pem:ro
+      - ./certs/wazuh.manager-key.pem:/etc/ssl/filebeat.key:ro
+      - ./certs/root-ca.pem:/etc/ssl/root-ca.pem:ro
+    ports: ["1514:1514", "1515:1515", "55000:55000"]
+
+  wazuh.indexer:
+    image: wazuh/wazuh-indexer:4.9.0
+    hostname: wazuh.indexer
+    restart: unless-stopped
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile:  { soft: 65536, hard: 65536 }
+    volumes:
+      - wazuh-indexer-data:/var/lib/wazuh-indexer
+      - ./certs/root-ca.pem:/usr/share/wazuh-indexer/certs/root-ca.pem:ro
+      - ./certs/wazuh.indexer.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.pem:ro
+      - ./certs/wazuh.indexer-key.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer-key.pem:ro
+      - ./certs/admin.pem:/usr/share/wazuh-indexer/certs/admin.pem:ro
+      - ./certs/admin-key.pem:/usr/share/wazuh-indexer/certs/admin-key.pem:ro
+    ports: ["9200:9200"]
+
+  wazuh.dashboard:
+    image: wazuh/wazuh-dashboard:4.9.0
+    hostname: wazuh.dashboard
+    restart: unless-stopped
+    depends_on: [wazuh.indexer]
+    environment:
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=SecretPassword
+      - WAZUH_API_URL=https://wazuh.manager
+      - DASHBOARD_USERNAME=kibanaserver
+      - DASHBOARD_PASSWORD=kibanaserver
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - ./certs/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem:ro
+      - ./certs/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem:ro
+      - ./certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem:ro
+    ports: ["8443:5601"]
+
+  victim:
+    build:
+      context: ./scenarios
+      dockerfile: Dockerfile.victim
+    hostname: victim
+    cap_add: ["AUDIT_WRITE", "SYS_PTRACE"]
+    depends_on: [wazuh.manager]
+    restart: unless-stopped
+
+volumes:
+  wazuh_api_configuration:
+  wazuh_etc:
+  wazuh_logs:
+  wazuh_queue:
+  wazuh_var_multigroups:
+  wazuh_integrations:
+  wazuh_active_response:
+  wazuh_agentless:
+  wazuh_wodles:
+  filebeat_etc:
+  filebeat_var:
+  wazuh-indexer-data:

@@ -1,0 +1,7 @@
+rules:
+  - id: no-eval
+    message: |
+      `eval()` executes arbitrary code. Use json.loads / ast.literal_eval / explicit parsers.
+    languages: [python]
+    severity: ERROR
+    pattern: eval(...)

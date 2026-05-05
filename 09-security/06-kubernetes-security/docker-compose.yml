@@ -1,0 +1,7 @@
+# Lab 06 uses kind (Kubernetes-in-Docker) — see scripts/kind-up.sh
+# This compose file is just for the trivy-operator helm chart pre-pull when offline.
+services:
+  helper:
+    image: alpine/k8s:1.30.0
+    profiles: ["help"]
+    command: ["true"]

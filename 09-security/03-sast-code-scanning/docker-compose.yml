@@ -1,0 +1,14 @@
+services:
+  semgrep:
+    image: returntocorp/semgrep:1.96.0
+    volumes:
+      - ./:/src
+    working_dir: /src
+    profiles: ["scan"]
+
+  bandit:
+    image: pyfound/bandit:1.7.10
+    volumes:
+      - ./:/src
+    working_dir: /src
+    profiles: ["scan"]

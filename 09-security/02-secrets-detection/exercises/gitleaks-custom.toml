@@ -1,0 +1,16 @@
+title = "security-labs custom rules"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id          = "internal-api-token"
+description = "Internal company API token (INT-...)"
+regex       = '''INT-[A-Z0-9]{16,}'''
+tags        = ["custom", "internal"]
+
+[[rules]]
+id          = "company-jwt-prefix"
+description = "Company-prefixed JWT (CJWT.<base64>.<base64>.<base64>)"
+regex       = '''CJWT\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'''
+tags        = ["custom", "jwt"]

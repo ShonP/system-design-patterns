@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dev-namespaced
+  namespace: good
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "services", "configmaps"]
+    verbs:     ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs:     ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-namespaced
+  namespace: good
+subjects:
+  - { kind: User, name: jane@example.com, apiGroup: rbac.authorization.k8s.io }
+roleRef:
+  kind: Role
+  name: dev-namespaced
+  apiGroup: rbac.authorization.k8s.io

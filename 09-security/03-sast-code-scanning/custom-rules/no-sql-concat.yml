@@ -1,0 +1,16 @@
+rules:
+  - id: no-sql-concat
+    message: |
+      String concatenation/interpolation passed to .execute() is SQL injection.
+      Use parameterized queries: cursor.execute(SQL, (param,))
+    languages: [python]
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: $CUR.execute("..." + $X)
+          - pattern: $CUR.execute($X + "...")
+          - pattern: $CUR.execute(f"...{$X}...")
+          - pattern: |
+              $Q = "..." + $X
+              ...
+              $CUR.execute($Q)

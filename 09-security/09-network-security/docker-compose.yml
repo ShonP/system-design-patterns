@@ -1,0 +1,43 @@
+services:
+  target-web:
+    image: nginx:1.18.0
+    hostname: target-web
+    networks:
+      seclabs09-net:
+        ipv4_address: 192.168.198.10
+    volumes:
+      - ./targets/web/index.html:/usr/share/nginx/html/index.html:ro
+      - ./targets/web/secret.html:/usr/share/nginx/html/admin/secret.html:ro
+
+  target-ssh:
+    image: linuxserver/openssh-server:9.7_p1-r4-ls175
+    hostname: target-ssh
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - PASSWORD_ACCESS=true
+      - USER_NAME=lab
+      - USER_PASSWORD=labpassword
+    networks:
+      seclabs09-net:
+        ipv4_address: 192.168.198.20
+
+  attacker:
+    build:
+      context: ./targets/attacker
+    hostname: attacker
+    networks:
+      seclabs09-net:
+        ipv4_address: 192.168.198.5
+    cap_add: ["NET_ADMIN", "NET_RAW"]
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    command: ["sleep", "infinity"]
+
+networks:
+  seclabs09-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.198.0/24

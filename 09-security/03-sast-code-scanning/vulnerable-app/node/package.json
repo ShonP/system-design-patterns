@@ -1,0 +1,10 @@
+{
+  "name": "vulnerable-node-sast",
+  "version": "0.0.1",
+  "private": true,
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

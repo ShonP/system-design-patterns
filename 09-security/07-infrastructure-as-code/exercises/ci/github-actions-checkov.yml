@@ -1,0 +1,22 @@
+name: iac
+
+on:
+  pull_request:
+    paths: ["**/*.tf", "**/*.yaml", "**/*.yml", "**/Dockerfile"]
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform,kubernetes,dockerfile,github_actions
+          output_format: sarif
+          output_file_path: results.sarif
+          soft_fail_on: LOW,MEDIUM
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: results.sarif

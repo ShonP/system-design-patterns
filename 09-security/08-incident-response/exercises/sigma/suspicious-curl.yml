@@ -1,0 +1,26 @@
+title: Suspicious curl downloads to /tmp
+id: 9b6c5b1a-1f2c-4f3e-8c01-c0ffeec0ffee
+status: experimental
+description: Detects curl/wget piped to bash, or downloads to common drop dirs.
+references:
+  - https://attack.mitre.org/techniques/T1105/
+tags:
+  - attack.execution
+  - attack.t1059
+  - attack.t1105
+logsource:
+  product: linux
+  service: auditd
+detection:
+  cmd_pipe_bash:
+    Image|endswith:
+      - '/curl'
+      - '/wget'
+    CommandLine|contains:
+      - '| sh'
+      - '| bash'
+      - '/tmp/'
+  condition: cmd_pipe_bash
+falsepositives:
+  - Legitimate package install scripts in CI
+level: high
