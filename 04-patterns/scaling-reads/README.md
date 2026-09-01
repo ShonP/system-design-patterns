@@ -33,33 +33,41 @@ As reads increase, your database will struggle under the load. This isn't a soft
 
 ### Part 2: Database Optimization
 - Indexing strategies (B-tree, Hash, Composite)
-- Covering indexes (`INCLUDE`) and partial indexes
-- **BRIN** (huge time-ordered tables) and **GIN** (arrays / JSONB / full-text)
+- Covering indexes (`INCLUDE`) — and why they need `VACUUM` to pay off
+- **BRIN** (huge time-ordered tables) and **GIN** (arrays / JSONB / full-text),
+  including a measured counter-example: BRIN on an unordered column
+- Partial indexes
 - Using EXPLAIN to analyze queries
-- Query optimization techniques
-- Connection pooling (in-process + PgBouncer)
+- Connection pooling (in-process + PgBouncer) and **how to size a pool**
+  (Little's Law + fan-in across app servers)
 
 ### Part 3: Denormalization
 - Normalized vs denormalized schemas
-- Materialized views
+- Watching denormalized copies drift after an update
+- Materialized views, and watching one go stale
 - Pre-computed aggregations
 
 ### Part 4: Read Replicas
 - Leader-follower replication
 - Synchronous vs asynchronous replication
-- Handling replication lag
+- Reproducing a stale read caused by replication lag
+- Read-your-own-writes routing — and what a too-short sticky window costs
+- Measuring the throughput multiplier with a queueing model (not multiplying by 10,000)
 - Doing it for real: PostgreSQL streaming & logical replication, `pg_stat_replication`
 
 ### Part 5: Application Caching
 - Redis as a cache layer
 - TTL strategies
-- Cache invalidation approaches
+- Cache invalidation approaches, and the invalidation **race**: why the delete
+  must come after the commit, and which race a TTL is the only defence against
+- Negative caching and cache warming
 
 ### Part 6: Advanced Cache Patterns
-- Cache stampede prevention (distributed lock + probabilistic early refresh)
-- Hot key problem (key fanout)
-- Request coalescing / single-flight
-- Cache versioning
+- Cache stampede prevention (distributed lock with a fencing token +
+  probabilistic early refresh, measured by peak concurrent DB queries)
+- Hot key problem (key fanout, including the cold→hot transition gap)
+- Request coalescing / single-flight, including the failure path
+- Cache versioning (with a shared version counter)
 - CDN edge caching & sharding (the final scaling tiers)
 
 ## Prerequisites
@@ -151,6 +159,8 @@ uv sync
 3. **Cache strategically** - Cache what's read often and changes rarely
 4. **Understand trade-offs** - Caching adds complexity and staleness
 5. **Know your ratios** - High read/write ratio = cache aggressively
+6. **Measure the win** - every speedup claim in these notebooks is computed and
+   asserted; if a technique stops helping, the notebook fails instead of lying
 
 ## License
 

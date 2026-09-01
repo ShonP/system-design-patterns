@@ -32,28 +32,35 @@ Hot partitions             One shard overloaded      Key distribution
 
 ### Part 2: Database Optimization for Writes
 - Write-optimized databases (Cassandra, time-series)
-- Reducing index overhead
-- Write-ahead log tuning
+- LSM vs B-tree **write amplification**, with the arithmetic
+- Reducing index overhead (measured, server-side)
+- Write-ahead log tuning and `UNLOGGED` tables
 
 ### Part 3: Sharding and Partitioning
 - Horizontal sharding strategies
-- Choosing partition keys
+- Choosing partition keys, and the **imbalance factor** that scores them
+- Monotonically increasing keys: the hot shard that hides in a backfill
+- Why cross-shard transactions are designed away rather than paid for
+- Consistent hashing and PostgreSQL declarative partitioning
 - Vertical partitioning
 
 ### Part 4: Queues and Load Shedding
 - Async write patterns
 - Burst absorption
-- Graceful degradation
+- Graceful degradation (and which priority tier you start eating)
+- Dead-letter queues, backpressure
+- At-most-once vs at-least-once: what a crash mid-processing loses
 
 ### Part 5: Batching and Aggregation
 - Write batching strategies
+- The latency side of the trade: staleness measured against flush interval
 - Hierarchical aggregation
 - Fan-in/fan-out patterns
 
 ### Part 6: Hot Keys and Advanced Patterns
 - Detecting hot keys
-- Key splitting strategies
-- Resharding without downtime
+- Fixed-K and rate-driven dynamic key splitting
+- Resharding without downtime (double-write → backfill → verify → cut over)
 
 ## Prerequisites
 
@@ -66,16 +73,17 @@ Hot partitions             One shard overloaded      Key distribution
 
 ```bash
 # Navigate to the pattern directory
-cd patterns/scaling-writes
+cd 04-patterns/scaling-writes
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=scaling-writes --display-name="Scaling Writes (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Start with the first notebook!
 ```
@@ -145,9 +153,13 @@ uv run python -m ipykernel install --user --name=scaling-writes --display-name="
 
 1. **Do the math first** - Verify writes are actually the bottleneck
 2. **Exhaust vertical scaling** - Modern hardware is powerful
-3. **Choose partition keys wisely** - Bad keys create hot spots
-4. **Queues smooth bursts** - But don't mask underlying problems
-5. **Batch aggressively** - Reduce per-write overhead
+3. **Choose partition keys wisely** - Bad keys create hot spots, and the worst
+   ones (monotonic keys) look perfectly balanced until live traffic arrives
+4. **Queues smooth bursts** - But don't mask underlying problems, and an
+   unbounded queue is a bug
+5. **Batch aggressively** - Reduce per-write overhead, and price the staleness
+   it costs you
+6. **Resharding is never free** - which is why the shard key is a day-one decision
 
 ## The Four Strategies
 

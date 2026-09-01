@@ -1,6 +1,6 @@
 # Rate Limiting And Throttling
 
-> Part of `04-patterns/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `04-patterns/`. Six runnable notebooks, each showing the wrong version first and measuring exactly how it is wrong.
 
 ## Overview
 
@@ -14,9 +14,9 @@ Controlling request rates at the edge and between services.
 - Token bucket (burst-tolerant) — AWS / Stripe / NGINX
 - Leaky bucket (paced output) — traffic shaping
 - **GCRA** (Generic Cell Rate Algorithm) — one-timestamp leaky bucket (Redis `redis-cell`, Shopify)
-- Fixed vs sliding-window counter — the boundary-burst bug
-- Hybrid sliding-window counter (O(1)) — Cloudflare / Kong
-- Distributed limiters with a shared store (atomic check-then-add, Lua-style)
+- Fixed vs sliding-window counter — the boundary-burst bug (demonstrated, not asserted)
+- Hybrid sliding-window counter (O(1)) — Cloudflare / Kong, and its measured approximation error
+- Distributed limiters: the read-then-write race on a shared counter, then the atomic fix (Lua-style)
 - Client-side exponential backoff **with full jitter** (AWS pattern)
 - Concurrency limiting (in-flight cap with a semaphore) vs rate limiting
 - Cost/weight-based limits, fail-open vs fail-closed, picking the limit key (IPv4 NAT, IPv6 `/64`, `X-Forwarded-For`)
@@ -37,9 +37,9 @@ Each notebook shows a **bad first try**, then a **better version**, with plots s
 
 - [`notebooks/00_intro.ipynb`](./notebooks/00_intro.ipynb) — why rate limit at all; vocabulary (RL vs throttling vs quotas); HTTP 429 / `Retry-After`.
 - [`notebooks/01_token_bucket.ipynb`](./notebooks/01_token_bucket.ipynb) — burst-tolerant limiter used by AWS / Stripe / NGINX; per-key buckets.
-- [`notebooks/02_leaky_bucket.ipynb`](./notebooks/02_leaky_bucket.ipynb) — paces traffic to a constant tempo; side-by-side plot vs token bucket.
-- [`notebooks/03_sliding_window.ipynb`](./notebooks/03_sliding_window.ipynb) — fixed-window boundary burst vs sliding-window log vs O(1) hybrid counter.
-- [`notebooks/04_distributed_and_backoff.ipynb`](./notebooks/04_distributed_and_backoff.ipynb) — Redis-style shared counter across servers + client-side exponential backoff with full jitter.
+- [`notebooks/02_leaky_bucket.ipynb`](./notebooks/02_leaky_bucket.ipynb) — the **shaper** (queues and paces, returns a service time) vs the **limiter** form (GCRA, yes/no); side-by-side plot of arrivals, limiter output and shaper output, plus the latency the shaper costs you.
+- [`notebooks/03_sliding_window.ipynb`](./notebooks/03_sliding_window.ipynb) — a real clock-driven boundary attack (2× the limit through a fixed window), the exact sliding-window log, and the O(1) hybrid counter with its error measured in both directions.
+- [`notebooks/04_distributed_and_backoff.ipynb`](./notebooks/04_distributed_and_backoff.ipynb) — per-server limits lie; a naive shared counter is racy (shown under 60-way concurrency); the atomic fix; real `429` responses with a computed `Retry-After`; and client-side exponential backoff with full jitter.
 - [`notebooks/05_concurrency_and_practice.ipynb`](./notebooks/05_concurrency_and_practice.ipynb) — in-flight concurrency caps (semaphore), cost-based limits, where to enforce (edge / gateway / service), fail-open vs fail-closed, choosing the limit key.
 
 ## References

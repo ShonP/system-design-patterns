@@ -3,6 +3,44 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-08-20
+
+### Fixed
+- `03_sliding_window.ipynb` — the boundary-burst "demo" faked the window roll by reaching
+  into the limiter (`fw.start -= 1.0`). It now runs against the real clock: the limiter
+  resets on clock-aligned windows, and the attack waits for a boundary, spends its budget,
+  crosses, and spends it again — 10 requests in ~0.10 s through a 5 req/s limiter.
+- `03_sliding_window.ipynb` — the comparison plot drove a 6 req/s stream through a 5 req/s
+  limiter, so the "2× the limit" it claimed to show was arithmetically impossible (peak
+  could not exceed 6). Replaced with a deterministic replay of a recorded boundary-attack
+  trace; the fixed window now visibly peaks at 10 while the sliding log holds at 5.
+- `02_leaky_bucket.ipynb` — the notebook described the leaky bucket as pacing output but
+  implemented an admission limiter, and the "token vs leaky" plot drew both at *arrival*
+  time, so the two lines were identical and demonstrated nothing.
+- `02_leaky_bucket.ipynb` — GCRA allowed `burst + 1` requests from idle (tolerance was
+  `burst` intervals rather than `burst - 1`).
+
+### Added
+- `03_sliding_window.ipynb` — measurement of the sliding-window **counter's approximation
+  error**: front-loaded traffic makes it reject 19 of 40 in-limit requests, back-loaded
+  traffic makes it exceed the limit by 5%. Plus explicit "when to use which" guidance.
+- `02_leaky_bucket.ipynb` — the shaper/limiter distinction stated up front, a real
+  `ShapingLeakyBucket` that returns each request's **service time**, a plot of arrivals vs
+  limiter output vs shaper output, the worst-case added latency, and a "when NOT to shape"
+  section. GCRA now also returns `Retry-After`.
+- `04_distributed_and_backoff.ipynb` — the **read-then-write race**: 60 concurrent
+  requests through a naive `get`/`set` shared counter all pass a limit of 10 and 59
+  increments are lost. Fixed with a single-round-trip atomic check-and-increment. The
+  limiter now returns real `429` responses with a computed `Retry-After` that counts down,
+  plus what the shared store costs (extra hop, hard dependency, hot keys, clock skew).
+- `01_token_bucket.ipynb` — `HttpTokenBucket` computing an exact `Retry-After` from the
+  token deficit, and an expanded when-to-use / when-not-to-use with the cost of each knob.
+
+### Changed
+- Hygiene: kernelspec normalized to `Python 3 (.venv)`; saved outputs and execution counts
+  stripped from all six notebooks. Limiters take an optional injected `now`, so plots
+  replay recorded traces deterministically instead of racing the wall clock.
+
 ## 2026-04-19 (later)
 - QA re-review: re-executed all notebooks end-to-end — all pass.
 - **Fixed** a correctness bug in `04_distributed_and_backoff.ipynb`: the simulated shared store recorded rejected requests, inflating the window and starving future traffic. Replaced with an atomic `check_and_add` and added a Redis-ready Lua script (with unique-member note).

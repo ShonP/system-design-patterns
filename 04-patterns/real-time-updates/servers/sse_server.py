@@ -13,6 +13,17 @@ message_id = 0
 MESSAGE_BUFFER_SIZE = 100
 message_buffer: deque = deque(maxlen=MESSAGE_BUFFER_SIZE)
 
+# How often we emit a heartbeat on an otherwise idle stream. Proxies and load
+# balancers close connections that go quiet, so every production SSE endpoint
+# sends *something* periodically. Clients can request a shorter interval with
+# `?heartbeat=`; a demo that wants to stop listening after N seconds needs
+# traffic at least that often to notice.
+DEFAULT_HEARTBEAT = 15.0
+MIN_HEARTBEAT = 0.2
+# Advertised via the SSE `retry:` field -- this is how a server tells the
+# browser's EventSource how long to wait before reconnecting.
+RETRY_MS = 2000
+
 class Message(BaseModel):
     user: str = "anonymous"
     text: str
@@ -27,10 +38,19 @@ def format_sse(data: dict, event: str | None = None, id: int | None = None) -> s
     return msg
 
 @app.get("/events")
-async def events(request: Request):
-    last_event_id_str = request.headers.get("Last-Event-ID")
-    last_event_id = int(last_event_id_str) if last_event_id_str else 0
-    
+async def events(request: Request, heartbeat: float = DEFAULT_HEARTBEAT):
+    # A client may echo back any id we sent it; browsers do this automatically.
+    # Anything we cannot parse means "start from the beginning" -- it must not
+    # blow up the connection with a 500.
+    last_event_id_str = request.headers.get("Last-Event-ID") or request.query_params.get("last_event_id")
+    try:
+        last_event_id = int(last_event_id_str) if last_event_id_str else 0
+    except (TypeError, ValueError):
+        print(f"⚠️  ignoring unparseable Last-Event-ID: {last_event_id_str!r}")
+        last_event_id = 0
+
+    heartbeat = max(MIN_HEARTBEAT, min(heartbeat, DEFAULT_HEARTBEAT))
+
     async def generate():
         client_queue: asyncio.Queue = asyncio.Queue()
         subscribers.append(client_queue)
@@ -45,12 +65,14 @@ async def events(request: Request):
         else:
             print(f"📱 New SSE client connected (total: {len(subscribers)})")
         
+        # `retry:` tells EventSource how long to wait before reconnecting.
+        yield f"retry: {RETRY_MS}\n\n"
         yield format_sse({"type": "connected", "message": "Welcome!", "recovered_from": last_event_id}, event="connection")
         
         try:
             while True:
                 try:
-                    message = await asyncio.wait_for(client_queue.get(), timeout=15)
+                    message = await asyncio.wait_for(client_queue.get(), timeout=heartbeat)
                     yield message
                 except asyncio.TimeoutError:
                     yield format_sse({"type": "heartbeat"}, event="heartbeat")
@@ -80,7 +102,7 @@ async def send_message(msg: Message) -> dict:
 
 @app.get("/stats")
 def stats() -> dict:
-    return {"connected_clients": len(subscribers), "messages_sent": message_id, "buffer_size": len(message_buffer), "buffer_max_size": MESSAGE_BUFFER_SIZE}
+    return {"connected_clients": len(subscribers), "messages_sent": message_id, "buffer_size": len(message_buffer), "buffer_max_size": MESSAGE_BUFFER_SIZE, "retry_ms": RETRY_MS}
 
 @app.get("/buffer")
 def get_buffer() -> dict:
@@ -94,4 +116,5 @@ if __name__ == "__main__":
     import uvicorn
     print("🚀 Starting SSE Server on port 5003")
     print(f"   📦 Message buffer size: {MESSAGE_BUFFER_SIZE}")
+    print(f"   💓 Default heartbeat: {DEFAULT_HEARTBEAT}s (override with ?heartbeat=)")
     uvicorn.run(app, host="0.0.0.0", port=5003, log_level="warning")

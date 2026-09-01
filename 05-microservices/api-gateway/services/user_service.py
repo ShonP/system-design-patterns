@@ -169,7 +169,11 @@ def get_user_profile(user_id):
     profile = {
         "user": user,
         "orders": orders,
-        "order_count": len(orders),
+        # order_count is a FACT we can only report when the call succeeded.
+        # If order-service was unreachable we know nothing about this user's
+        # orders, so we must say `null` — reporting 0 would tell the client
+        # "this user has no orders", which is a claim we did not verify.
+        "order_count": len(orders) if error is None else None,
         "served_by": f"user-service-{INSTANCE_ID}",
     }
 

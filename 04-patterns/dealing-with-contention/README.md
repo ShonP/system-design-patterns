@@ -71,13 +71,15 @@ The race condition happens because reading and writing aren't atomic. There's a 
 cd 04-patterns/dealing-with-contention
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
 # Register a Jupyter kernel that points at this lab's .venv
-uv run python -m ipykernel install --user --name=contention --display-name="Contention (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the notebooks in VS Code and pick the "Contention (Python)" kernel
 # (top-right of the notebook). If it doesn't appear: Cmd+Shift+P → "Reload Window"

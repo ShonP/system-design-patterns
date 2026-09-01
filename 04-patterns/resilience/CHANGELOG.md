@@ -3,6 +3,34 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-08-20
+
+### Fixed
+- `04_timeouts_and_graceful_degradation.ipynb` — the "BAD: no timeout" case was prose plus
+  `print('skipping — this would block 30s')`. It now actually runs: four stuck calls take
+  every thread in a 4-worker pool and a healthy request is still queued a second later.
+
+### Added
+- `04_timeouts_and_graceful_degradation.ipynb` — a demo that **a missing timeout defeats
+  every other mechanism**: the same breaker + retry wrapper around a dependency that
+  answers 1 s late stays `CLOSED` forever without a timeout (it never sees a failure to
+  count) and trips correctly with one.
+- `04_timeouts_and_graceful_degradation.ipynb` — **load shedding** (Part 4): goodput
+  collapse measured over two rounds, showing that an unshed server's own client timeouts
+  become its next wave of load; plus shed-by-priority guidance and when not to shed.
+- `04_timeouts_and_graceful_degradation.ipynb` — **health checks** (Part 5): liveness vs
+  readiness vs startup, and a runnable demo of the classic backwards implementation where
+  a deep readiness check turns a non-critical dependency blip into a 100% fleet outage.
+- `03_bulkhead.ipynb` — what partitioning costs (lower utilization, more knobs, and the
+  fact that `ThreadPoolExecutor`'s unbounded queue is not a bulkhead), and when not to use
+  one.
+
+### Changed
+- The stacking diagram and pattern table now include load shedding and health checks, and
+  every pattern has an explicit "when NOT to use it" column.
+- Hygiene: kernelspec normalized to `Python 3 (.venv)`; saved outputs and execution counts
+  stripped from all five notebooks.
+
 ## 2026-04-18
 - Scaffolded `Resilience` lab: `README.md`, `references/designgurus.md`, `CHANGELOG.md`.
 - No notebooks yet — see README for planned notebooks.

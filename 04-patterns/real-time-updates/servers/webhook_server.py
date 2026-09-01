@@ -30,8 +30,13 @@ app = FastAPI()
 SECRET = "super-secret-signing-key"
 subscriptions: dict[str, dict] = {}        # id -> {"url": str}
 deliveries: list[dict] = []                 # delivery attempts log
-MAX_RETRIES = 3
-BACKOFF_SECONDS = [0.5, 1.5, 3.0]           # tries: 1st fails → wait 0.5s, ...
+
+# 3 attempts = 1 try + 2 retries, so we need 2 gaps. Doubling each time is
+# "exponential backoff"; production adds random jitter on top so that a fleet
+# of receivers coming back after an outage doesn't retry in lockstep. We keep
+# it jitter-free here purely so the notebook's timings are reproducible.
+MAX_ATTEMPTS = 3
+BACKOFF_SECONDS = [0.5, 1.0]                # wait after attempt 1, after attempt 2
 
 
 class Subscription(BaseModel):
@@ -43,22 +48,34 @@ class Event(BaseModel):
     data: dict = {}
 
 
-def sign(body: bytes) -> str:
-    """HMAC-SHA256 signature of the raw request body."""
-    return hmac.new(SECRET.encode(), body, hashlib.sha256).hexdigest()
+def sign(timestamp: int, body: bytes) -> str:
+    """HMAC-SHA256 over `<timestamp>.<raw body>` -- the Stripe scheme.
+
+    Signing the body alone is not enough: an attacker who captures one valid
+    delivery could replay it verbatim forever, and the signature would still
+    check out. Binding a timestamp into the signed string lets the receiver
+    reject anything older than a few minutes.
+    """
+    signed_payload = str(timestamp).encode() + b"." + body
+    return hmac.new(SECRET.encode(), signed_payload, hashlib.sha256).hexdigest()
 
 
 async def deliver(sub_id: str, url: str, payload: dict) -> None:
     body = json.dumps(payload).encode()
-    signature = sign(body)
+    # Signed once, outside the retry loop: every retry re-sends the *identical*
+    # bytes, headers and delivery id. That is what makes the receiver able to
+    # dedupe on `X-Webhook-Delivery-Id`.
+    timestamp = int(time.time())
+    signature = sign(timestamp, body)
     headers = {
         "Content-Type": "application/json",
         "X-Webhook-Signature": f"sha256={signature}",
+        "X-Webhook-Timestamp": str(timestamp),
         "X-Webhook-Event": payload["event"],
         "X-Webhook-Delivery-Id": payload["delivery_id"],
     }
 
-    for attempt in range(1, MAX_RETRIES + 1):
+    for attempt in range(1, MAX_ATTEMPTS + 1):
         started = time.time()
         try:
             async with httpx.AsyncClient(timeout=5) as client:
@@ -69,6 +86,7 @@ async def deliver(sub_id: str, url: str, payload: dict) -> None:
                 "url": url,
                 "event": payload["event"],
                 "attempt": attempt,
+                "delivery_id": payload["delivery_id"],
                 "status_code": resp.status_code,
                 "ok": ok,
                 "elapsed_ms": round((time.time() - started) * 1000, 1),
@@ -83,6 +101,7 @@ async def deliver(sub_id: str, url: str, payload: dict) -> None:
                 "url": url,
                 "event": payload["event"],
                 "attempt": attempt,
+                "delivery_id": payload["delivery_id"],
                 "status_code": None,
                 "ok": False,
                 "error": str(exc),
@@ -90,10 +109,10 @@ async def deliver(sub_id: str, url: str, payload: dict) -> None:
             })
             print(f"📮 attempt {attempt} → {url} : ERROR {exc}")
 
-        if attempt < MAX_RETRIES:
+        if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(BACKOFF_SECONDS[attempt - 1])
 
-    print(f"❌ giving up on {url} after {MAX_RETRIES} attempts")
+    print(f"❌ giving up on {url} after {MAX_ATTEMPTS} attempts")
 
 
 @app.post("/subscriptions", status_code=201)
@@ -132,6 +151,9 @@ async def trigger(event: Event) -> dict:
         }
         tasks.append(deliver(sub_id, sub["url"], payload))
 
+    # A real vendor enqueues the deliveries and returns immediately -- it will
+    # not hold your API call open for the length of a retry schedule. We await
+    # here so the notebook can observe the whole attempt sequence in one cell.
     await asyncio.gather(*tasks)
     return {"delivered_to": len(tasks)}
 

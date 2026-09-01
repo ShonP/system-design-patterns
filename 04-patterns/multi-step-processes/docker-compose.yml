@@ -16,12 +16,15 @@ services:
       retries: 5
 
   temporal:
-    image: temporalio/auto-setup:1.24
+    image: temporalio/auto-setup:1.26.2
     depends_on:
       postgresql:
         condition: service_healthy
     environment:
-      - DB=postgresql
+      # Must be a driver the auto-setup image knows: mysql8, postgres12,
+      # postgres12_pgx or cassandra. 'postgresql' makes the server exit(1)
+      # with "Unsupported driver specified".
+      - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=postgres
       - POSTGRES_PWD=postgres
@@ -43,7 +46,7 @@ services:
       - "8080:8080"
 
   temporal-admin-tools:
-    image: temporalio/admin-tools:1.24
+    image: temporalio/admin-tools:1.26.2  # admin-tools has no 1.24 tag; keep this in lockstep with auto-setup
     depends_on:
       - temporal
     environment:

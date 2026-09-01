@@ -60,9 +60,10 @@ When systems require real-time updates, the solution requires two distinct piece
 
 ### Part 8: Webhooks
 - Vendor → your-server push (the inverse of polling)
-- HMAC signature verification
+- HMAC signature over a signed timestamp (forgery **and** replay defence)
+- Attacking your own receiver four ways to prove the checks fire
 - Retries with exponential backoff
-- Idempotent handlers and fast-ACK pattern
+- Idempotent handlers keyed on `delivery_id`, and the fast-ACK pattern
 
 ## Prerequisites
 
@@ -78,11 +79,15 @@ When systems require real-time updates, the solution requires two distinct piece
 cd 04-patterns/real-time-updates
 
 # Start the required services (Redis + RedisInsight)
-docker-compose up -d
+docker compose up -d
 
 # Install Python dependencies into a local .venv (using uv)
 uv sync
 
+# The notebooks start their own demo servers (servers/*.py) on ports
+# 5001-5006 and shut them down when the kernel exits -- there is nothing to
+# launch by hand. A server you DO start yourself is detected and left alone.
+#
 # Open any notebook in VS Code, then:
 #   1. Click the kernel picker (top-right of the notebook)
 #   2. Choose the .venv we just created (Python 3.x .venv/bin/python)
@@ -97,11 +102,16 @@ If another lab is already running a Redis container on port 6379, the
 existing container will work for this lab — you can skip `docker compose up`
 and just confirm Redis answers `PING`.
 
+Redis is only needed for the real-Redis Pub/Sub demo in notebook 7. If it
+isn't reachable that cell prints a skip notice and moves on; every other cell
+in the series runs without Docker at all.
+
 ## 🔍 Visualization Tools (Included in Docker)
 
 ### RedisInsight (Redis GUI)
 - **URL**: http://localhost:5540
 - **First time setup**: Click "Add Redis Database" → Host: `redis`, Port: `6379`
+  (`redis` is the compose service name, reachable from the RedisInsight container)
 - **Use for**: Watch Pub/Sub channels and messages in Notebook 7
 
 ## Real-World Applications
@@ -111,7 +121,7 @@ and just confirm Redis answers `PING`.
 | Ticketmaster | WebSockets + Pub/Sub | Real-time seat availability |
 | Uber | WebSockets | Driver location updates |
 | WhatsApp | WebSockets | Instant messaging |
-| Google Docs | WebSockets + CRDT | Collaborative editing |
+| Google Docs | Long-lived HTTP + OT | Collaborative editing (server-mediated, not P2P) |
 | Robinhood | SSE/WebSockets | Stock price updates |
 | Live Comments | WebSockets + Pub/Sub | High fan-out broadcasting |
 

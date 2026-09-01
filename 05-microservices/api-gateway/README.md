@@ -44,9 +44,9 @@ This lab uses **nginx** as the API gateway, **two Flask microservices** as backe
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
 | 1 | Routing & Load Balancing | Why direct service calls are bad, how path-based routing and load balancing work |
-| 2 | Rate Limiting & Auth | Protecting APIs with rate limiting and API key authentication at the gateway |
-| 3 | Request Transformation | Header injection, API versioning, and request/response modification |
-| 4 | Advanced Patterns | Circuit-breaker-style failover, request aggregation (BFF), canary / weighted routing, CORS, observability/logging, SSL termination |
+| 2 | Rate Limiting & Auth | Fixed-window vs sliding-window rate limiting (including the 2x burst-at-the-boundary bug), nginx `limit_req`, and API key authentication at the gateway |
+| 3 | Request Transformation | Header injection, the gateway as a trust boundary (forgeable headers), API versioning, and request/response modification |
+| 4 | Advanced Patterns | Circuit breaker state machine, retry amplification, timeout budgets, request aggregation (BFF) and how it degrades, canary / weighted routing, CORS, observability/logging, SSL termination |
 
 Each notebook follows the **BAD → BETTER → BEST** pattern so you can see why each concept matters.
 
@@ -63,13 +63,14 @@ Each notebook follows the **BAD → BETTER → BEST** pattern so you can see why
 cd 05-microservices/api-gateway
 
 # Start all services (nginx gateway + Flask backends + Redis)
-docker-compose up -d --build
+docker compose up -d --build
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=api-gateway --display-name="API Gateway (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -94,7 +95,7 @@ uv run python -m ipykernel install --user --name=api-gateway --display-name="API
 | `GET /api/v2/users` | List users (API version 2 format) |
 | `GET /api/debug/headers` | See what headers the backend receives |
 | `GET /health` | Gateway health check |
-| `GET /api/users/:id/profile` | Aggregated user profile + orders (BFF pattern) |
+| `GET /api/profile/:id` | Aggregated user profile + orders (BFF pattern) |
 | `GET /api/canary/users` | Weighted canary routing (~90% stable / ~10% canary) |
 | `GET /api/cors/users` | CORS-enabled endpoint (preflight + real request) |
 
@@ -117,8 +118,8 @@ uv run python -m ipykernel install --user --name=api-gateway --display-name="API
 2. **Load Balancing** — distribute traffic across service instances
 3. **Rate Limiting** — prevent abuse and protect backends
 4. **Authentication** — validate credentials before forwarding
-5. **Request/Response Transformation** — modify headers, version APIs
-6. **Resilience** — circuit-breaker-style failover (`max_fails`/`fail_timeout`)
+5. **Request/Response Transformation** — modify headers, version APIs; **clear or overwrite** every header the backend trusts, or the client can forge it
+6. **Resilience** — circuit-breaker-style failover (`max_fails`/`fail_timeout`), bounded retries, and a timeout budget that shrinks with depth
 7. **Request Aggregation** — BFF pattern combining multiple backend calls
 8. **Canary / Weighted Routing** — gradual rollouts via weighted upstream servers
 9. **CORS** — cross-origin request handling at the gateway
@@ -132,6 +133,17 @@ uv run python -m ipykernel install --user --name=api-gateway --display-name="API
 - ❌ Simple monolithic apps (adds unnecessary complexity)
 - ❌ Internal service-to-service calls (use service mesh instead)
 
+## What This Lab Does NOT Do
+
+Honest scope, so you don't carry the wrong lesson into a design:
+
+- **Auth is API keys in an nginx `map`, not JWT/OAuth.** No signature verification, no expiry, no revocation without a config reload. Real gateways validate a signed token (and pin the algorithm — accepting `alg: none` or skipping signature verification is a classic critical bug).
+- **No active health checks.** nginx OSS never calls `/health` on its own; it only ejects a backend *after* real requests to it fail (`max_fails`/`fail_timeout`). Active probing needs nginx Plus, Envoy, or a service mesh.
+- **No true circuit breaker at the gateway.** Notebook 4 simulates the open/half-open/closed state machine in Python because nginx OSS has no such thing.
+- **`worker_processes 1`** is set deliberately so the load-balancing demos are exactly reproducible. Production uses `worker_processes auto` plus a shared-memory `zone` in the upstream.
+- **Aggregation lives inside `user_service.py`**, not in a dedicated BFF, to keep the container count low. Notebook 4 says why that's the wrong shape at scale.
+- **TLS termination is concept-only** — the lab ships no certificates.
+
 ## Valid API Keys (for Notebook 2)
 
 | Key | Description |
@@ -144,10 +156,10 @@ uv run python -m ipykernel install --user --name=api-gateway --display-name="API
 
 ```bash
 # Stop all containers
-docker-compose down
+docker compose down
 
 # Remove volumes too
-docker-compose down -v
+docker compose down -v
 ```
 
 ## License
