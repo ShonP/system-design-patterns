@@ -1,0 +1,21 @@
+---
+# Mounted over /usr/share/wazuh-indexer/opensearch-security/internal_users.yml.
+# These are the WELL-KNOWN Wazuh demo hashes. They are public; this stack is a lab and
+# must never be exposed beyond localhost.
+#   admin        / SecretPassword
+#   kibanaserver / kibanaserver     (the dashboard's service account)
+_meta:
+  type: "internalusers"
+  config_version: 2
+
+admin:
+  hash: "$2y$12$K/SpwjtB.wOHJ/Nc6GVRDuc1h0rM1DfvziFRNPtk27P.c4yDr9njO"
+  reserved: true
+  backend_roles:
+  - "admin"
+  description: "Lab admin user"
+
+kibanaserver:
+  hash: "$2a$12$4AcgAt3xwOWadA5s5blL6ev39OXDNhmOesEoo33eZtrq2N0YrU3H."
+  reserved: true
+  description: "Dashboard service account"

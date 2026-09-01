@@ -1,13 +1,16 @@
 services:
   semgrep:
-    image: returntocorp/semgrep:1.96.0
+    image: semgrep/semgrep:1.96.0
+    environment:
+      SEMGREP_SEND_METRICS: "off"
     volumes:
       - ./:/src
     working_dir: /src
     profiles: ["scan"]
 
+  # `latest` is the only tag PyCQA publishes for this image. Nothing to pin.
   bandit:
-    image: pyfound/bandit:1.7.10
+    image: ghcr.io/pycqa/bandit/bandit:latest
     volumes:
       - ./:/src
     working_dir: /src

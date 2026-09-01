@@ -11,7 +11,7 @@
 - Sensitivity labels and Data Loss Prevention (DLP)
 - Records management and retention policies
 - Insider Risk Management and Communication Compliance
-- eDiscovery (Standard and Premium) and Audit
+- eDiscovery (Standard and Premium capabilities, now delivered through the unified Purview eDiscovery experience) and Audit
 
 ## Notebooks
 
@@ -32,3 +32,5 @@ uv sync
 Then open any notebook in VS Code and select the `.venv` kernel from the kernel picker (top-right of the notebook). If the `.venv` kernel doesn't show up, reload the VS Code window (`Cmd+Shift+P` → *Developer: Reload Window*).
 
 No Docker needed — all Purview features are simulated in Python.
+
+Each notebook ends with an auto-graded **self-check quiz** — edit `MY_ANSWERS` and re-run the cell.

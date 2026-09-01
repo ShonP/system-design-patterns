@@ -1,0 +1,11 @@
+# Artifacts produced by running this lab. Regenerated on demand.
+
+# Exercise 2 writes scan reports here.
+exercises/*.txt
+exercises/*.json
+
+# Exercise 8 generates a cosign key pair in the lab directory. cosign.key is a
+# PRIVATE key -- lab-grade, empty passphrase, but never commit one out of habit.
+cosign.key
+cosign.pub
+signingconfig.json

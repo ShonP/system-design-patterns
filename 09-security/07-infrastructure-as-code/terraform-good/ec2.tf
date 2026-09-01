@@ -19,10 +19,40 @@ resource "aws_security_group" "web" {
   }
 }
 
+# CKV2_AWS_41: an instance profile means the app gets short-lived, scoped
+# credentials from IMDSv2 instead of a long-lived access key baked into user_data.
+data "aws_iam_policy_document" "ec2_assume" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "web" {
+  name               = "web-instance-role"
+  assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
+}
+
+resource "aws_iam_role_policy" "web" {
+  name   = "web-instance-policy"
+  role   = aws_iam_role.web.id
+  policy = data.aws_iam_policy_document.dev_read_only.json
+}
+
+resource "aws_iam_instance_profile" "web" {
+  name = "web-instance-profile"
+  role = aws_iam_role.web.name
+}
+
 resource "aws_instance" "web" {
-  ami           = "ami-12345678"
-  instance_type = "t3.micro"
+  ami                         = "ami-12345678"
+  instance_type               = "t3.micro"
   vpc_security_group_ids      = [aws_security_group.web.id]
+  iam_instance_profile        = aws_iam_instance_profile.web.name
   associate_public_ip_address = false
   monitoring                  = true
   ebs_optimized               = true

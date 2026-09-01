@@ -1,0 +1,46 @@
+# kube-bench has to run ON a node, with that node's config files mounted, to audit it.
+# Running the container on your laptop (against your laptop's /etc and /var) audits your
+# laptop -- which for kind is not the cluster at all: the control plane lives inside a
+# Docker container. Hence a Job pinned to the control-plane node.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kube-bench-master
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels: { app: kube-bench }
+    spec:
+      hostPID: true
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ""
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+      restartPolicy: Never
+      containers:
+        - name: kube-bench
+          image: aquasec/kube-bench:v0.10.4
+          # No --benchmark flag: kube-bench detects the Kubernetes version and picks the
+          # matching CIS benchmark. Hard-coding cis-1.24 against a 1.31 cluster produces
+          # confidently wrong results.
+          command: ["kube-bench", "run", "--targets", "master,etcd,policies"]
+          volumeMounts:
+            - { name: var-lib-etcd,                   mountPath: /var/lib/etcd,                   readOnly: true }
+            - { name: var-lib-kubelet,                mountPath: /var/lib/kubelet,                readOnly: true }
+            - { name: var-lib-kube-scheduler,         mountPath: /var/lib/kube-scheduler,         readOnly: true }
+            - { name: var-lib-kube-controller-manager, mountPath: /var/lib/kube-controller-manager, readOnly: true }
+            - { name: etc-kubernetes,                 mountPath: /etc/kubernetes,                 readOnly: true }
+            - { name: usr-bin,                        mountPath: /usr/local/mount-from-host/bin,  readOnly: true }
+      volumes:
+        - { name: var-lib-etcd,                    hostPath: { path: /var/lib/etcd } }
+        - { name: var-lib-kubelet,                 hostPath: { path: /var/lib/kubelet } }
+        - { name: var-lib-kube-scheduler,          hostPath: { path: /var/lib/kube-scheduler } }
+        - { name: var-lib-kube-controller-manager, hostPath: { path: /var/lib/kube-controller-manager } }
+        - { name: etc-kubernetes,                  hostPath: { path: /etc/kubernetes } }
+        - { name: usr-bin,                         hostPath: { path: /usr/bin } }

@@ -1,0 +1,44 @@
+# Mounted over /usr/share/wazuh-indexer/opensearch.yml (OPENSEARCH_PATH_CONF).
+#
+# WHY THIS FILE EXISTS: the opensearch.yml baked into wazuh/wazuh-indexer:4.9.0 points at
+# /etc/wazuh-indexer/certs/indexer.pem -- a path that does not exist inside the image --
+# and declares `nodes_dn: CN=node-1`, which does not match the CN the certs generator
+# produces (CN=wazuh.indexer). Without this mount the security plugin fails to load and
+# the container crash-loops forever with:
+#   failed to load plugin class [org.opensearch.security.OpenSearchSecurityPlugin]
+#   access denied ("java.io.FilePermission" "/etc/wazuh-indexer/certs/indexer.pem" "read")
+# The image is not usable without a config mount. Same file as upstream wazuh-docker
+# v4.9.0 single-node, with the key filename adjusted to what this compose mounts.
+network.host: "0.0.0.0"
+node.name: "wazuh.indexer"
+path.data: /var/lib/wazuh-indexer
+path.logs: /var/log/wazuh-indexer
+discovery.type: single-node
+http.port: 9200-9299
+transport.tcp.port: 9300-9399
+compatibility.override_main_response_version: true
+plugins.security.ssl.http.pemcert_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.pem
+plugins.security.ssl.http.pemkey_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
+plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.pem
+plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.pem
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.transport.enforce_hostname_verification: false
+plugins.security.ssl.transport.resolve_hostname: false
+plugins.security.authcz.admin_dn:
+- "CN=admin,OU=Wazuh,O=Wazuh,L=California,C=US"
+plugins.security.check_snapshot_restore_write_privileges: true
+plugins.security.enable_snapshot_restore_privilege: true
+plugins.security.nodes_dn:
+- "CN=wazuh.indexer,OU=Wazuh,O=Wazuh,L=California,C=US"
+plugins.security.restapi.roles_enabled:
+- "all_access"
+- "security_rest_api_access"
+plugins.security.system_indices.enabled: true
+plugins.security.system_indices.indices: [".opendistro-alerting-config", ".opendistro-alerting-alert*", ".opendistro-anomaly-results*", ".opendistro-anomaly-detector*", ".opendistro-anomaly-checkpoints", ".opendistro-anomaly-detection-state", ".opendistro-reports-*", ".opendistro-notifications-*", ".opendistro-notebooks", ".opensearch-observability", ".opendistro-asynchronous-search-response*", ".replication-metadata-store"]
+# Loads internal_users.yml below into the .opendistro_security index on first boot.
+# Without it there are no users at all and every request 401s.
+plugins.security.allow_default_init_securityindex: true
+# A laptop's Docker disk is usually >85% full; without this the indexer refuses writes.
+cluster.routing.allocation.disk.threshold_enabled: false

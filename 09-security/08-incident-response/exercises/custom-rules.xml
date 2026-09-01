@@ -4,9 +4,13 @@
     <field name="event">^jwt_validation_failed$</field>
     <description>App: JWT validation failed</description>
   </rule>
+  <!-- same_source_ip, NOT <same_field>srcip</same_field>.
+       same_field works on dynamic decoder fields; srcip is one of Wazuh's static
+       fields and same_field silently never matches it. With same_field the composite
+       rule below simply never fires and rule 100100 is the only thing you ever see. -->
   <rule id="100101" level="10" frequency="5" timeframe="60">
     <if_matched_sid>100100</if_matched_sid>
-    <same_field>srcip</same_field>
+    <same_source_ip />
     <description>App: 5 JWT failures in 60s from same IP — possible token brute-force</description>
     <mitre>
       <id>T1110</id>

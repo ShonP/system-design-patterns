@@ -29,7 +29,7 @@ The mini-SIEM is a FastAPI service backed by SQLite. A log generator produces re
 
 ```bash
 cd security-certs/sc-200/01-build-a-siem
-docker compose up -d          # start the mini-SIEM + seed attack data
+docker compose up -d --build          # start the mini-SIEM + seed attack data
 uv sync                       # install notebook dependencies
 ```
 
@@ -39,11 +39,37 @@ Open any notebook in VS Code and pick the **`.venv` kernel** from this folder
 
 The log generator automatically seeds the SIEM with normal traffic + attack patterns. Open any notebook and you'll have real data to investigate.
 
+The seed is **deterministic** (`random.seed` in `../siem/log_generator.py`), so everyone
+gets the same dataset and the same detections fire every time. Seeding also self-checks:
+if the injected attack chain stops being detectable by the six shipped rules, or if the
+brute-force rule starts firing on a benign account, `sc200-log-generator` exits non-zero
+instead of handing the notebooks a quietly broken dataset.
+
+## What the seeded environment contains
+
+| | |
+|---|---|
+| Normal traffic | ~55 minutes of sign-ins, firewall flows, process launches and email across 5 users |
+| Benign failed sign-ins | 1-4 per user (everyday password typos) — the population the brute-force rule must **not** alert on |
+| The campaign | phish delivered to alice → 15 failed + 1 successful sign-in from `185.220.101.42` → psexec/mimikatz across 3 servers → 10 large uploads back to the same IP |
+
+One attacker IP runs the whole campaign, so it is a real join key between `SigninLogs`
+and `AzureFirewall` — which is what makes entity pivoting work rather than merely
+look plausible.
+
+## Honest scope
+
+The mini-SIEM is a teaching stand-in, not a Sentinel clone. Notably it correlates alerts
+only when their entity dictionaries are **identical**, so one campaign against one user
+fragments into several incidents. Notebook 3 measures that rather than hiding it, and
+lab 2 (`../02-incident-response`) works the problem. The full gap list is at the end of
+notebook 3.
+
 ## Troubleshooting
 
 | Symptom | Fix |
 |--------|-----|
-| `ConnectError` on `localhost:8000` | Run `docker compose up -d`, then `docker compose ps` to confirm `sc200-siem` is **healthy**. |
+| `ConnectError` on `localhost:8000` | Run `docker compose up -d --build`, then `docker compose ps` to confirm `sc200-siem` is **healthy**. |
 | Dashboard shows `total_logs: 0` | Wait ~10 seconds for the log generator to finish, or run `docker logs sc200-log-generator`. |
-| Want to start fresh | `docker compose down -v && docker compose up -d` — the `-v` wipes the seeded database. |
+| Want to start fresh | `docker compose down -v && docker compose up -d --build` — the `-v` wipes the seeded database. |
 | Notebook kernel missing | Re-run `uv sync`; pick the `.venv` kernel; reload the VS Code window. |

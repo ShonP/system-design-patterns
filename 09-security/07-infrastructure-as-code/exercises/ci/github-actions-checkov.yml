@@ -4,19 +4,47 @@ on:
   pull_request:
     paths: ["**/*.tf", "**/*.yaml", "**/*.yml", "**/Dockerfile"]
 
+permissions:
+  contents: read
+  security-events: write   # required by upload-sarif
+
 jobs:
   checkov:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: bridgecrewio/checkov-action@master
+
+      # 1. Full scan, reported but non-blocking. Findings land in the Security tab,
+      #    where GitHub does the "net-new on this PR" diff for you.
+      #
+      #    NOTE the trailing comma in output_file_path. Without it checkov treats the
+      #    value as a DIRECTORY and writes results.sarif/results_sarif.sarif, and the
+      #    upload step below silently gets a directory instead of a file.
+      - uses: bridgecrewio/checkov-action@v12.3119.0
         with:
           directory: .
           framework: terraform,kubernetes,dockerfile,github_actions
           output_format: sarif
-          output_file_path: results.sarif
-          soft_fail_on: LOW,MEDIUM
+          output_file_path: "results.sarif,"
+          soft_fail: true
+
       - uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: results.sarif
+
+      # 2. The actual gate. Fails the PR only on the checks you decided are
+      #    exploitable -- the eight from Exercise 1.
+      #
+      #    Do NOT gate on severities here. Open-source checkov ships no severity data
+      #    (that comes from the Prisma platform via an API key), so `soft_fail_on:
+      #    LOW,MEDIUM` is a no-op and `hard_fail_on: HIGH,CRITICAL` matches nothing and
+      #    passes a repo full of critical findings. Gate on check IDs.
+      - uses: bridgecrewio/checkov-action@v12.3119.0
+        with:
+          directory: .
+          framework: terraform
+          quiet: true
+          compact: true
+          output_format: cli
+          hard_fail_on: CKV_AWS_20,CKV_AWS_24,CKV_AWS_79,CKV_AWS_17,CKV_AWS_16,CKV_AWS_355,CKV_AWS_36,CKV_AWS_67

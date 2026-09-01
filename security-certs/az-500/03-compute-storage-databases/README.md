@@ -13,22 +13,25 @@
 - Storage encryption — BYOK (CMK), infrastructure encryption (double encryption)
 - Storage data protection — soft delete, versioning, PITR, immutable storage (WORM)
 - SQL security — Entra-only auth, firewall vs private endpoint, auditing, Defender for SQL
-- Data protection — TDE (BYOK), Always Encrypted, Dynamic Data Masking, Row-Level Security
+- Data protection — TDE (BYOK), Always Encrypted (deterministic / randomized / secure enclaves), Dynamic Data Masking, Row-Level Security
 - Cosmos DB / PostgreSQL / MySQL security patterns
 - Bad → best progression for every topic
+- A self-check quiz with answers at the end of every notebook
 
 ## Notebooks
 
 | # | Notebook | Topics |
 |---|----------|--------|
-| 1 | [Compute security](notebooks/01_compute_security.ipynb) | Bastion, JIT, AKS, containers, disk encryption |
-| 2 | [Storage security](notebooks/02_storage_security.ipynb) | Access control, SAS, BYOK, soft delete, immutable storage |
-| 3 | [Database security](notebooks/03_database_security.ipynb) | SQL Entra auth, TDE, dynamic masking, Always Encrypted, auditing |
+| 1 | [Compute security](notebooks/01_compute_security.ipynb) | Bastion SKUs, JIT lifecycle, AKS, containers, disk encryption (SSE / ADE / at-host / confidential), self-check |
+| 2 | [Storage security](notebooks/02_storage_security.ipynb) | Access control, SAS types + revocation story, BYOK, soft delete, immutable storage, self-check |
+| 3 | [Database security](notebooks/03_database_security.ipynb) | SQL Entra auth, firewall precedence, TDE, dynamic masking, RLS, Always Encrypted (+ secure enclaves), auditing, self-check |
 
 ## Quick start
 
 ```bash
-cd security/az-500/03-compute-storage-databases
+cd security-certs/az-500/03-compute-storage-databases
 uv sync
-uv run python -m ipykernel install --user --name=az-500 --display-name="AZ-500 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```

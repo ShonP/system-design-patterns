@@ -1,17 +1,29 @@
 repos:
+  # gitleaks' pre-commit hook scans the STAGED diff only (`gitleaks git --pre-commit
+  # --staged`). Under `pre-commit run --all-files` nothing is staged, so it passes
+  # vacuously -- for a full-history scan use lab 02's `gitleaks git .` directly.
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.21.2
     hooks: [{ id: gitleaks }]
-  - repo: https://github.com/returntocorp/semgrep
-    rev: v1.96.0
+
+  # v1.96.0 will not start on Python 3.13+ (its pinned protobuf breaks). Keep this rev
+  # current, or swap `semgrep` for `semgrep-docker` if you would rather pin an image.
+  - repo: https://github.com/semgrep/semgrep
+    rev: v1.174.0
     hooks:
       - id: semgrep
-        args: ["--config", "p/owasp-top-ten", "--error", "--quiet"]
+        args: ["--config", "p/owasp-top-ten", "--error", "--quiet",
+               "--disable-version-check", "--skip-unknown-extensions"]
+
+  # `hadolint` (not -docker) is a `language: system` hook: it needs the binary already
+  # on your PATH. The docker variant is self-contained.
   - repo: https://github.com/hadolint/hadolint
     rev: v2.12.0
-    hooks: [{ id: hadolint }]
+    hooks: [{ id: hadolint-docker }]
+
+  # `checkov` installs from source and needs a Rust toolchain on new Pythons; the
+  # container hook does not. Both only run on *.tf, so in this repo it reports
+  # "(no files to check) Skipped" -- it earns its place in the lab 07 repo.
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.2.334
-    hooks:
-      - id: checkov
-        args: ["--quiet", "--compact", "--framework", "terraform,kubernetes,dockerfile"]
+    hooks: [{ id: checkov_container }]

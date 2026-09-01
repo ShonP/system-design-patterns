@@ -3,8 +3,13 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
+# `npm ci` is the correct command: it installs exactly the lock file, or fails.
+# This lab does not commit a lock file (it would be 10k lines of noise), so there is a
+# fallback. In a real repo, commit package-lock.json and delete the fallback -- a build
+# that can silently resolve fresh versions is not a reproducible build.
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev --no-audit --no-fund
+    npm ci --omit=dev --no-audit --no-fund \
+ || npm install --omit=dev --no-audit --no-fund
 
 # Stage 2 — copy app source
 FROM node:20-alpine AS build

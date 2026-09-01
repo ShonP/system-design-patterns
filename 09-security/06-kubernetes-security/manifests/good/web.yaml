@@ -19,7 +19,7 @@ spec:
         seccompProfile: { type: RuntimeDefault }
       containers:
         - name: web
-          image: nginxinc/nginx-unprivileged:1.27-alpine
+          image: nginxinc/nginx-unprivileged:1.29-alpine
           ports: [{ containerPort: 8080 }]
           securityContext:
             allowPrivilegeEscalation: false
@@ -33,11 +33,18 @@ spec:
           readinessProbe:
             httpGet: { path: /, port: 8080 }
           volumeMounts:
+            # readOnlyRootFilesystem means every path nginx writes to needs a
+            # volume. nginx-unprivileged puts *all* of its temp paths under /tmp
+            # (proxy_temp, client_temp, fastcgi_temp, ...); miss that one and the
+            # container CrashLoopBackOffs with
+            #   [emerg] mkdir() "/tmp/proxy_temp" failed (30: Read-only file system)
             - { name: cache, mountPath: /var/cache/nginx }
             - { name: pid,   mountPath: /var/run }
+            - { name: tmp,   mountPath: /tmp }
       volumes:
         - { name: cache, emptyDir: {} }
         - { name: pid,   emptyDir: {} }
+        - { name: tmp,   emptyDir: {} }
 ---
 apiVersion: v1
 kind: Service

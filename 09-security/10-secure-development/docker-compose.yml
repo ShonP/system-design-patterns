@@ -2,17 +2,17 @@ services:
   vulnerable:
     build:
       context: ./vulnerable-app
-    ports: ["3001:3000"]
+    ports: ["${VULN_PORT:-3001}:3000"]
     environment:
       - NODE_ENV=development
 
   secure:
     build:
       context: ./secure-app
-    ports: ["3002:3000"]
+    ports: ["${SEC_PORT:-3002}:3000"]
     environment:
       - NODE_ENV=production
-      - ALLOWED_ORIGINS=https://app.example.com,http://localhost:3002
+      - ALLOWED_ORIGINS=https://app.example.com,http://localhost:${SEC_PORT:-3002}
     read_only: true
     cap_drop: ["ALL"]
     security_opt: ["no-new-privileges:true"]

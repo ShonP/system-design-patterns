@@ -1,6 +1,6 @@
 # Lab 2: Security Operations, Identity & Compliance Design
 
-📖 **Exam domain**: Design security operations, identity & access, and compliance capabilities (30–35%)
+📖 **Exam domain**: Design security operations, identity, and compliance capabilities (25–30%)
 
 ## What you'll design
 
@@ -16,12 +16,14 @@
 | # | Notebook | Topics |
 |---|----------|--------|
 | 1 | [Security operations design](notebooks/01_security_operations_design.ipynb) | Glossary, bad→best practices, SIEM vs XDR, Sentinel architecture, SOAR, MITRE ATT&CK, **runnable detection engine**, SolarWinds case study |
-| 2 | [Identity and compliance design](notebooks/02_identity_and_compliance_design.ipynb) | Glossary, bad→best practices, Enterprise access model, **runnable Conditional Access evaluator**, PIM, **Zero Trust maturity scorer**, Purview, Azure Policy, Midnight Blizzard case study |
+| 2 | [Identity and compliance design](notebooks/02_identity_and_compliance_design.ipynb) | Glossary, bad→best practices, **Zero Trust maturity scorer**, Enterprise access model, Conditional Access evaluation order + **runnable CA evaluator**, PIM / PAW / break-glass, Purview, Azure Policy, Midnight Blizzard case study |
 
 ## Quick start
 
 ```bash
-cd security/sc-100/02-secops-identity-compliance
+cd security-certs/sc-100/02-secops-identity-compliance
 uv sync
-uv run python -m ipykernel install --user --name=sc-100 --display-name="SC-100 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```

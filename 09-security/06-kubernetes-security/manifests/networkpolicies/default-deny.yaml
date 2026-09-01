@@ -1,3 +1,12 @@
+# Selects every pod in the namespace and declares both directions policed, with no
+# allow rules -- so everything is denied. An empty podSelector means "all pods".
+#
+# This object is inert unless the CNI enforces NetworkPolicy: on a CNI that ignores them
+# `kubectl apply` succeeds, `kubectl get netpol` shows it, and every packet still flows.
+# kindnet used to be one of those; it enforces on kindest/node:v1.36.1 (measured
+# 2026-08-24). Prove it with ./scripts/probe.sh rather than trusting either answer, and
+# fall back to `CNI=calico ./scripts/kind-up.sh` + `./scripts/install-calico.sh` if your
+# kindnet turns out not to enforce.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:

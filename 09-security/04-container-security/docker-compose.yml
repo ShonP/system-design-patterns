@@ -10,3 +10,11 @@ services:
       context: ./secure
     image: securitylabs/todo-secure:latest
     profiles: ["build-only"]
+
+  # Exercise 8 only: cosign signs artifacts in a registry, never a local image cache.
+  # `docker compose --profile registry up -d registry` gives you one on :5001.
+  registry:
+    image: registry:2
+    ports:
+      - "${REGISTRY_PORT:-5001}:5000"
+    profiles: ["registry"]

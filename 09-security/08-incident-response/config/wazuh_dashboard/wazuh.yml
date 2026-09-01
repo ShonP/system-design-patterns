@@ -1,0 +1,9 @@
+# Tells the Wazuh dashboard plugin which manager API to talk to. Without it the UI comes
+# up but every Agents/Security-events page reports "no API configured".
+hosts:
+  - 1513629884013:
+      url: "https://wazuh.manager"
+      port: 55000
+      username: wazuh-wui
+      password: "MyS3cr37P450r.*-"
+      run_as: false

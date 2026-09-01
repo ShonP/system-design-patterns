@@ -1,0 +1,19 @@
+# Mounted over /usr/share/wazuh-dashboard/config/opensearch_dashboards.yml.
+#
+# WHY THIS FILE EXISTS: the config baked into wazuh/wazuh-dashboard:4.9.0 listens on
+# server.port 443 (not 5601), points opensearch.hosts at https://localhost:9200 (there is
+# no indexer inside the dashboard container) and reads its TLS material from
+# /etc/wazuh-dashboard/certs/, which does not exist in the image. All three are wrong for
+# this compose, so the port mapping "8443:5601" would hit nothing.
+server.host: 0.0.0.0
+server.port: 5601
+opensearch.hosts: https://wazuh.indexer:9200
+opensearch.ssl.verificationMode: certificate
+opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+opensearch_security.multitenancy.enabled: false
+opensearch_security.readonly_mode.roles: ["kibana_read_only"]
+server.ssl.enabled: true
+server.ssl.key: "/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem"
+server.ssl.certificate: "/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem"
+opensearch.ssl.certificateAuthorities: ["/usr/share/wazuh-dashboard/certs/root-ca.pem"]
+uiSettings.overrides.defaultRoute: /app/wz-home

@@ -1,26 +1,39 @@
-title: Suspicious curl downloads to /tmp
+title: Suspicious curl/wget download to a drop directory
 id: 9b6c5b1a-1f2c-4f3e-8c01-c0ffeec0ffee
 status: experimental
-description: Detects curl/wget piped to bash, or downloads to common drop dirs.
+description: >-
+  Detects curl or wget being piped into a shell, or downloading into a common
+  post-exploitation drop directory (/tmp, /dev/shm, /var/tmp).
 references:
   - https://attack.mitre.org/techniques/T1105/
+author: security-labs
+date: 2025/01/01
 tags:
-  - attack.execution
-  - attack.t1059
+  - attack.command-and-control
   - attack.t1105
+  - attack.execution
+  - attack.t1059.004
 logsource:
+  # process_creation is the Sigma *category* that carries Image/CommandLine on Linux
+  # (populated by auditd via the sigma linux process_creation mapping, or by Sysmon for
+  # Linux). `service: auditd` would be the raw-auditd taxonomy, whose fields are named
+  # exe/a0/a1 -- the field names below would never match.
   product: linux
-  service: auditd
+  category: process_creation
 detection:
-  cmd_pipe_bash:
+  downloader:
     Image|endswith:
       - '/curl'
       - '/wget'
+  suspicious_args:
     CommandLine|contains:
       - '| sh'
       - '| bash'
       - '/tmp/'
-  condition: cmd_pipe_bash
+      - '/dev/shm/'
+      - '/var/tmp/'
+  condition: downloader and suspicious_args
 falsepositives:
-  - Legitimate package install scripts in CI
+  - Package install scripts and CI runners that legitimately curl into /tmp
+  - Container image builds
 level: high

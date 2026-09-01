@@ -1,3 +1,10 @@
+# Applied AFTER default-deny.yaml. Note that it takes three rules, not one, to let a
+# single pod talk to a single service:
+#   1. the client needs EGRESS to the server        (default-deny blocks it)
+#   2. the server needs INGRESS from the client     (default-deny blocks it too)
+#   3. everyone needs EGRESS to CoreDNS             (or the name never resolves, and the
+#                                                    failure looks like "connection refused")
+# Forgetting #3 is the single most common default-deny outage.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -12,6 +19,22 @@ spec:
             matchLabels: { app: frontend }
       ports:
         - protocol: TCP
+          port: 8080   # the POD port, not the Service port. Policies never see port 80.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-egress-to-web
+spec:
+  podSelector:
+    matchLabels: { app: frontend }
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: { app: web }
+      ports:
+        - protocol: TCP
           port: 8080
 ---
 apiVersion: networking.k8s.io/v1
@@ -23,6 +46,10 @@ spec:
   policyTypes: [Egress]
   egress:
     - to:
+        # namespaceSelector AND podSelector in the SAME list item = "kube-dns pods in any
+        # namespace". Two separate list items would mean "any pod in any namespace, OR any
+        # kube-dns pod in this namespace" -- a much wider hole. This is the most commonly
+        # mis-written block in Kubernetes networking.
         - namespaceSelector: {}
           podSelector:
             matchLabels: { k8s-app: kube-dns }

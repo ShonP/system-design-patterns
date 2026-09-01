@@ -1,6 +1,6 @@
 # 🛡️ Security Labs — Learn Security By Doing
 
-A hands-on, opinionated curriculum for learning **modern open-source security tooling**. Inspired by patterns described in `research-report.md` (a survey of the 2024–2025 OSS security ecosystem), each lab is a self-contained exercise with Docker-based setup, real vulnerabilities to find, and remediation steps.
+A hands-on, opinionated curriculum for learning **modern open-source security tooling**. Each lab is self-contained: Docker-based setup, real vulnerabilities to find, and — this is the part most tutorials skip — a remediation step and a rescan that proves the fix worked.
 
 > **You don't learn security by reading.** You learn it by scanning a vulnerable image, getting a wall of CVEs, fixing them, and rescanning until the wall shrinks. These labs are designed for that loop.
 
@@ -19,20 +19,24 @@ Prerequisites: comfort with Docker, a terminal, and Git. Each lab spells out lan
 
 ## 📚 Syllabus
 
-| #  | Lab                                                              | Tools                                       | Time   |
-|----|------------------------------------------------------------------|---------------------------------------------|--------|
-| 01 | [Vulnerability Scanning](./01-vulnerability-scanning/)           | Trivy, Syft, Grype                          | 60 min |
-| 02 | [Secrets Detection](./02-secrets-detection/)                     | Gitleaks, TruffleHog, pre-commit            | 45 min |
-| 03 | [SAST / Code Scanning](./03-sast-code-scanning/)                 | Semgrep, Bandit                             | 75 min |
-| 04 | [Container Security](./04-container-security/)                   | Docker, Trivy, Docker Bench, Hadolint       | 75 min |
-| 05 | [Web App Security (OWASP)](./05-web-app-security-owasp/)         | Juice Shop, ZAP, Nuclei                     | 90 min |
-| 06 | [Kubernetes Security](./06-kubernetes-security/)                 | Kubescape, Trivy Operator, kube-bench       | 90 min |
-| 07 | [Infrastructure as Code](./07-infrastructure-as-code/)           | Checkov, KICS, tfsec, Prowler               | 75 min |
-| 08 | [Incident Response](./08-incident-response/)                     | Wazuh, ELK, log analysis                    | 90 min |
-| 09 | [Network Security](./09-network-security/)                       | Nmap, Nuclei, Wireshark/tshark              | 60 min |
-| 10 | [Secure Development](./10-secure-development/)                   | Dependabot, Renovate, headers, rate limits  | 60 min |
+| #  | Lab                                                              | Tools                                              | Exercises | Time    |
+|----|------------------------------------------------------------------|----------------------------------------------------|-----------|---------|
+| 01 | [Vulnerability Scanning](./01-vulnerability-scanning/)           | Trivy, Syft, Grype, CISA KEV                        | 8         | 75 min  |
+| 02 | [Secrets Detection](./02-secrets-detection/)                     | Gitleaks, TruffleHog, pre-commit                    | 8         | 60 min  |
+| 03 | [SAST / Code Scanning](./03-sast-code-scanning/)                 | Semgrep (+ taint mode), Bandit                      | 9         | 90 min  |
+| 04 | [Container Security](./04-container-security/)                   | Hadolint, Trivy, Syft, Docker Bench, cosign         | 9         | 90 min  |
+| 05 | [Web App Security (OWASP)](./05-web-app-security-owasp/)         | Juice Shop, ZAP (baseline/full/proxy), Nuclei       | 9         | 120 min |
+| 06 | [Kubernetes Security](./06-kubernetes-security/)                 | kind, Kubescape, Trivy Operator, kube-bench, Calico | 9         | 120 min |
+| 07 | [Infrastructure as Code](./07-infrastructure-as-code/)           | Checkov, KICS, tfsec, Trivy, Prowler                | 7         | 75 min  |
+| 08 | [Incident Response](./08-incident-response/)                     | Wazuh (manager/indexer/dashboard), Sigma            | 8         | 120 min |
+| 09 | [Network Security](./09-network-security/)                       | Nmap + NSE, Nuclei, tshark, iptables                | 9         | 75 min  |
+| 10 | [Secure Development](./10-secure-development/)                   | helmet, zod, rate limits, Dependabot, Renovate      | 10        | 90 min  |
 
-Total: ~12 hours of hands-on work. Do them in order if you're new to security; jump around if you have a focus area.
+Total: **~15–16 hours** of hands-on work, plus image pulls. Labs 05, 06 and 08 are the
+long ones — 05 because a full ZAP active scan takes 10–30 minutes on its own, 06 because
+exercise 5 requires rebuilding the cluster with a different CNI, and 08 because Wazuh is
+three services that take minutes to become healthy. Do them in order if you're new to
+security; jump around if you have a focus area.
 
 ---
 
@@ -60,10 +64,10 @@ Total: ~12 hours of hands-on work. Do them in order if you're new to security; j
              08 Incident Response ←→ 09 Network
 ```
 
-**Beginner track** (4–6 hrs): 01 → 02 → 04 → 05
-**Developer track** (6–8 hrs): 01 → 02 → 03 → 04 → 10
-**DevSecOps track** (10+ hrs): 01 → 04 → 06 → 07 → 08 → 09
-**AppSec track** (8–10 hrs): 01 → 02 → 03 → 05 → 10
+**Beginner track** (~6 hrs): 01 → 02 → 04 → 05
+**Developer track** (~7 hrs): 01 → 02 → 03 → 04 → 10
+**DevSecOps track** (~8.5 hrs): 01 → 04 → 06 → 07 → 08 → 09
+**AppSec track** (~7 hrs): 01 → 02 → 03 → 05 → 10
 
 ---
 
@@ -73,13 +77,22 @@ Install once, use everywhere:
 
 ```bash
 # macOS
-brew install docker docker-compose git curl jq
-brew install --cask docker
+brew install --cask docker         # Docker Desktop (includes the compose plugin)
+brew install git curl jq
 
 # Linux (Debian/Ubuntu)
-sudo apt-get update && sudo apt-get install -y docker.io docker-compose git curl jq
+sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin git curl jq
 sudo usermod -aG docker $USER  # log out + back in
 ```
+
+Per-lab extras (each lab's Prerequisites section repeats this):
+
+| Lab | Also needs |
+|-----|------------|
+| 06  | `kubectl`, `kind`, `helm` (`brew install kubectl kind helm`) — and ~3 GB RAM for the cluster |
+| 08  | ≥ 6 GB of RAM allocated to Docker; on Linux, `sudo sysctl -w vm.max_map_count=262144` |
+| 10  | Node 20 if you want to run the apps outside Docker |
+| 02, 03, 04, 07 | Optional native CLIs (`gitleaks`, `semgrep`, `bandit`, `hadolint`, `checkov`, `trivy`, `cosign`) — every wrapper script prefers a native binary and falls back to Docker |
 
 Most labs run scanners as **Docker containers** so you don't have to install 15 different CLIs locally. Where a native install is significantly easier (e.g., `trivy` via Homebrew), the lab will mention it.
 
@@ -149,6 +162,14 @@ You'll touch most of this graph by the time you finish Lab 10.
 - **`$` prefix** = run on your host shell
 - **`#` prefix** = run inside a container (root)
 - Sample outputs are abbreviated. Your CVE counts will differ as databases are updated daily — that's normal.
+- **Port conflicts are the #1 setup failure.** Lab 05 wants 3000 (override with `JUICE_PORT`),
+  lab 08 wants 8443/9200/1514/1515/55000, lab 10 wants 3001/3002, lab 04 exercise 8 wants 5001.
+  If a `docker compose up` dies on "address already in use", change the host-side port; nothing
+  in these labs depends on a specific one.
+- Each lab writes scanner output into its own `exercises/` directory. Those files are
+  gitignored and regenerated on every run — but several exercises **read the output of an
+  earlier exercise**, so skipping around inside a lab will produce `null` from `jq`. Each
+  README flags the dependency where it exists.
 - All labs are **self-contained**: run `docker compose down -v` when done to free disk space.
 - **No production credentials.** Anything that looks like a key, token, or password in this repo is fake / planted on purpose.
 
@@ -157,9 +178,8 @@ You'll touch most of this graph by the time you finish Lab 10.
 ## 🏗️ Repository Layout
 
 ```text
-security-labs/
+09-security/
 ├── README.md                       # this file
-├── research-report.md              # 2024–2025 OSS security tooling survey
 ├── 01-vulnerability-scanning/
 ├── 02-secrets-detection/
 ├── 03-sast-code-scanning/
@@ -174,6 +194,34 @@ security-labs/
 
 ---
 
+## 🧭 Tool versions, drift, and what "expected output" means here
+
+Every scanner image is pinned (`aquasec/trivy:0.58.1`, `zricethezav/gitleaks:v8.21.2`,
+`semgrep/semgrep:1.96.0`, …) so that a lab you run today behaves like the lab that was
+written. Two consequences you should expect:
+
+- **Pinned tags age out.** If a `docker pull` 404s, the tag was removed upstream — bump it
+  in the wrapper script and the compose file together, and expect the exercise's expected
+  output to shift a little.
+- **The wrappers prefer your native binary over the pinned image.** That is deliberate (it
+  is much faster), but it means you may be running a newer tool than the lab was written
+  against. Gitleaks is the sharpest example: the `detect` command that every older tutorial
+  uses no longer exists in 8.3x. Where a version difference changes the *commands*, not just
+  the counts, the lab README says so.
+
+### Where the "expected output" numbers come from
+
+| Claim | Status |
+|---|---|
+| Lab 02 finding counts (4 in the tree, 7 across 4 commits, 5 with the custom rule), and the fact that the AWS documentation canary is *not* reported | **Measured** — gitleaks 8.30.1, default config |
+| Lab 07 checkov counts (52 failed on `terraform-bad/`, 0 failed + 4 skipped on `terraform-good/`, custom policy FAIL→PASS) | **Measured** — checkov 3.2.x |
+| Every YAML / JSON / TOML / XML / Python / shell file in this section parses | **Measured** |
+| Everything requiring a container to run — CVE counts, ZAP alert lists, Wazuh alerts, kube-bench output, nuclei hits, cosign signatures | **Not measured.** These are stated as shapes and orders of magnitude, and they drift with vulnerability databases and rule packs anyway. If your numbers differ, that is expected; if the *commands* fail, that is a bug worth a PR. |
+| Pinned image tags exist upstream | **Not verified.** They were correct when written; see the drift note above. |
+
+Treat every expected count as "the right order of magnitude and the right shape", never as
+a test to pass.
+
 ## 🤝 Contributing / Forking
 
 Fork freely. PRs that **add a new exercise**, **fix a broken scanner version**, or **add a new lab** are welcome. PRs that swap one tool for another for taste reasons probably are not — these labs are intentionally opinionated.
@@ -184,6 +232,6 @@ When a tool's CLI changes (and they do), please update the lab README and the sc
 
 ## 📄 License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](../LICENSE).
 
 The vulnerable apps and intentionally-bad configs in this repo are derived from public OWASP / community projects and are clearly marked. **Don't deploy any of this to the internet.**

@@ -35,7 +35,7 @@ jobs:
 
   semgrep:
     runs-on: ubuntu-latest
-    container: returntocorp/semgrep
+    container: semgrep/semgrep
     steps:
       - uses: actions/checkout@v4
       - run: semgrep ci --sarif --output=semgrep.sarif --config=p/owasp-top-ten --config=p/security-audit

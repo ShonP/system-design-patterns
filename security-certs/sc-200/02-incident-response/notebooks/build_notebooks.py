@@ -3,6 +3,12 @@
 Run with:  uv run --project .. python build_notebooks.py
 (from the notebooks/ directory). This file is a build tool only — the notebooks
 themselves are what learners open.
+
+WARNING: this regenerates the notebooks from the templates BELOW and will discard
+any edit made directly to the .ipynb files. The committed notebooks have since been
+hand-edited (corrected classification logic, campaign-link triage scoring, self-check
+quizzes), so this script is kept for reference only. Do not run it unless you have
+first ported those edits back into the templates here.
 """
 import json
 import uuid
@@ -34,11 +40,19 @@ def code(src: str) -> dict:
 def save(name: str, cells: list[dict]) -> None:
     nb = {
         "cells": cells,
-        "metadata": {"language_info": {"name": "python"}},
+        "metadata": {
+            # Must match the repo-wide hygiene rule: notebooks bind to the local .venv.
+            "kernelspec": {
+                "display_name": "Python 3 (.venv)",
+                "language": "python",
+                "name": "python3",
+            },
+            "language_info": {"name": "python"},
+        },
         "nbformat": 4,
         "nbformat_minor": 5,
     }
-    (HERE / name).write_text(json.dumps(nb, indent=1))
+    (HERE / name).write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n")
 
 
 # ---------------------------------------------------------------------------

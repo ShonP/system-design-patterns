@@ -1,0 +1,35 @@
+# Labs 2 and 3 investigate the same mini-SIEM you built in Lab 1. Rather than
+# duplicating that stack, each service here `extends` Lab 1's definition, so there
+# is exactly one copy of the SIEM in this cert track and the labs cannot drift.
+#
+#   docker compose up -d --wait          # from this directory
+#
+# The SIEM comes up on http://localhost:8000 and the log generator seeds it with
+# the attack data these notebooks investigate. Compose namespaces volumes per
+# project, so this lab gets its own copy of the database: mutating incidents here
+# will not disturb Lab 1's.
+#
+# Container names differ from Lab 1's so that starting this stack while Lab 1 is
+# still up fails on the real conflict (both publish host port 8000) rather than on
+# a confusing duplicate-container-name error. Run one lab in this track at a time.
+#
+# `extends` deliberately does not inherit `depends_on`, so the ordering is
+# restated below.
+services:
+  siem:
+    extends:
+      file: ../01-build-a-siem/docker-compose.yml
+      service: siem
+    container_name: sc200-lab3-siem
+
+  log-generator:
+    extends:
+      file: ../01-build-a-siem/docker-compose.yml
+      service: log-generator
+    container_name: sc200-lab3-log-generator
+    depends_on:
+      siem:
+        condition: service_healthy
+
+volumes:
+  siem_data:

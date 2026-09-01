@@ -2,13 +2,16 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev --no-audit --no-fund
+RUN npm ci --omit=dev --no-audit --no-fund \
+ || npm install --omit=dev --no-audit --no-fund   # see secure/Dockerfile for why
 COPY . .
 
-# Distroless: no shell, no apt, no busybox. Image is ~70MB and ships near-zero CVEs.
+# Distroless: no shell, no apt, no busybox, and crucially no npm -- which is where most of
+# the "secure" image's remaining CVEs live. ~186MB (a Node runtime is big wherever it ships).
+# --chown is required: COPY preserves the 0600 source mode and there is no shell to fix it.
 FROM gcr.io/distroless/nodejs20-debian12:nonroot
 WORKDIR /app
-COPY --from=build /app /app
+COPY --from=build --chown=nonroot:nonroot /app /app
 ENV NODE_ENV=production
 EXPOSE 3000
 USER nonroot

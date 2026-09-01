@@ -7,10 +7,21 @@ rules:
     severity: ERROR
     patterns:
       - pattern-either:
+          # The query is built inline, in the call.
           - pattern: $CUR.execute("..." + $X)
           - pattern: $CUR.execute($X + "...")
           - pattern: $CUR.execute(f"...{$X}...")
+          # The query is built into a variable first, then executed.
+          # `<... ... ...>` is the deep-expression operator: it matches the
+          # concatenation ANYWHERE inside the right-hand side. Without it,
+          # `$Q = "..." + $X` only matches a two-part concat, and the app's
+          # `"..." + user_id + "'"` parses as ("..." + user_id) + "'" -- the
+          # left operand is a BinOp, not a string literal, so it never matched.
           - pattern: |
-              $Q = "..." + $X
+              $Q = <... "..." + $X ...>
+              ...
+              $CUR.execute($Q)
+          - pattern: |
+              $Q = f"...{$X}..."
               ...
               $CUR.execute($Q)

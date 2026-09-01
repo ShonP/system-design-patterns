@@ -1,0 +1,23 @@
+<!-- Worked answer for exercise 8: exercises/sigma/suspicious-curl.yml translated by hand
+     into a Wazuh rule. Try the translation yourself before reading this.
+
+     There is no Wazuh backend for sigma-cli (`sigma plugin list` has ~35 backends and
+     Wazuh is not one of them), so for Wazuh the translation is always manual. What
+     sigma-cli buys you here is the *field taxonomy check* — `sigma check`, and a
+     reference query in a language that does have a backend.
+
+     Note what the taxonomy costs you. Sigma's process_creation category has structured
+     Image and CommandLine fields. Wazuh's auditd decoder exposes only audit.type and
+     audit.id as fields; a0/a1/a2 stay in the raw message. So the structured Sigma
+     match becomes a regex over the raw line. That lossiness is normal and is why you
+     validate the translated rule instead of assuming it. -->
+<group name="sigma,audit,">
+  <rule id="100300" level="12">
+    <if_sid>80700</if_sid>
+    <regex type="pcre2">a\d+="[^"]*\b(?:curl|wget)"[\s\S]*(?:/tmp/|/dev/shm/|/var/tmp/|\|\s*(?:sh|bash))</regex>
+    <description>Sigma T1105: curl/wget downloading into a drop directory</description>
+    <mitre>
+      <id>T1105</id>
+    </mitre>
+  </rule>
+</group>

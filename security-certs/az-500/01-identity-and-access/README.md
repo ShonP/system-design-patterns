@@ -16,9 +16,9 @@
 
 | # | Notebook | Topics | Needs Docker? |
 |---|----------|--------|:-:|
-| 1 | [RBAC and custom roles](notebooks/01_rbac_and_custom_roles.ipynb) | Built-in roles, custom role creation, scopes, bad→best least privilege, Access Reviews, deny assignments | no |
-| 2 | [PIM and Conditional Access](notebooks/02_pim_and_conditional_access.ipynb) | PIM eligible vs active, activation policies, CA structure, break-glass accounts, Identity Protection | no |
-| 3 | [App registrations and managed identities](notebooks/03_app_registrations_and_managed_identities.ipynb) | App regs, delegated vs app tokens, consent, managed identities, Workload Identity Federation | **yes** |
+| 1 | [RBAC and custom roles](notebooks/01_rbac_and_custom_roles.ipynb) | Built-in roles (Owner vs Contributor vs User Access Administrator vs RBAC Administrator), control plane vs data plane, custom role JSON and `AssignableScopes` limits, scope inheritance, bad→best least privilege, Access Reviews, deny assignments, self-check | no |
+| 2 | [PIM and Conditional Access](notebooks/02_pim_and_conditional_access.ipynb) | PIM eligible vs active × permanent vs time-bound, activation rules and duration caps, CA structure, the two-phase CA evaluation model (block beats grant), report-only mode, break-glass accounts, user risk vs sign-in risk, self-check | no |
+| 3 | [App registrations and managed identities](notebooks/03_app_registrations_and_managed_identities.ipynb) | App regs, delegated (`scp`) vs application (`roles`) tokens, consent and the empty-`roles` trap, system- vs user-assigned managed identities, IMDS vs `IDENTITY_ENDPOINT`, Workload Identity Federation, self-check | **yes** |
 
 ## Quick start
 
@@ -29,7 +29,7 @@ cd security-certs/az-500/01-identity-and-access
 uv sync
 
 # 2. Start the tiny mock Entra ID (only needed for notebook 3)
-docker compose up -d
+docker compose up -d --build
 
 # 3. Check the mock is healthy
 curl http://localhost:9100/health
@@ -45,7 +45,7 @@ curl http://localhost:9100/health
 
 ### What the Docker mock is
 
-`docker compose up -d` starts a minimal stand-in for Microsoft Entra ID (the real
+`docker compose up -d --build` starts a minimal stand-in for Microsoft Entra ID (the real
 `login.microsoftonline.com`) and a pretend protected API (`api-b`). They come
 from the [`08-enterprise/azure-authentication`](../../../08-enterprise/azure-authentication)
 lab and speak just enough OAuth2 so the notebooks can demonstrate tokens, scopes

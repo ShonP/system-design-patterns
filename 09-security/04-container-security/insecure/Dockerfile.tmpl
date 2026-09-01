@@ -6,7 +6,7 @@ COPY . .
 
 RUN apt-get update && apt-get install -y curl python3 build-essential
 
-ENV API_KEY=sk_live_EXAMPLE_FAKE_KEY_FOR_LAB
+ENV API_KEY=__STRIPE_SECRET_KEY__
 ENV NODE_ENV=production
 
 RUN npm install

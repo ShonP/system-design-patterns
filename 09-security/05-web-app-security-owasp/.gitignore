@@ -1,0 +1,4 @@
+# ZAP writes its generated automation plan here on every scan run (Exercises 2/3/9).
+# It is a regenerated artifact, not lab source. Report files (.html/.json) are already
+# covered by ../.gitignore.
+exercises/zap.yaml

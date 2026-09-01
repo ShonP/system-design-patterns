@@ -1,6 +1,24 @@
+# Copy to .pre-commit-config.yaml in the target repo, then `pre-commit install`.
+#
+# The upstream hook's entry is already `checkov -d .` -- do NOT repeat `-d .` in args.
+# If you do, checkov scans the tree twice and prints two summary blocks with
+# cumulative counts (8 failures, then 16), which looks like a bug in your Terraform.
+#
+# `id: checkov` builds checkov from source in a pre-commit virtualenv, so it needs a
+# Python that has wheels for checkov's deps. On Python 3.14 the rustworkx build fails
+# with "can't find Rust compiler". Pin the interpreter, or use `id: checkov_container`
+# below, which only needs Docker.
+default_language_version:
+  python: python3.12
+
 repos:
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.2.334
     hooks:
       - id: checkov
-        args: [-d, ., --quiet, --compact, --framework, terraform]
+        args: [--quiet, --compact, --framework, terraform]
+
+      # Docker-only alternative -- no Python toolchain required.
+      # Note it runs bridgecrew/checkov:latest, not the pinned `rev` above.
+      # - id: checkov_container
+      #   args: [--quiet, --compact, --framework, terraform]

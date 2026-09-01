@@ -22,20 +22,19 @@ The exam has 4 domains. Each maps to a lab folder:
 ## Prerequisites
 
 - Python 3.10+
-- Docker & Docker Compose
+- No Docker required — every SC-900 lab here is pure Python
 - Optional: [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) + a free Azure subscription for the Azure-specific labs
 
 ## Quick start (any lab)
 
 ```bash
-cd security/sc-900/<lab-folder>
-
-# Start any needed infrastructure
-docker compose up -d    # (only if the lab has a docker-compose.yml)
+cd security-certs/sc-900/<lab-folder>
 
 # Install dependencies + register kernel
 uv sync
-uv run python -m ipykernel install --user --name=sc-900 --display-name="SC-900 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```
 
 Then open any notebook and select the `SC-900 (Python)` kernel. If it doesn't appear, `Cmd+Shift+P` → **Reload Window**.
@@ -49,7 +48,6 @@ Each lab folder contains:
 ├── README.md            # Overview and learning objectives
 ├── pyproject.toml       # Python dependencies
 ├── notebooks/           # Interactive Jupyter notebooks (numbered)
-├── docker-compose.yml   # Infrastructure (if needed)
 └── scripts/             # Azure CLI scripts for real-Azure exercises (optional)
 ```
 
@@ -62,4 +60,4 @@ Each lab folder contains:
 
 ## Related labs in this repo
 
-- [Azure Authentication](../../enterprise-patterns/azure-authentication/) — deep dive on app registrations, service principals, managed identities, On-Behalf-Of flow (goes beyond SC-900 into real implementation)
+- [Azure Authentication](../../08-enterprise/azure-authentication/) — deep dive on app registrations, service principals, managed identities, On-Behalf-Of flow (goes beyond SC-900 into real implementation)

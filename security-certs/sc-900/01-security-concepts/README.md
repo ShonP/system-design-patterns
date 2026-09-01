@@ -26,7 +26,9 @@ This lab covers the foundational mental models that every security topic builds 
 cd security-certs/sc-900/01-security-concepts
 
 uv sync
-uv run python -m ipykernel install --user --name=sc-900 --display-name="SC-900 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```
 
-No Docker needed — these labs are pure Python. Select the `SC-900 (Python)` kernel in VS Code (top-right of the notebook). If it's missing, `Cmd+Shift+P` → **Reload Window**.
+No Docker needed — these labs are pure Python. Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't appear, `Cmd+Shift+P` → **Developer: Reload Window**.

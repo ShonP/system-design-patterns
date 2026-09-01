@@ -10,7 +10,7 @@ services:
     working_dir: /workspace
     profiles: ["scan"]
   tfsec:
-    image: aquasec/tfsec:v1.28.13
+    image: aquasec/tfsec:v1.28.14
     volumes: [".:/workspace"]
     working_dir: /workspace
     profiles: ["scan"]

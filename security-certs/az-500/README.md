@@ -30,14 +30,16 @@ This lab series covers every exam domain with runnable code, real Azure CLI comm
 ## Quick start (any lab)
 
 ```bash
-cd security/az-500/<lab-folder>
+cd security-certs/az-500/<lab-folder>
 
 # Start any needed infrastructure
 docker compose up -d    # (only if the lab has a docker-compose.yml)
 
 # Install dependencies + register kernel
 uv sync
-uv run python -m ipykernel install --user --name=az-500 --display-name="AZ-500 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```
 
 Select the `AZ-500 (Python)` kernel. If it doesn't appear, `Cmd+Shift+P` → **Reload Window**.

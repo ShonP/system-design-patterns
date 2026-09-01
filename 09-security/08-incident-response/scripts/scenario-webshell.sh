@@ -7,5 +7,11 @@ cat > /var/www/html/shell.php <<'PHP'
 PHP
 ls -la /var/www/html/shell.php
 "
-echo "==> Webshell created. FIM scan runs every 12h by default; force one:"
-docker compose exec -T wazuh.manager /var/ossec/bin/agent_control -R -u 001 || true
+echo "==> Webshell created."
+echo "    /var/www/html is watched in realtime (see scenarios/Dockerfile.victim), so the"
+echo "    alert should appear within seconds. Force a scan anyway if it does not:"
+AGENT_ID=$("$(dirname "$0")"/victim-agent-id.sh)
+docker compose exec -T wazuh.manager /var/ossec/bin/agent_control -r -u "$AGENT_ID" || true
+echo
+echo "    Check without the dashboard:"
+echo "      docker compose exec -T wazuh.manager sh -c \"grep shell.php /var/ossec/logs/alerts/alerts.json | tail -1\" | jq ."

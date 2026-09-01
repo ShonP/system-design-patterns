@@ -1,12 +1,12 @@
 # Lab 3: Infrastructure Security Design
 
-📖 **Exam domain**: Design security solutions for infrastructure (20–25%)
+📖 **Exam domain**: Design security solutions for infrastructure (25–30%)
 
 ## What you'll design
 
 - Security posture management with Defender for Cloud (CSPM + CWPP)
 - Azure Arc for hybrid and multicloud governance
-- External Attack Surface Management (EASM)
+- External Attack Surface Management (Defender EASM) and Microsoft Security Exposure Management
 - Endpoint security strategy (servers, mobile, IoT/OT)
 - Network segmentation and Zero Trust networking
 - Microsoft Entra Internet Access / Private Access (SSE)
@@ -25,7 +25,9 @@ Each notebook starts with a **glossary** and a **bad practice → best practice*
 ## Quick start
 
 ```bash
-cd security/sc-100/03-infrastructure
+cd security-certs/sc-100/03-infrastructure
 uv sync
-uv run python -m ipykernel install --user --name=sc-100 --display-name="SC-100 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```

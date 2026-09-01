@@ -61,14 +61,16 @@ SC-200 is the **Security Operations Analyst** certification. While SC-900 teache
 ## Quick start
 
 ```bash
-cd security/sc-200/01-build-a-siem
+cd security-certs/sc-200/01-build-a-siem
 
 # Start the mini-SIEM + log generators
 docker compose up -d
 
 # Install dependencies
 uv sync
-uv run python -m ipykernel install --user --name=sc-200 --display-name="SC-200 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```
 
 Then open the notebooks and select the `SC-200 (Python)` kernel.

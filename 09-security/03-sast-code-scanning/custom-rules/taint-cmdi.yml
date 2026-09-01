@@ -11,6 +11,13 @@ rules:
       - pattern: request.form.get(...)
       - pattern: request.form[...]
       - pattern: request.json[...]
+    # Without sanitizers a taint rule reports every flow, including the ones
+    # that were already made safe -- i.e. it manufactures false positives.
+    # Anything listed here stops the taint at that point.
+    pattern-sanitizers:
+      - pattern: shlex.quote(...)
+      - pattern: int(...)
+      - pattern: re.fullmatch(...)
     pattern-sinks:
       - pattern: os.system(...)
       - pattern: subprocess.$F($X, ..., shell=True)

@@ -3,10 +3,11 @@ FROM debian:12-slim
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
       curl ca-certificates gnupg lsb-release sudo procps \
-      apache2 php-cli net-tools iputils-ping \
+      apache2 php-cli net-tools iputils-ping rsyslog \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Wazuh agent and point at the manager service
+# Install Wazuh agent and point it at the manager service.
+# WAZUH_MANAGER must be set during package install: the postinst writes it into ossec.conf.
 RUN curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring /usr/share/keyrings/wazuh.gpg --import \
     && chmod 644 /usr/share/keyrings/wazuh.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" > /etc/apt/sources.list.d/wazuh.list \
@@ -14,10 +15,60 @@ RUN curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyr
     && WAZUH_MANAGER="wazuh.manager" apt-get install -y wazuh-agent=4.9.0-1 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -s /bin/bash alice && echo "alice:alice" | chpasswd
+# alice is a real sudoer with a weak password. That matters: if she is NOT in sudoers,
+# every sudo attempt -- right password or wrong -- ends in "user NOT in sudoers" and a
+# *successful* authentication can never be produced. Exercise 5's timeline turns on
+# "failures, then a success", so the success has to be reachable.
+RUN useradd -m -s /bin/bash alice \
+ && echo "alice:alice" | chpasswd \
+ && usermod -aG sudo alice
 
-# Make /var/www/html exist for FIM scenario
+# /var/www/html must exist for the FIM scenario
 RUN mkdir -p /var/www/html && echo "<h1>victim</h1>" > /var/www/html/index.html
+
+# --- Agent configuration the exercises depend on -----------------------------------
+# Default FIM watches /etc, /usr/bin, /usr/sbin, /bin, /sbin and /boot -- NOT /var/www.
+# Exercise 3 drops a webshell in /var/www/html, so add it in realtime mode.
+# </syscheck> occurs exactly once, so a plain sed is safe here.
+RUN sed -i \
+      -e 's#</syscheck>#  <directories check_all="yes" realtime="yes">/var/www/html</directories>\n  </syscheck>#' \
+      /var/ossec/etc/ossec.conf
+
+# Localfiles are APPENDED as a new <ossec_config> block rather than sed-injected before
+# </ossec_config>: the stock agent ossec.conf contains TWO </ossec_config> tags, so a sed
+# on that pattern inserts every localfile twice and logcollector logs
+# "(1958): Log file ... is duplicated".
+#
+# /var/log/auth.log is the important one. The stock Debian agent config monitors
+# apache2, dpkg.log and active-responses.log -- but NOT auth.log. Installing rsyslog
+# (above) makes sudo failures get *written*; this block is what makes them get *read*.
+# Without it exercise 2 produces zero alerts even though /var/log/auth.log is full of
+# them. Exercise 7 needs the json localfile for /var/log/myapp.json.
+RUN printf '%s\n' \
+      '<ossec_config>' \
+      '  <localfile>' \
+      '    <log_format>syslog</log_format>' \
+      '    <location>/var/log/auth.log</location>' \
+      '  </localfile>' \
+      '  <localfile>' \
+      '    <log_format>json</log_format>' \
+      '    <location>/var/log/myapp.json</location>' \
+      '  </localfile>' \
+      '</ossec_config>' >> /var/ossec/etc/ossec.conf
+
+RUN grep -q "/var/www/html" /var/ossec/etc/ossec.conf \
+ && [ "$(grep -c 'myapp.json' /var/ossec/etc/ossec.conf)" = 1 ] \
+ && grep -q "/var/log/auth.log" /var/ossec/etc/ossec.conf \
+ && echo "agent config patched OK"
+
+# Both syscheck (FIM) and rootcheck default to a 43200s (12h) scan interval, so this one
+# sed lowers both to 5 minutes -- which is what makes exercise 4 finish in one sitting.
+# The scenario scripts still force a scan with `agent_control -r -u <id>` rather than
+# waiting; /usr/bin is on the scheduled scan, not realtime.
+RUN sed -i -e 's#<frequency>43200</frequency>#<frequency>300</frequency>#' /var/ossec/etc/ossec.conf
+
+# Both files must exist at container start; logcollector warns and skips missing ones.
+RUN touch /var/log/myapp.json /var/log/auth.log && chmod 644 /var/log/myapp.json /var/log/auth.log
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

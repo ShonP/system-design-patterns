@@ -52,6 +52,11 @@ services:
       - ./certs/wazuh.indexer-key.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer-key.pem:ro
       - ./certs/admin.pem:/usr/share/wazuh-indexer/certs/admin.pem:ro
       - ./certs/admin-key.pem:/usr/share/wazuh-indexer/certs/admin-key.pem:ro
+      # REQUIRED. The opensearch.yml inside the image points at /etc/wazuh-indexer/certs/,
+      # a directory that does not exist in the image -- without this mount the security
+      # plugin fails to load and the container crash-loops. See the file's header comment.
+      - ./config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml:ro
+      - ./config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml:ro
     ports: ["9200:9200"]
 
   wazuh.dashboard:
@@ -71,6 +76,10 @@ services:
       - ./certs/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem:ro
       - ./certs/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem:ro
       - ./certs/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem:ro
+      # REQUIRED. The image's own config listens on :443, not :5601, and points at
+      # https://localhost:9200 -- so "8443:5601" would map to nothing. See the file header.
+      - ./config/wazuh_dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml:ro
+      - ./config/wazuh_dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
     ports: ["8443:5601"]
 
   victim:

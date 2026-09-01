@@ -1,11 +1,25 @@
 services:
   juice-shop:
     image: bkimminich/juice-shop:v17.3.0
+    # Override with JUICE_PORT=3010 docker compose up -d if 3000 is taken on your machine
+    # (it very often is). The scan scripts read TARGET, so keep the two in sync.
     ports:
-      - "3000:3000"
+      - "${JUICE_PORT:-3000}:3000"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/rest/admin/application-version"]
       interval: 10s
       timeout: 3s
       retries: 6
+    restart: unless-stopped
+
+  # Exercise 9 only: the same Juice Shop, behind a header-hardening reverse proxy.
+  #   docker compose --profile hardened up -d hardened
+  hardened:
+    image: nginx:1.27-alpine
+    depends_on: [juice-shop]
+    ports:
+      - "${HARDENED_PORT:-3010}:80"
+    volumes:
+      - ./hardened/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    profiles: ["hardened"]
     restart: unless-stopped

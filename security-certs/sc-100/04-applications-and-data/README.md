@@ -26,5 +26,7 @@
 ```bash
 cd security-certs/sc-100/04-applications-and-data
 uv sync
-uv run python -m ipykernel install --user --name=sc-100 --display-name="SC-100 (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```

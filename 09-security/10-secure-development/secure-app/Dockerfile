@@ -11,9 +11,9 @@ RUN addgroup -g 10001 -S app && adduser -u 10001 -S app -G app
 WORKDIR /app
 COPY --from=deps --chown=app:app /app /app
 COPY --chown=app:app . .
-USER app
+USER 10001:10001
 ENV NODE_ENV=production
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
+  CMD ["wget", "-q", "--spider", "http://127.0.0.1:3000/api/health"]
 CMD ["node", "src/index.js"]
