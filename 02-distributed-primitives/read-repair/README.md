@@ -1,6 +1,6 @@
 # Read Repair
 
-> Part of `02-distributed-primitives/`. Scaffolded during Phase 3 of the repo restructure — this lab currently contains references and a notebook plan; notebooks will be added incrementally.
+> Part of `02-distributed-primitives/`. Pure-Python lab — no Docker required.
 
 ## Learning objectives
 
@@ -25,8 +25,24 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 ## Notebooks
 
 - [`notebooks/01_stale_replica.ipynb`](./notebooks/01_stale_replica.ipynb) — **the problem**: trusting the first response returns stale data; quantify how often with varying replica/stale counts.
-- [`notebooks/02_read_repair.ipynb`](./notebooks/02_read_repair.ipynb) — **the fix, bad → best**: read-one → quorum read → blocking read-repair → async read-repair → probabilistic read-repair (Cassandra-style).
+- [`notebooks/02_read_repair.ipynb`](./notebooks/02_read_repair.ipynb) — **the fix, bad → best**: read-one → quorum read → blocking read-repair → async read-repair → probabilistic read-repair (Cassandra-style). Repairs only the replicas the coordinator actually heard from, which is why cold keys never heal.
 - [`notebooks/03_anti_entropy_and_hints.ipynb`](./notebooks/03_anti_entropy_and_hints.ipynb) — **the full picture**: hinted handoff for short outages and a tiny Merkle-tree anti-entropy sweep for cold keys — complementary to read-repair.
+
+## When you need this — and when you don't
+
+**Use read-repair when** replicas can diverge and reads already fan out to several of them. The
+repair rides along on RPCs you are paying for anyway, so hot keys stay fresh essentially for free.
+
+**Never rely on it alone.** It only fixes what someone reads. Cold keys — usually the majority —
+are never touched and stay wrong indefinitely. Pair it with hinted handoff (short outages) and
+anti-entropy (everything else); notebook 3 runs all three side by side.
+
+**Choose blocking vs async deliberately.** Blocking repair guarantees the straggler is fixed
+before you answer, at the cost of tail latency. Async keeps latency low and leaves a window in
+which another coordinator can still read the stale value.
+
+**Not needed when** every write goes through consensus (etcd, Spanner, CockroachDB): committed
+replicas cannot disagree, so there is nothing to reconcile.
 
 ## References
 

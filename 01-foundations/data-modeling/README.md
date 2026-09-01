@@ -1,6 +1,6 @@
 # Data Modeling
 
-📖 **Source**: [Hello Interview – Data Modeling for System Design Interviews](https://www.hellointerview.com/learn/system-design/core-concepts/data-modeling)
+📖 **Source**: [Hello Interview – Data Modeling for System Design Interviews](https://www.hellointerview.com/learn/system-design/01-foundations/data-modeling)
 
 ## Overview
 
@@ -76,13 +76,14 @@ erDiagram
 cd 01-foundations/data-modeling
 
 # Start PostgreSQL + Adminer
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=data-modeling --display-name="Data Modeling (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

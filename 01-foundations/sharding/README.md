@@ -1,6 +1,6 @@
 # Sharding
 
-📖 **Source**: [Hello Interview – Sharding in System Design Interviews](https://www.hellointerview.com/learn/system-design/core-concepts/sharding)
+📖 **Source**: [Hello Interview – Sharding in System Design Interviews](https://www.hellointerview.com/learn/system-design/01-foundations/sharding)
 
 ## Overview
 
@@ -30,13 +30,14 @@ Your app is taking off. Traffic is growing and your database keeps getting bigge
 cd 01-foundations/sharding
 
 # Start 3 PostgreSQL shards + Adminer
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=sharding --display-name="Sharding (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -67,7 +68,7 @@ uv run python -m ipykernel install --user --name=sharding --display-name="Shardi
         ┌──────────┐ ┌──────────┐ ┌──────────┐
         │ Shard 1  │ │ Shard 2  │ │ Shard 3  │
         │ Postgres │ │ Postgres │ │ Postgres │
-        │ :5433    │ │ :5434    │ │ :5435    │
+        │ :55433    │ │ :55434    │ │ :55435    │
         └──────────┘ └──────────┘ └──────────┘
 ```
 

@@ -1,6 +1,6 @@
 # Caching
 
-📖 **Source**: [Hello Interview – Caching for System Design Interviews](https://www.hellointerview.com/learn/system-design/core-concepts/caching)
+📖 **Source**: [Hello Interview – Caching for System Design Interviews](https://www.hellointerview.com/learn/system-design/01-foundations/caching)
 
 ## Overview
 
@@ -34,13 +34,14 @@ But caching also introduces new challenges: **invalidation**, **consistency**, a
 cd 01-foundations/caching
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=caching --display-name="Caching (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

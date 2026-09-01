@@ -1,6 +1,6 @@
 # API Design
 
-📖 **Source**: [Hello Interview – API Design for System Design Interviews](https://www.hellointerview.com/learn/system-design/core-concepts/api-design)
+📖 **Source**: [Hello Interview – API Design for System Design Interviews](https://www.hellointerview.com/learn/system-design/01-foundations/api-design)
 
 ## Overview
 
@@ -27,16 +27,17 @@ This lab focuses on **REST APIs** — the default choice for most web services. 
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/api-design
+cd 01-foundations/api-design
 
 # Start PostgreSQL + FastAPI server + Adminer
-docker-compose up -d
+docker compose up -d --build
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=api-design --display-name="API Design (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

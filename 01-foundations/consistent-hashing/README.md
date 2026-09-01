@@ -45,7 +45,9 @@ docker compose up -d
 uv sync
 
 # 3. Register the kernel for Jupyter
-uv run python -m ipykernel install --user --name consistent-hashing --display-name "Consistent Hashing (.venv)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # 4. Open notebooks in VS Code or Jupyter
 #    In VS Code: select the "Consistent Hashing (.venv)" kernel (top-right of notebook)

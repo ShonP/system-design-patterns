@@ -32,6 +32,21 @@ Select the `.venv` kernel in VS Code (top-right of the notebook).
 - [`notebooks/02_phi_accrual.ipynb`](./notebooks/02_phi_accrual.ipynb) — phi accrual detector that learns the network's cadence; side-by-side comparison with fixed timeout under a realistic network blip.
 - [`notebooks/03_real_world.ipynb`](./notebooks/03_real_world.ipynb) — push vs pull, central monitor vs gossip, and why detection without **fencing** can corrupt your data.
 
+## When you need this — and when you don't
+
+**Use heartbeats when** you need to know a peer is *alive* and you control both ends. They are
+the cheapest liveness signal there is: one small message per interval, no round trip.
+
+**Use pull health checks instead when** you need to know a peer is *useful*, not merely running —
+a load balancer wants "can you serve a query", which a heartbeat cannot answer.
+
+**Know the limit before you build on it:** no failure detector can distinguish a crashed node
+from a slow one. Every timeout is a bet, and notebook 1 measures the price of both sides of it.
+Phi accrual (notebook 2) changes the units of the bet; it does not remove it.
+
+**Never act destructively on detection alone.** A false positive that triggers a failover is how
+you get two leaders. Pair detection with fencing — see `lease` and `split-brain-and-fencing`.
+
 ## References
 
 - [`references/designgurus.md`](./references/designgurus.md) — scraped lessons that feed this lab

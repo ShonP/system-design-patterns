@@ -24,6 +24,17 @@ services:
     ports:
       - "5003:5000"
 
+  # ── Certificate generator ──
+  # Runs once before nginx and writes self-signed CA / server / client certs
+  # into ./nginx/certs. Nginx refuses to start without them, so this service
+  # must complete successfully first (see nginx.depends_on below).
+  certgen:
+    image: nginx:latest
+    container_name: net-certgen
+    volumes:
+      - ./nginx:/nginx
+    command: ["bash", "/nginx/generate_certs.sh"]
+
   # ── Nginx Reverse Proxy / Load Balancer ──
   nginx:
     image: nginx:latest
@@ -36,6 +47,11 @@ services:
       - "8443:443"    # HTTPS (TLS)
       - "9443:8443"   # mTLS
     depends_on:
-      - backend1
-      - backend2
-      - backend3
+      certgen:
+        condition: service_completed_successfully
+      backend1:
+        condition: service_started
+      backend2:
+        condition: service_started
+      backend3:
+        condition: service_started

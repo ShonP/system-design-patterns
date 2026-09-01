@@ -1,6 +1,6 @@
 # Networking Essentials
 
-📖 **Source**: [Hello Interview – Networking Essentials for System Design Interviews](https://www.hellointerview.com/learn/system-design/core-concepts/networking-essentials)
+📖 **Source**: [Hello Interview – Networking Essentials for System Design Interviews](https://www.hellointerview.com/learn/system-design/01-foundations/networking-essentials)
 
 ## Overview
 
@@ -27,19 +27,20 @@ This lab gives you hands-on experience with the key networking concepts that com
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/networking-essentials
+cd 01-foundations/networking-essentials
 
 # Generate TLS certificates (needed for notebooks 3 and 4)
 bash nginx/generate_certs.sh
 
 # Start nginx + 3 Flask backends
-docker-compose up -d --build
+docker compose up -d --build
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=networking --display-name="Networking (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

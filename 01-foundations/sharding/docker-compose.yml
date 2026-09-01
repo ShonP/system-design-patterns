@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: shard_1
     ports:
-      - "5433:5432"
+      - "55433:5432"
     volumes:
       - shard1_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: shard_2
     ports:
-      - "5434:5432"
+      - "55434:5432"
     volumes:
       - shard2_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -43,7 +43,7 @@ services:
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: shard_3
     ports:
-      - "5435:5432"
+      - "55435:5432"
     volumes:
       - shard3_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql

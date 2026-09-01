@@ -22,9 +22,9 @@
 | # | Notebook | What you'll learn |
 |---|----------|-------------------|
 | 1 | [`01_intro_and_round_robin.ipynb`](./notebooks/01_intro_and_round_robin.ipynb) | What a load balancer is, why one server is a bottleneck, and how round robin fixes it |
-| 2 | [`02_algorithms_compared.ipynb`](./notebooks/02_algorithms_compared.ipynb) | Round robin, weighted, least-connections, random, and **power-of-two-choices** compared on an uneven workload, with real avg/p50/p95/p99 latencies |
+| 2 | [`02_algorithms_compared.ipynb`](./notebooks/02_algorithms_compared.ipynb) | Round robin, weighted, least-connections, **weighted** least-connections, random, and **power-of-two-choices** compared on a queueing simulation of an uneven fleet, with real avg/p50/p95/p99 latencies — and why they all share the same p99 floor |
 | 3 | [`03_health_checks_and_sticky_sessions.ipynb`](./notebooks/03_health_checks_and_sticky_sessions.ipynb) | Liveness vs. readiness checks, draining an unhealthy backend, and the trade-offs of sticky sessions |
-| 4 | [`04_consistent_hashing.ipynb`](./notebooks/04_consistent_hashing.ipynb) | Why naive `hash % N` breaks caches, how a hash ring with virtual nodes fixes it, and where you'll meet this in real systems |
+| 4 | [`04_consistent_hashing.ipynb`](./notebooks/04_consistent_hashing.ipynb) | Why naive `hash % N` breaks caches, how a hash ring with virtual nodes fixes it, measured remap rates for **adding and removing** a backend, and where you'll meet this in real systems |
 
 Each notebook is pure Python — backends are simulated in-process, so there is no Docker or external infrastructure to set up for this lab.
 

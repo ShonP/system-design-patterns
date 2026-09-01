@@ -22,7 +22,7 @@ This lab walks through the classic progression **single-DB auto-increment → UU
 |---|----------|-------------------|
 | 1 | [`01_why_id_generation_is_hard.ipynb`](notebooks/01_why_id_generation_is_hard.ipynb) | Auto-increment bottleneck, UUIDv4 randomness, B-tree locality — **BAD → BETTER → BEST** |
 | 2 | [`02_uuid_ulid_ksuid_compared.ipynb`](notebooks/02_uuid_ulid_ksuid_compared.ipynb) | Implement UUIDv4, UUIDv7 (RFC 9562), ULID, and KSUID from scratch |
-| 3 | [`03_snowflake_id_generator.ipynb`](notebooks/03_snowflake_id_generator.ipynb) | Build a Snowflake generator: bit layout, sequence overflow, clock-skew defence |
+| 3 | [`03_snowflake_id_generator.ipynb`](notebooks/03_snowflake_id_generator.ipynb) | Build a Snowflake generator: bit layout, sequence overflow, and a clock rewind that makes the unguarded version emit **duplicate IDs** before we fix it |
 | 4 | [`04_production_patterns.ipynb`](notebooks/04_production_patterns.ipynb) | Worker-ID strategies, DB storage, decoding a real Discord snowflake, NanoID, gotchas |
 
 ## Prerequisites

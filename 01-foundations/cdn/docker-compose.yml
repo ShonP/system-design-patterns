@@ -34,7 +34,10 @@ services:
       # someone uploaded them directly to the edge (simulating a push CDN).
       - ./edge/edge1_pushed:/usr/share/nginx/pushed
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      # Use 127.0.0.1, not localhost: inside the container `localhost`
+      # resolves to ::1 first, and this nginx config only has `listen 80`
+      # (IPv4), so the IPv6 probe is refused and the edge never goes healthy.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -53,7 +56,10 @@ services:
       - edge2_cache:/var/cache/nginx/edge
       - ./edge/edge2_pushed:/usr/share/nginx/pushed
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      # Use 127.0.0.1, not localhost: inside the container `localhost`
+      # resolves to ::1 first, and this nginx config only has `listen 80`
+      # (IPv4), so the IPv6 probe is refused and the edge never goes healthy.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
       interval: 5s
       timeout: 5s
       retries: 10

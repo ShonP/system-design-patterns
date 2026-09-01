@@ -31,7 +31,7 @@ services:
       PGUSER: replicator
       PGPASSWORD: replicator
     ports:
-      - "5433:5432"
+      - "55433:5432"
     depends_on:
       postgres-primary:
         condition: service_healthy

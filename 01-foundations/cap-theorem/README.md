@@ -1,6 +1,6 @@
 # CAP Theorem
 
-📖 **Source**: [Hello Interview – CAP Theorem for System Design Interviews](https://www.hellointerview.com/learn/system-design/core-concepts/cap-theorem)
+📖 **Source**: [Hello Interview – CAP Theorem for System Design Interviews](https://www.hellointerview.com/learn/system-design/01-foundations/cap-theorem)
 
 ## Overview
 
@@ -26,16 +26,17 @@ This lab lets you experience the trade-off hands-on. You'll write to a PostgreSQ
 
 ```bash
 # Navigate to the lab directory
-cd core-concepts/cap-theorem
+cd 01-foundations/cap-theorem
 
 # Start PostgreSQL primary + replica + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=cap-theorem --display-name="CAP Theorem (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -62,7 +63,7 @@ uv run python -m ipykernel install --user --name=cap-theorem --display-name="CAP
 │  │  PostgreSQL  │──replication──▶│  PostgreSQL   │   │
 │  │   Primary    │                │   Replica     │   │
 │  │  (writes)    │                │  (reads only) │   │
-│  │  port 5432   │                │  port 5433    │   │
+│  │  port 5432   │                │  port 55433    │   │
 │  └─────────────┘                └──────────────┘   │
 │                                                      │
 │  ┌─────────────┐                                    │

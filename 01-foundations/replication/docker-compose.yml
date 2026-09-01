@@ -34,7 +34,7 @@ services:
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: replication_demo
     ports:
-      - "5433:5432"
+      - "55433:5432"
     volumes:
       - replica_data:/var/lib/postgresql/data
       - ./db/replica/setup.sh:/usr/local/bin/setup.sh:ro

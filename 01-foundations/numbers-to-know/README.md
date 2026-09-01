@@ -1,6 +1,6 @@
 # Numbers to Know for System Design
 
-📖 **Source**: [Hello Interview – Numbers to Know](https://www.hellointerview.com/learn/system-design/core-concepts/numbers-to-know)
+📖 **Source**: [Hello Interview – Numbers to Know](https://www.hellointerview.com/learn/system-design/01-foundations/numbers-to-know)
 
 ## Overview
 
@@ -29,13 +29,14 @@ This lab teaches you the numbers that actually matter in 2026 — **by measuring
 cd 01-foundations/numbers-to-know
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=numbers-to-know --display-name="Numbers to Know (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

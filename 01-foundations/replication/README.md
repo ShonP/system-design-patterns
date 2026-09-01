@@ -46,7 +46,7 @@ window: `Cmd+Shift+P` → "Reload Window".
 | Service | Port | Purpose |
 |---------|------|---------|
 | `primary` | `5432` | Postgres 16 primary (accepts writes) |
-| `replica` | `5433` | Postgres 16 streaming-replication replica (read-only) |
+| `replica` | `55433` | Postgres 16 streaming-replication replica (read-only) |
 | `adminer` | `8080` | Web UI to inspect both databases |
 
 ### Adminer login

@@ -11,4 +11,6 @@ dependencies = [
     "bcrypt>=4.1.0",
     "pyjwt>=2.8.0",
     "itsdangerous>=2.1.0",
+    # for RS256 keys in the algorithm-confusion demo (notebook 2)
+    "cryptography>=42.0.0",
 ]

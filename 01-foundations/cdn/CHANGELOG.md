@@ -3,6 +3,10 @@
 All notable changes to this lab will be documented here.
 New content is **added**, never destructively replaced.
 
+## 2026-08-20 (repo-wide verification pass)
+- **Fix**: both edge containers never became healthy, so `docker compose up --wait` failed. The healthcheck fetched `http://localhost/health`, and inside the container `localhost` resolves to `::1` first while this nginx config only has `listen 80` (IPv4) -- so the probe was refused. Switched to `127.0.0.1`.
+- All 4 notebooks re-verified end-to-end against the stack.
+
 ## 2026-04-18 (QA pass)
 - **Fix**: bind-mount `./origin/assets` into the origin container so notebook 3's "stale demo" (host edits → origin serves new bytes) actually works. Previously assets were baked into the image at build time.
 - **Fix**: implement explicit `If-None-Match` handling in `origin/main.py` so the origin returns a real `304 Not Modified` (empty body, no artificial delay) when the client's ETag matches. Previously Starlette's stat-based default ETag conflicted with our md5 ETag and `304` was never returned.

@@ -27,7 +27,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook).
 
 - [`notebooks/01_build_a_merkle_tree.ipynb`](./notebooks/01_build_a_merkle_tree.ipynb) — build a Merkle tree with `hashlib`; see one bit-flip move the root; learn why **leaf order**, **canonical serialization**, and **domain separation** matter.
 - [`notebooks/02_inclusion_proofs.ipynb`](./notebooks/02_inclusion_proofs.ipynb) — prove a single leaf is in a tree using only `O(log N)` sibling hashes. Compare 🟥 send-everything vs 🟨 all-hashes vs 🟩 Merkle proof. The technique behind Bitcoin SPV and Certificate Transparency.
-- [`notebooks/03_replica_diff.ipynb`](./notebooks/03_replica_diff.ipynb) — full scan vs per-key hashes vs Merkle walk on two near-identical replicas; measure bytes sent. Uses a non-power-of-two dataset so padding is visible.
+- [`notebooks/03_replica_diff.ipynb`](./notebooks/03_replica_diff.ipynb) — full scan vs per-key hashes vs Merkle walk on two near-identical replicas. **Counts the node comparisons** and checks the `O(K log N)` claim against a measured sweep from 500 to 32,000 keys. Uses a non-power-of-two dataset so padding is visible.
 
 ## Where Merkle trees show up in the real world
 
@@ -43,6 +43,23 @@ Select the `.venv` kernel in VS Code (top-right of the notebook).
 | **ZFS / btrfs** | Checksummed block trees (Merkle-like) detect bit-rot on disk. |
 
 "Merkle **DAG**" generalizes the binary-tree idea to any directed acyclic graph of hashes — same core idea, different shape.
+
+## When you need this — and when you don't
+
+**Use a Merkle tree when** two parties hold large, *mostly identical* datasets and you need to
+find the difference without shipping everything. Cost is `O(K log N)` in the number of
+differences — and exactly one comparison when they already agree, which is the normal case.
+
+**Also use one when** a small client must verify a single item against a huge dataset it cannot
+download: an `O(log N)` inclusion proof plus a 32-byte root is the whole trust anchor. This is
+Bitcoin SPV and Certificate Transparency.
+
+**Don't bother when** the replicas usually differ a lot. Once `K` approaches `N` the walk
+degenerates into a full scan with extra hashing on top — just ship the data.
+
+**Also skip it when** the dataset is small enough to hash whole, or when you cannot pin down a
+**canonical order and serialization**. Two honest replicas that iterate keys differently compute
+different roots and will "disagree" forever.
 
 ## References
 
