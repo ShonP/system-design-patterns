@@ -215,7 +215,7 @@ Now that we have a base to work with let's figure out how we can implement them 
 
 ### 1) Users should be able to start group chats with multiple participants (limit 100)
 
-For our first requirement, we need a way for a user to create a chat. We'll start with a simple service behind an L4 load balancer (we're using Websockets) which can write Chat metadata to a database. Let's use [DynamoDB](/learn/system-design/deep-dives/dynamodb) for fast key/value performance and scalability here, although we have lots of other options.
+For our first requirement, we need a way for a user to create a chat. We'll start with a simple service behind an L4 load balancer (we're using Websockets) which can write Chat metadata to a database. Let's use [DynamoDB](/learn/system-design/03-technologies/databases/dynamodb) for fast key/value performance and scalability here, although we have lots of other options.
 
 Can we use an L7 load balancer? In many cases, yes. There is wide support for Websockets in many modern L7 load balancers. But the important thing is that *we don't need any L7 capabilities for this service*. L7 load balancers shine when we want to, for instance, route traffic with specific paths or headers to different services. They are also helpful when we may want to spread HTTP requests across many servers even behind a single client connection. But neither of these apply here!
 
@@ -237,7 +237,7 @@ For the ChatParticipant table, we'll want to be able to (1) look up all particip
 
 - We can do this with a composite primary key where chatId is the partition key and participantId is the sort key. A Query on the chatId partition key will return all participants for a given chat.
 
-- We'll need a [Global Secondary Index (GSI)](/learn/system-design/deep-dives/dynamodb#global-secondary-indexes) with participantId as the partition key and chatId as the sort key. This will allow us to efficiently query all chats for a given user. The GSI will automatically be kept in sync with the base table by DynamoDB.
+- We'll need a [Global Secondary Index (GSI)](/learn/system-design/03-technologies/databases/dynamodb#global-secondary-indexes) with participantId as the partition key and chatId as the sort key. This will allow us to efficiently query all chats for a given user. The GSI will automatically be kept in sync with the base table by DynamoDB.
 
 Great! We got some chats. How about messages?
 
@@ -403,7 +403,7 @@ There are potential fixes that you might conceive, like creating "super topics" 
 
 Another approach for us to use is to always assign users to a specific Chat Server based on their user ID. If we do this correctly, we'll always know which Chat Server is responsible for a given user so, when we need to send them messages, we can do so directly.
 
-To do this we'll need to keep a central registry of how many Chat Servers we have, their addresses, and the which segments of a consistent hash space they own. We might use a service like [ZooKeeper](/learn/system-design/deep-dives/zookeeper) or Etcd to do this.
+To do this we'll need to keep a central registry of how many Chat Servers we have, their addresses, and the which segments of a consistent hash space they own. We might use a service like [ZooKeeper](/learn/system-design/03-technologies/coordination/zookeeper) or Etcd to do this.
 
 When a request comes in, we'll connect them to the Chat Server they are assigned to based on their user id. When a new event is created, Chat Servers will connect directly with the Chat Server that "owns" that user id, then call an API which delivers a notification the connected user (if they're connected).
 
@@ -649,7 +649,7 @@ First, when users connect to our Chat Servers, they are creating a new Websocket
 
 Second, if users are online *they can tell us*.
 
-So what can we do? We'll create a new table in DynamoDB which will keep track of the *last disconnect* for a given user. Whenever a user **disconnects** from a Chat Server, we'll update this value using the current timestamp. We can use DynamoDB's [conditional expressions](/learn/system-design/deep-dives/dynamodb#conditional-writes) (e.g., only update if the new timestamp is greater than the existing one) to ensure that two servers don't race each other and accidentally overwrite a more recent disconnect time.
+So what can we do? We'll create a new table in DynamoDB which will keep track of the *last disconnect* for a given user. Whenever a user **disconnects** from a Chat Server, we'll update this value using the current timestamp. We can use DynamoDB's [conditional expressions](/learn/system-design/03-technologies/databases/dynamodb#conditional-writes) (e.g., only update if the new timestamp is greater than the existing one) to ensure that two servers don't race each other and accidentally overwrite a more recent disconnect time.
 
 Next, we'll have a special request we send from a client who wants to request a "last seen" a given user.
 

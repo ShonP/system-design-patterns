@@ -316,7 +316,7 @@ Our read operations are going to be be slightly slower by needing to filter on t
 ### 
 
 Approach
-Another great solution is to implement a [distributed lock](https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies#distributed-lock) with a TTL (Time To Live) using a distributed system like [Redis](https://www.hellointerview.com/learn/system-design/deep-dives/redis).
+Another great solution is to implement a [distributed lock](https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies#distributed-lock) with a TTL (Time To Live) using a distributed system like [Redis](https://www.hellointerview.com/learn/system-design/03-technologies/databases/redis).
 
 You might wonder, if PostgreSQL already provides strong consistency, why do we need Redis at all? The key reason is that we need a *temporary* reservation that automatically expires. PostgreSQL doesn't natively support row-level TTLs, you'd need application-level expiration logic (the cron approach above). Redis gives us automatic key expiration built in, and since it's in-memory, lock acquisition and release are extremely fast under high concurrency.
 
@@ -476,7 +476,7 @@ Challenges
 ### 
 
 Approach
-We can extend the basic indexing strategy above to utilize full-text indexes in our database, if available. [PostgreSQL](/learn/system-design/deep-dives/postgres#beyond-basic-indexes) has built-in full-text search using tsvector and GIN indexes, while MySQL offers its own full-text indexing. Neither uses Lucene, which is what powers Elasticsearch. These make queries for specific strings like "Taylor" or "Swift" much faster than doing a full table scan using LIKE.
+We can extend the basic indexing strategy above to utilize full-text indexes in our database, if available. [PostgreSQL](/learn/system-design/03-technologies/databases/postgres#beyond-basic-indexes) has built-in full-text search using tsvector and GIN indexes, while MySQL offers its own full-text indexing. Neither uses Lucene, which is what powers Elasticsearch. These make queries for specific strings like "Taylor" or "Swift" much faster than doing a full table scan using LIKE.
 Challenges
 
 - Full text indexes require additional storage space and can be slower to query than standard indexes.
@@ -486,7 +486,7 @@ Challenges
 ### 
 
 Approach
-Add [Elasticsearch](/learn/system-design/deep-dives/elasticsearch) or a similar [full-text search engine](https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies#search-optimized-database). Elasticsearch is a powerful search engine that excels in full-text search, complex query execution, and handling high-volume traffic efficiently. At its core, Elasticsearch operates using inverted indexes, a key feature that makes it highly efficient for search operations. Inverted indexes allow Elasticsearch to quickly locate and retrieve data by mapping each unique word to the documents or records it appears in, significantly speeding up search queries.
+Add [Elasticsearch](/learn/system-design/03-technologies/databases/elasticsearch) or a similar [full-text search engine](https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies#search-optimized-database). Elasticsearch is a powerful search engine that excels in full-text search, complex query execution, and handling high-volume traffic efficiently. At its core, Elasticsearch operates using inverted indexes, a key feature that makes it highly efficient for search operations. Inverted indexes allow Elasticsearch to quickly locate and retrieve data by mapping each unique word to the documents or records it appears in, significantly speeding up search queries.
 
 - To make sure the data in Elasticsearch is always in sync with the data in our SQL DB, we can use change data capture (CDC) for real-time or near-real-time data synchronization from PostgreSQL to Elasticsearch. This setup captures changes in the PostgreSQL database, such as inserts, updates, and deletes, and replicates them to the Elasticsearch index.
 
@@ -563,7 +563,7 @@ Ok, that was a lot. You may be thinking, "how much of that is actually required 
 
 **Depth of Expertise**: As a senior candidate, expectations shift towards more in-depth knowledge — about 60% breadth and 40% depth. This means you should be able to go into technical details in areas where you have hands-on experience. It's crucial that you demonstrate a deep understanding of key concepts and technologies relevant to the task at hand.
 
-**Advanced System Design**: You should be familiar with advanced system design principles. For example, knowing how to use a search-optimized data store like Elasticsearch for event searching is essential. You're also expected to understand the use of a distributed lock for reserving tickets and to discuss detailed scaling strategies (it's ok if this took some probing/hints from the interviewer), including [sharding](/learn/system-design/core-concepts/sharding) and replication. Your ability to navigate these advanced topics with confidence and clarity is key.
+**Advanced System Design**: You should be familiar with advanced system design principles. For example, knowing how to use a search-optimized data store like Elasticsearch for event searching is essential. You're also expected to understand the use of a distributed lock for reserving tickets and to discuss detailed scaling strategies (it's ok if this took some probing/hints from the interviewer), including [sharding](/learn/system-design/01-foundations/sharding) and replication. Your ability to navigate these advanced topics with confidence and clarity is key.
 
 **Articulating Architectural Decisions**: You should be able to clearly articulate the pros and cons of different architectural choices, especially how they impact scalability, performance, and maintainability. You justify your decisions and explain the trade-offs involved in your design choices.
 

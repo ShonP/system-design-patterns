@@ -5,10 +5,12 @@
 > **bad → better → best** teaching progression so you can *see why* the naive
 > solution breaks before learning the production one.
 
-![Labs](https://img.shields.io/badge/labs-148-blue)
-![Notebooks](https://img.shields.io/badge/notebooks-510-orange)
-![Categories](https://img.shields.io/badge/categories-8-green)
+[![Validate labs](https://github.com/ShonP/system-design-patterns/actions/workflows/validate-labs.yml/badge.svg)](https://github.com/ShonP/system-design-patterns/actions/workflows/validate-labs.yml)
+![Labs](https://img.shields.io/badge/labs-160-blue)
+![Notebooks](https://img.shields.io/badge/notebooks-529-orange)
+![Categories](https://img.shields.io/badge/categories-9-green)
 ![Security Certs](https://img.shields.io/badge/cert%20tracks-4-red)
+![Verified](https://img.shields.io/badge/labs%20verified-160%2F160-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 ![Stack](https://img.shields.io/badge/stack-Python%20%7C%20Docker%20%7C%20uv-purple)
 
@@ -25,8 +27,9 @@ hardening. Use it to experiment, break things, and build intuition.
 3. [Learning Roadmap](#-learning-roadmap-8-weeks)
 4. [Full Lab Index](#-full-lab-index)
 5. [How Each Lab Works](#-how-each-lab-works)
-6. [Contributing](#-contributing)
-7. [License](#-license)
+6. [Verifying the Labs](#-verifying-the-labs)
+7. [Contributing](#-contributing)
+8. [License](#-license)
 
 ---
 
@@ -34,18 +37,20 @@ hardening. Use it to experiment, break things, and build intuition.
 
 | # | Category | Labs | Notebooks | What you'll learn |
 |---|----------|-----:|----------:|-------------------|
-| 01 | [Foundations](01-foundations/) | 16 | 61 | Core building blocks: caching, sharding, replication, load balancing, CAP, consistent hashing, IDs, observability, messaging basics, CDN, DNS, auth |
+| 01 | [Foundations](01-foundations/) | 16 | 62 | Core building blocks: caching, sharding, replication, load balancing, CAP, consistent hashing, IDs, observability, messaging basics, CDN, DNS, auth |
 | 02 | [Distributed Primitives](02-distributed-primitives/) | 14 | 41 | Low-level mechanics: WAL, gossip, vector clocks, quorum, merkle trees, heartbeats, leases, hinted handoff, read repair, fencing |
-| 03 | [Technologies](03-technologies/) | 10 + 6 refs | 45 | Deep dives: Postgres, Redis, Kafka, ZooKeeper, Cassandra, DynamoDB, Elasticsearch, vector/time-series DBs, Temporal + reference papers (GFS, HDFS, Bigtable, Dynamo, Chubby, S3) |
+| 03 | [Technologies](03-technologies/) | 11 + 6 refs | 60 | Deep dives: Postgres, Redis, Kafka, ZooKeeper, Cassandra, DynamoDB, Elasticsearch, vector/time-series DBs, Temporal + reference papers (GFS, HDFS, Bigtable, Dynamo, Chubby, S3) |
 | 04 | [Patterns](04-patterns/) | 11 | 62 | Scaling & reliability: read/write scaling, contention, real-time, large blobs, rate limiting, resilience, idempotency, outbox/CDC, sagas |
 | 05 | [Microservices](05-microservices/) | 12 | 39 | Service patterns: API gateway, BFF, service discovery, sidecar, circuit breaker, bulkhead, retry, saga, CQRS, EDA, strangler, config externalization |
 | 06 | [System Designs](06-system-designs/) | 47 | 156 | End-to-end: Bitly, Uber, WhatsApp, Instagram, YouTube, Dropbox, Netflix, Discord, Tinder, Stock Exchange, Payment, Ticketmaster, +35 more |
 | 07 | [Object-Oriented Design](07-object-oriented-design/) | 18 | 43 | Classic LLD/OOD interview problems: parking lot, elevator, chess, library, ATM, hotel, airline, +more |
 | 08 | [Enterprise](08-enterprise/) | 5 | 21 | Process patterns: BCDR, GDPR paired regions, privacy review, security review, Azure auth |
+| 09 | [Security](09-security/) | 10 | — | Hands-on AppSec labs driven by shell scripts (not notebooks): vulnerability scanning, secrets detection, SAST, container & Kubernetes security, OWASP web attacks, IaC scanning, incident response, network security, secure SDLC |
 | — | [Security Certifications](security-certs/) | 4 tracks · 15 modules | 42 | Azure study labs: SC-900, SC-100, SC-200, AZ-500 |
-| | **Total** | **148** | **510** | |
+| | **Total** | **159** | **526** | |
 
-> Numbers reflect labs that contain runnable notebooks. Some labs in
+> Notebook counts are exact. `09-security/` is script-driven and has no
+> notebooks. Some labs in
 > `03-technologies/reference-systems/` and a few in `06-system-designs/`
 > (e.g. `chatgpt/`) are currently documentation-only.
 
@@ -150,6 +155,7 @@ Go deep on the tools you'll actually use.
 5. [`databases/cassandra`](03-technologies/databases/cassandra/), [`dynamodb`](03-technologies/databases/dynamodb/), [`elasticsearch`](03-technologies/databases/elasticsearch/)
 6. [`databases/vector-databases`](03-technologies/databases/vector-databases/), [`time-series-databases`](03-technologies/databases/time-series-databases/)
 7. [`workflow-engines/temporal`](03-technologies/workflow-engines/temporal/) — durable workflows
+8. [`container-orchestration/kubernetes`](03-technologies/container-orchestration/kubernetes/) — pods → services → Helm → GitOps → mesh (**needs a local cluster**: minikube, kubectl, helm)
 
 ### Week 5 · Scaling & Reliability Patterns
 
@@ -203,6 +209,7 @@ Start small, build up. Each design reuses pieces from weeks 1–6.
 
 - **Object-Oriented Design** → [`07-object-oriented-design/`](07-object-oriented-design/) — LLD interview prep
 - **Enterprise / compliance** → [`08-enterprise/`](08-enterprise/) — privacy, BCDR, paired regions
+- **Application security** → [`09-security/`](09-security/) — scanner-driven labs; run `./scripts/*.sh`, no Jupyter needed
 - **Azure security certs** → [`security-certs/`](security-certs/) — SC-900 → SC-200 → AZ-500 → SC-100
 
 ---
@@ -220,7 +227,7 @@ Start small, build up. Each design reuses pieces from weeks 1–6.
 | [`cap-theorem`](01-foundations/cap-theorem/) | 3 | Consistency vs availability vs partitions |
 | [`cdn`](01-foundations/cdn/) | 4 | Edge caching, origin shield, cache keys |
 | [`consistent-hashing`](01-foundations/consistent-hashing/) | 4 | Modulo → hash ring → virtual nodes |
-| [`data-modeling`](01-foundations/data-modeling/) | 4 | Relational, denormalization, NoSQL, schema evolution |
+| [`data-modeling`](01-foundations/data-modeling/) | 5 | Relational, denormalization, NoSQL, schema evolution |
 | [`id-generation`](01-foundations/id-generation/) | 4 | UUIDs, snowflake, ULID, collisions |
 | [`load-balancing`](01-foundations/load-balancing/) | 4 | L4 vs L7, algorithms, health checks |
 | [`messaging-basics`](01-foundations/messaging-basics/) | 3 | Queues, topics, delivery semantics |
@@ -269,9 +276,19 @@ Start small, build up. Each design reuses pieces from weeks 1–6.
 |---|---:|---|
 | [`messaging/kafka`](03-technologies/messaging/kafka/) | 5 | Producers/consumers, partitions, exactly-once, Streams |
 | [`coordination/zookeeper`](03-technologies/coordination/zookeeper/) | 5 | Locks, leader election, config, discovery, watches |
-| [`workflow-engines/temporal`](03-technologies/workflow-engines/temporal/) | 5 | Durable workflows, sagas, signals, versioning |
+| [`workflow-engines/temporal`](03-technologies/workflow-engines/temporal/) | 10 | Durable workflows, sagas, signals, child workflows, versioning, AI agents, production deployment |
 
-**Reference systems (canonical papers, docs-only)**
+**Container orchestration · Actor runtimes**
+
+| Lab | Notebooks | Focus |
+|---|---:|---|
+| [`container-orchestration/kubernetes`](03-technologies/container-orchestration/kubernetes/) | 10 | Cluster setup, pods/deployments, services & networking, Helm/Kustomize, observability, RBAC, GitOps with ArgoCD, service mesh, storage & secrets, production patterns. **Needs a real cluster** — the notebooks preflight-check for `minikube`/`kubectl`/`helm` and a reachable API server. |
+| [`workflow-engines/orleans`](03-technologies/workflow-engines/orleans/) | — | Microsoft Orleans virtual actors. A **.NET** lab: 7 exercises under `labs/` run with `dotnet run`, not Jupyter — grains, state, timers/reminders, streams, AI agent grains, monitoring. |
+
+**[Reference systems](03-technologies/reference-systems/) (canonical papers, docs-only)**
+
+Paper guides rather than runnable labs — each covers the design, the trade-offs it
+made and what it cost, and links to the labs here where those ideas run as code.
 
 | Lab | Paper |
 |---|---|
@@ -328,7 +345,6 @@ Start small, build up. Each design reuses pieces from weeks 1–6.
 | [`discord`](06-system-designs/discord/) | 3 | Real-time chat, voice, presence |
 | [`distributed-cache`](06-system-designs/distributed-cache/) | 4 | Partitioning, coherence, consistent hashing |
 | [`distributed-lock-manager`](06-system-designs/distributed-lock-manager/) | 3 | Chubby-style distributed locks |
-| [`distributed-rate-limiter`](06-system-designs/distributed-rate-limiter/) | 3 | Token/sliding window, distributed |
 | [`dropbox`](06-system-designs/dropbox/) | 4 | File sync, dedup, sharing |
 | [`fb-live-comments`](06-system-designs/fb-live-comments/) | 3 | Live comment streaming & ordering |
 | [`fb-news-feed`](06-system-designs/fb-news-feed/) | 4 | Fan-out, ranking, social graph |
@@ -350,7 +366,7 @@ Start small, build up. Each design reuses pieces from weeks 1–6.
 | [`notification-system`](06-system-designs/notification-system/) | 4 | Multi-channel fan-out |
 | [`online-auction`](06-system-designs/online-auction/) | 4 | Bid processing, fairness |
 | [`payment-system`](06-system-designs/payment-system/) | 4 | Pipeline, idempotency, ledger, fraud |
-| [`rate-limiter`](06-system-designs/rate-limiter/) | 4 | Token/leaky bucket at the gateway |
+| [`rate-limiter`](06-system-designs/rate-limiter/) | 4 | Token bucket, sliding window, distributed limiting with Redis, limiting at the gateway |
 | [`reddit`](06-system-designs/reddit/) | 3 | Forum/feed platform |
 | [`reminder-alert`](06-system-designs/reminder-alert/) | 3 | Scheduled reminders at scale |
 | [`robinhood`](06-system-designs/robinhood/) | 3 | Brokerage backend, market data |
@@ -481,6 +497,38 @@ top-right of any notebook. If it doesn't show up, `Cmd/Ctrl+Shift+P` →
 
 ---
 
+## 🔧 Verifying the labs
+
+The repo ships its own test harness in [`tools/`](tools/) — see
+[`tools/README.md`](tools/README.md) for the details.
+
+```bash
+python3 tools/validate_labs.py              # static checks over every lab (seconds)
+python3 tools/check_ports.py                # which labs would fail to start right now, and why
+python3 tools/run_labs.py --all --no-docker # actually execute the labs that need no containers
+python3 tools/run_labs.py 01-foundations/caching   # one lab, containers and all
+```
+
+`validate_labs.py` exits non-zero on any error, so it works as a CI gate.
+If a stack refuses to start, run `check_ports.py` first — labs publish fixed host
+ports and cannot run two at a time, so the usual cause is another lab you forgot
+to tear down.
+
+**Every lab has been executed against real infrastructure** — 160/160, including
+the Kubernetes lab (which needs a cluster) and the shell-driven security labs.
+The one thing worth knowing before you trust a green run:
+
+> A lab that runs cleanly is not a lab that is correct. Every lab here executed
+> without error before the correctness pass, and the review still found real
+> defects in most of them — a top-K heap that evicted genuine heavy hitters, an
+> operational-transform function that did not converge, a reconciler that marked
+> orders filled with no ledger entry. Assertions were added throughout so a lab
+> that stops reproducing its own lesson now fails loudly.
+
+The findings, the failure patterns, and what remains open are in
+[`docs/VERIFICATION-HANDOFF.md`](docs/VERIFICATION-HANDOFF.md). Per-lab state lives in
+[`tools/qa-status.json`](tools/qa-status.json).
+
 ## 🤝 Contributing
 
 Contributions are welcome! The repo follows a few conventions that keep the
@@ -537,7 +585,7 @@ labs consistent and beginner-friendly:
 
 ## 📝 License
 
-MIT License — use freely for learning and teaching.
+MIT License — see [LICENSE](LICENSE). Use freely for learning and teaching.
 
 ## 🙏 Acknowledgments
 

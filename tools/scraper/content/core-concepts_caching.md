@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/core-concepts/caching
+source: https://www.hellointerview.com/learn/system-design/01-foundations/caching
 title: "Caching for System Design Interviews"
 category: core-concepts
 scraped_at: 2026-03-31T10:52:45.929Z
@@ -41,7 +41,7 @@ Let's look at the main places you can cache data, why each one exists, and when 
 
 ### External Caching
 
-An external cache is a standalone cache service that your application talks to over the network. This is what most people think of when they hear caching. You store frequently accessed data in something like [Redis](/learn/system-design/deep-dives/redis) or [Memcached](https://memcached.org/) so you do not have to hit the database every time.
+An external cache is a standalone cache service that your application talks to over the network. This is what most people think of when they hear caching. You store frequently accessed data in something like [Redis](/learn/system-design/03-technologies/databases/redis) or [Memcached](https://memcached.org/) so you do not have to hit the database every time.
 
 External Caching
 
@@ -271,7 +271,7 @@ High database CPU: "Our database CPU is hitting 80% during peak hours just servi
 
 Latency requirements: "We need sub-10ms response times for the API. Database queries are taking 30-50ms. We have to cache."
 
-The pattern is simple. Identify the performance problem, quantify it with rough numbers, and explain how caching solves it. You can use our [Numbers to Know](/learn/system-design/core-concepts/numbers-to-know) to get a sense of reasonable database and cache latencies.
+The pattern is simple. Identify the performance problem, quantify it with rough numbers, and explain how caching solves it. You can use our [Numbers to Know](/learn/system-design/01-foundations/numbers-to-know) to get a sense of reasonable database and cache latencies.
 
 ### How to Introduce Caching
 
@@ -338,7 +338,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: Sharding](/learn/system-design/core-concepts/sharding)
+[Next: Sharding](/learn/system-design/01-foundations/sharding)
 
 Your account is free and you can post anonymously if you choose.
 

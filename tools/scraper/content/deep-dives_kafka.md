@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/deep-dives/kafka
+source: https://www.hellointerview.com/learn/system-design/03-technologies/messaging/kafka
 title: "Kafka Deep Dive for System Design Interviews"
 category: deep-dives
 scraped_at: 2026-03-31T10:53:08.268Z

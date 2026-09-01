@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/core-concepts/data-modeling
+source: https://www.hellointerview.com/learn/system-design/01-foundations/data-modeling
 title: "Data Modeling for System Design Interviews"
 category: core-concepts
 scraped_at: 2026-03-31T10:52:44.946Z
@@ -35,7 +35,7 @@ Still, a reasonable schema is more than box-drawing. It sets up the rest of your
 
 Before you can design a schema, you need to pick what type of database you're working with. Different database models shape how you structure your data, so this choice affects everything that follows.
 
-In interviews, the temptation is to show off by choosing exotic database types. Resist this. Most of the time, the right answer is a relational database. It's the default unless your requirements clearly signal a specialized model. Unless you have significant experience and, with it, strong opinions about another database, my recommendation is to stick with [PostgreSQL](/learn/system-design/deep-dives/postgres).
+In interviews, the temptation is to show off by choosing exotic database types. Resist this. Most of the time, the right answer is a relational database. It's the default unless your requirements clearly signal a specialized model. Unless you have significant experience and, with it, strong opinions about another database, my recommendation is to stick with [PostgreSQL](/learn/system-design/03-technologies/databases/postgres).
 
 That doesn’t mean other database models aren’t worth knowing. Showing you understand when they might be useful demonstrates that you’re thinking about trade-offs, not just parroting the default. Still, the star of the show is SQL, so we’ll start there before briefly touching on the alternatives.
 
@@ -61,7 +61,7 @@ SQL is great at handling complex queries. If you need to fetch "all posts by use
 
 The usual knock on relational databases is scalability, but this is often exaggerated. Modern SQL databases scale with techniques like read replicas, sharding, connection pooling, and caching. Some of the largest companies in the world (Facebook, Airbnb) rely on relational foundations. Scaling isn't just about the database you choose, but how you architect around it.
 
-**Example technologies include** [PostgreSQL](/learn/system-design/deep-dives/postgres), [MySQL](https://www.mysql.com/), and [SQLite](https://www.sqlite.org/index.html).
+**Example technologies include** [PostgreSQL](/learn/system-design/03-technologies/databases/postgres), [MySQL](https://www.mysql.com/), and [SQLite](https://www.sqlite.org/index.html).
 
 ### Document Databases
 
@@ -110,7 +110,7 @@ Key-value stores provide simple lookups where you fetch values by exact key matc
 
 Key-Value Cache
 
-**Example technologies include** [Redis](/learn/system-design/deep-dives/redis), [DynamoDB](/learn/system-design/deep-dives/dynamodb), and [Memcached](https://memcached.org/).
+**Example technologies include** [Redis](/learn/system-design/03-technologies/databases/redis), [DynamoDB](/learn/system-design/03-technologies/databases/dynamodb), and [Memcached](https://memcached.org/).
 
 ### Wide-Column Databases
 
@@ -124,7 +124,7 @@ Wide-Column Database
 
 **Data modeling impact:** You'll design around query patterns even more than with SQL, often duplicating data across different column families to support various access patterns. Time becomes a first-class citizen in your modeling.
 
-**Example technologies include** [Cassandra](/learn/system-design/deep-dives/cassandra) and [HBase](https://hbase.apache.org/).
+**Example technologies include** [Cassandra](/learn/system-design/03-technologies/databases/cassandra) and [HBase](https://hbase.apache.org/).
 
 ### Graph Databases
 
@@ -233,7 +233,7 @@ That said, even if you need denormalized quick access for performance, you can j
 
 ### Scaling and Sharding
 
-When your data gets too large for a single database, you need to [shard](/learn/system-design/core-concepts/sharding) it across multiple machines. The key is choosing a partition strategy that keeps related data together.
+When your data gets too large for a single database, you need to [shard](/learn/system-design/01-foundations/sharding) it across multiple machines. The key is choosing a partition strategy that keeps related data together.
 
 **Shard by the primary access pattern.** If you mostly query "posts by user," shard by user_id. This keeps a user's posts on the same database, avoiding expensive cross-shard queries.
 
@@ -261,7 +261,7 @@ Start by outlining your core entities early in the interview. Then, when introdu
 
 - Determine whether you need to denormalize for performance
 
-- Consider whether [sharding](/learn/system-design/core-concepts/sharding) is necessary. If yes, choose a shard key that matches your main access pattern.
+- Consider whether [sharding](/learn/system-design/01-foundations/sharding) is necessary. If yes, choose a shard key that matches your main access pattern.
 
 At the end, your whiteboard should look something like this:
 
@@ -272,7 +272,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: Caching](/learn/system-design/core-concepts/caching)
+[Next: Caching](/learn/system-design/01-foundations/caching)
 
 Your account is free and you can post anonymously if you choose.
 

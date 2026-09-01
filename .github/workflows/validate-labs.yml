@@ -1,0 +1,52 @@
+name: Validate labs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  static:
+    name: Static checks (all 150+ labs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # tools/validate_labs.py shells out to `docker compose config` to lint each
+      # lab's compose file. Docker is preinstalled on ubuntu-latest runners, so
+      # nothing extra is needed here -- no containers are actually started.
+      - name: Validate every lab
+        run: python tools/validate_labs.py
+
+  smoke:
+    name: Execute a sample of container-free labs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      # A representative slice that needs no containers, so CI stays under a few
+      # minutes. The full sweep (`python tools/run_labs.py --all`) brings up real
+      # infrastructure per lab and takes hours -- run that locally before a
+      # release, not on every push.
+      - name: Run sample labs end to end
+        run: |
+          python tools/run_labs.py \
+            01-foundations/bloom-filters \
+            02-distributed-primitives/vector-clocks \
+            05-microservices/circuit-breaker \
+            07-object-oriented-design/parking-lot \
+            --no-docker

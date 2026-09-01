@@ -207,9 +207,9 @@ They give an intuitive reading order (foundations → primitives → tech → pa
 |---|---|
 | `core-concepts/*` | `01-foundations/*` (same subfolders) |
 | `deep-dives/api-gateway/` | `05-microservices/api-gateway/` |
-| `deep-dives/postgres|cassandra|dynamodb|redis|elasticsearch|time-series-databases|vector-databases/` | `03-technologies/databases/<same>/` |
-| `deep-dives/kafka/` | `03-technologies/messaging/kafka/` |
-| `deep-dives/zookeeper/` | `03-technologies/coordination/zookeeper/` |
+| `03-technologies/databases/postgres|cassandra|dynamodb|redis|elasticsearch|time-series-databases|vector-databases/` | `03-technologies/databases/<same>/` |
+| `03-technologies/messaging/kafka/` | `03-technologies/messaging/kafka/` |
+| `03-technologies/coordination/zookeeper/` | `03-technologies/coordination/zookeeper/` |
 | `patterns/*` | `04-patterns/*` (same subfolders) |
 | `enterprise-patterns/long-running-jobs-temporal/` | `03-technologies/workflow-engines/temporal/` |
 | `enterprise-patterns/{bcdr,gdpr-paired-regions,privacy-review,security-review,azure-authentication}/` | `08-enterprise/<same>/` |

@@ -31,7 +31,7 @@ What follows are some common patterns that you can use to build systems. These p
 
 In many systems, you'll need to be able to make updates to the user in real-time. For synchronous APIs, this is as simple as returning a response once the request is completed. For other systems like chat applications, notifications, or live dashboards, you'll need to be able to push updates to the user as they happen.
 
-There are a lot of decisions to make when implementing realtime updates. First, you'll need to choose a protocol. Simple HTTP polling is the simplest option, but it's not the most efficient. Server-sent events (SSE) and websockets are purpose-built for realtime updates, but the infrastructure can be tricky to get right. Read our [Networking Essentials](/learn/system-design/core-concepts/networking-essentials) core concept for a deep dive on the protocol choice. We generally recommend starting with HTTP polling until it no longer serves your needs. Once you're there, you can consider SSE or websockets.
+There are a lot of decisions to make when implementing realtime updates. First, you'll need to choose a protocol. Simple HTTP polling is the simplest option, but it's not the most efficient. Server-sent events (SSE) and websockets are purpose-built for realtime updates, but the infrastructure can be tricky to get right. Read our [Networking Essentials](/learn/system-design/01-foundations/networking-essentials) core concept for a deep dive on the protocol choice. We generally recommend starting with HTTP polling until it no longer serves your needs. Once you're there, you can consider SSE or websockets.
 
 For the server side of realtime updates, you again have more options! Pub/Sub services are a common way to decouple the publisher and subscriber (used in our [Whatsapp](/learn/system-design/problem-breakdowns/whatsapp) breakdown), while stateful servers in a consistent hash ring or other configuration can be used for situations where processing is heavier (used in our [Google Docs](/learn/system-design/problem-breakdowns/google-docs) breakdown).
 
@@ -83,15 +83,15 @@ Learn about indexing strategies, read replicas, and cache invalidation patterns 
 
 ## Scaling Writes
 
-As your application grows from hundreds to millions of writes per second, individual database servers and storage systems hit hard limits. The Scaling Writes pattern addresses write bottlenecks through [sharding](/learn/system-design/core-concepts/sharding), batching, and intelligent load management.
+As your application grows from hundreds to millions of writes per second, individual database servers and storage systems hit hard limits. The Scaling Writes pattern addresses write bottlenecks through [sharding](/learn/system-design/01-foundations/sharding), batching, and intelligent load management.
 
-The core strategies are horizontal [sharding](/learn/system-design/core-concepts/sharding) (distributing data across multiple servers), vertical partitioning (separating different types of data), and handling write bursts through queues and load shedding. Key considerations include selecting good partition keys that distribute load evenly while keeping related data together.
+The core strategies are horizontal [sharding](/learn/system-design/01-foundations/sharding) (distributing data across multiple servers), vertical partitioning (separating different types of data), and handling write bursts through queues and load shedding. Key considerations include selecting good partition keys that distribute load evenly while keeping related data together.
 
 For burst handling, you can use write queues to buffer temporary spikes or implement load shedding to prioritize important writes during overload. Batching techniques help reduce per-operation overhead by grouping multiple writes together.
 
 Good and Bad Partition Keys
 
-Read our comprehensive guide to [sharding](/learn/system-design/core-concepts/sharding), partitioning, and handling write bursts in our [Scaling Writes](/learn/system-design/patterns/scaling-writes) Pattern.
+Read our comprehensive guide to [sharding](/learn/system-design/01-foundations/sharding), partitioning, and handling write bursts in our [Scaling Writes](/learn/system-design/patterns/scaling-writes) Pattern.
 
 ## Handling Large Blobs
 

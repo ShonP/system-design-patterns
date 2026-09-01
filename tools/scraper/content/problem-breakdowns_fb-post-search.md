@@ -204,7 +204,7 @@ Some candidates might see the problem here and think that they can solve this vi
 
 ##### Approach
 
-This is a canonical use case for an [Inverted Index](/learn/system-design/deep-dives/elasticsearch#inverted-index). You can read more about [inverted indices](/learn/system-design/deep-dives/elasticsearch#inverted-index) in the linked Deep Dive for Elasticsearch, but the most important idea behind an inverted index is that we can create a dictionary which maps keywords to the documents that contain them. In this case, we'll create a map from keywords to posts!
+This is a canonical use case for an [Inverted Index](/learn/system-design/03-technologies/databases/elasticsearch#inverted-index). You can read more about [inverted indices](/learn/system-design/03-technologies/databases/elasticsearch#inverted-index) in the linked Deep Dive for Elasticsearch, but the most important idea behind an inverted index is that we can create a dictionary which maps keywords to the documents that contain them. In this case, we'll create a map from keywords to posts!
 
 Inverted Index Illustration
 
@@ -251,7 +251,7 @@ A different approach would be to have two separate indexes: one sorted by the cr
 
 For the creation index keys, we can use a standard Redis list. We're always going to appending to this list and our queries will only be taking from the last elements.
 
-For the likes index, each key can use a [Redis sorted set](/learn/system-design/deep-dives/redis#redis-for-leaderboards). The sorted set allows us to keep a list of items ordered by a score in the same way that a priority queue or sorted list might work, with the same time complexity of insertions and queries.
+For the likes index, each key can use a [Redis sorted set](/learn/system-design/03-technologies/databases/redis#redis-for-leaderboards). The sorted set allows us to keep a list of items ordered by a score in the same way that a priority queue or sorted list might work, with the same time complexity of insertions and queries.
 
 When a new post is created, we'll add it to both indexes for every keyword it contains. When a like event happens, we'll update the score in our sorted set for the likes index.
 

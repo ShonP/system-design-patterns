@@ -163,7 +163,7 @@ For keeping track of our all-time top K videos, we need to establish some counte
 
 Rather than building a system which accepts a "view" API call, we're going to assume there exists a Kafka stream of view events from which we can consume. Basically: some other system in YouTube is responsible for showing videos to users and when they do they record it to this topic.
 
-This is a reasonable assumption for this system and allows us to skip a lot of boilerplate elements that we might otherwise need to add to our diagram, so we can spend more time on the good stuff! We'll assume this ViewEvent topic is partitioned by video ID and we'll start with a simple consumer service which pulls these view events and updates a [Postgres database](/learn/system-design/deep-dives/postgres) with the results.
+This is a reasonable assumption for this system and allows us to skip a lot of boilerplate elements that we might otherwise need to add to our diagram, so we can spend more time on the good stuff! We'll assume this ViewEvent topic is partitioned by video ID and we'll start with a simple consumer service which pulls these view events and updates a [Postgres database](/learn/system-design/03-technologies/databases/postgres) with the results.
 
 So:
 
@@ -273,7 +273,7 @@ The calculation for our throughput is simple:
 `70B views/day / (100k seconds/day) = 700k tps`
 ```
 
-Woo, that's a lot. While [modern RDMSs can handle an impressive 10k+ writes per second per node under the right circumstances](/learn/system-design/deep-dives/numbers-to-know#databases), we're still well beyond that.
+Woo, that's a lot. While [modern RDMSs can handle an impressive 10k+ writes per second per node under the right circumstances](/learn/system-design/01-foundations/numbers-to-know#databases), we're still well beyond that.
 
 While we're here, it's probably useful for us to figure out how much storage we're going to need:
 

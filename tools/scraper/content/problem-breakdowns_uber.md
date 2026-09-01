@@ -282,7 +282,7 @@ Managing the high volume of location updates from drivers and performing efficie
 
 - **Query Efficiency**: Without any optimizations, to query a table based on lat/long we would need to perform a full table scan, calculating the distance between each driver's location and the rider's location. This would be extremely inefficient, especially with millions of drivers. Even with indexing on lat/long columns, traditional B-tree indexes are not well-suited for multi-dimensional data like geographical coordinates, leading to suboptimal query performance for proximity searches. This is essentially a non-starter.
 
-For DynamoDB in particular, 2M writes a second of 100 bytes at on-demand pricing ($1.25 per million WRUs) would cost you over $200k a day. Learn more about DynamoDB and its limitations [here](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb)
+For DynamoDB in particular, 2M writes a second of 100 bytes at on-demand pricing ($1.25 per million WRUs) would cost you over $200k a day. Learn more about DynamoDB and its limitations [here](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb)
 
 So, what can we do to address these issues?
 
@@ -307,7 +307,7 @@ The interval between batch writes introduces a delay, which means the location d
 ### 
 
 Approach
-We can address all the limitation of the previous solutions by using an in-memory data store like [Redis](https://www.hellointerview.com/learn/system-design/deep-dives/redis), which supports geospatial data types and commands. This allows us to handle real-time driver location updates and proximity searches with high throughput and low latency while minimizing storage costs with automatic data expiration.
+We can address all the limitation of the previous solutions by using an in-memory data store like [Redis](https://www.hellointerview.com/learn/system-design/03-technologies/databases/redis), which supports geospatial data types and commands. This allows us to handle real-time driver location updates and proximity searches with high throughput and low latency while minimizing storage costs with automatic data expiration.
 
 Redis is an in-memory data store that supports geospatial data types and commands. It uses [geohashing](https://www.pubnub.com/guides/what-is-geohashing/) to encode latitude and longitude coordinates into a 52-bit integer score within a sorted set, where each member (e.g., driverId) is associated with its geohash score. This allows for efficient storage and querying of geospatial data.
 
@@ -392,7 +392,7 @@ Additionally, if a Ride Matching Service goes down, any ride requests that were 
 Approach
 To address this issue, we can introduce a [queueing system](https://www.hellointerview.com/learn/system-design/in-a-hurry/key-technologies#queue) with dynamic scaling. When a ride request comes in, it is added to the queue. The Ride Matching Service then processes requests from the queue in a first-come, first-served manner. If the queue grows too large, the system scales horizontally by adding more instances of the Ride Matching Service to handle the increased load. This allows us to scale the system dynamically based on demand, ensuring that no requests are dropped. We can also partition the queues based on geographic regions to further improve efficiency.
 
-We could use a distributed message queue system like [Kafka](https://www.hellointerview.com/learn/system-design/deep-dives/kafka), which allows us to commit the offset of the message in the queue only after we have successfully found a match. This way, if the Ride Matching Service goes down, the match request would still be in the queue, and a new instance of the service would pick it up. This approach ensures that no ride requests are lost due to service failures and provides fault tolerance to our system.
+We could use a distributed message queue system like [Kafka](https://www.hellointerview.com/learn/system-design/03-technologies/messaging/kafka), which allows us to commit the offset of the message in the queue only after we have successfully found a match. This way, if the Ride Matching Service goes down, the match request would still be in the queue, and a new instance of the service would pick it up. This approach ensures that no ride requests are lost due to service failures and provides fault tolerance to our system.
 Challenges
 The main challenge with this approach is the complexity of managing a queueing system. We need to ensure that the queue is scalable, fault-tolerant, and highly available. We can address this by using a managed queueing service like Amazon SQS, Amazon MSK (Managed Streaming for Apache Kafka), or Confluent Cloud, which provide these capabilities out of the box. This allows us to focus on the business logic of the system without worrying about the underlying infrastructure.
 
@@ -486,7 +486,7 @@ Ok, that was a lot. You may be thinking, "how much of that is actually required 
 
 **Depth of Expertise**: As a senior candidate, expectations shift towards more in-depth knowledge — about 60% breadth and 40% depth. This means you should be able to go into technical details in areas where you have hands-on experience. It's crucial that you demonstrate a deep understanding of key concepts and technologies relevant to the task at hand.
 
-**Advanced System Design**: You should be familiar with advanced system design principles. For example, knowing how to use a search-optimized data store like [Elasticsearch](/learn/system-design/deep-dives/elasticsearch) for event searching is essential. You're also expected to understand the use of a distributed cache or similar for locking drivers and to discuss detailed scaling strategies (it's ok if this took some probing/hints from the interviewer), including sharding and replication. Your ability to navigate these advanced topics with confidence and clarity is key.
+**Advanced System Design**: You should be familiar with advanced system design principles. For example, knowing how to use a search-optimized data store like [Elasticsearch](/learn/system-design/03-technologies/databases/elasticsearch) for event searching is essential. You're also expected to understand the use of a distributed cache or similar for locking drivers and to discuss detailed scaling strategies (it's ok if this took some probing/hints from the interviewer), including sharding and replication. Your ability to navigate these advanced topics with confidence and clarity is key.
 
 **Articulating Architectural Decisions**: You should be able to clearly articulate the pros and cons of different architectural choices, especially how they impact scalability, performance, and maintainability. You justify your decisions and explain the trade-offs involved in your design choices.
 

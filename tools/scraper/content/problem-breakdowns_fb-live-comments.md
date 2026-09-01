@@ -315,7 +315,7 @@ Since having a channel per live video would consume a lot resources (and may be 
 
 But there's still a problem. With round-robin load balancing, a server could end up with viewers subscribed to many different streams, forcing it to subscribe to many channels and replicating the inefficiency we tried to avoid.
 
-The solution is intelligent routing. A Layer 7 load balancer can use [consistent hashing](/learn/system-design/core-concepts/consistent-hashing) based on the liveVideoId to route viewers of the same video to the same server. By inspecting the request path or headers, NGINX or Envoy can ensure related viewers stay together. Alternatively, we can store a dynamic mapping of liveVideoId to server in a coordination service like [Zookeeper](/learn/system-design/deep-dives/zookeeper), giving us more flexibility at the cost of operational complexity.
+The solution is intelligent routing. A Layer 7 load balancer can use [consistent hashing](/learn/system-design/core-concepts/consistent-hashing) based on the liveVideoId to route viewers of the same video to the same server. By inspecting the request path or headers, NGINX or Envoy can ensure related viewers stay together. Alternatively, we can store a dynamic mapping of liveVideoId to server in a coordination service like [Zookeeper](/learn/system-design/03-technologies/coordination/zookeeper), giving us more flexibility at the cost of operational complexity.
 Challenges
 The main challenge is managing the coordination between load balancing and pub/sub subscriptions. When a server's viewer composition changes, it needs to update its subscriptions accordingly. And when servers scale up or down, the routing mappings need to stay in sync.
 

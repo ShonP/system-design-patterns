@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/core-concepts/api-design
+source: https://www.hellointerview.com/learn/system-design/01-foundations/api-design
 title: "API Design for System Design Interviews"
 category: core-concepts
 scraped_at: 2026-03-31T10:52:43.504Z
@@ -45,7 +45,7 @@ In an interview, you'll typically choose between three main API protocols:
 
 - 
 
-**RPC (Remote Procedure Call)** - RPC protocols like gRPC use binary serialization and HTTP/2 for efficient communication between services. While REST treats everything as resources, RPC lets you think in terms of actions and procedures - when your user service needs to quickly validate permissions with your auth service, an RPC call like checkPermission(userId, resource) is more natural than trying to model this as a REST resource. If the interviewer specifically mentions microservices or internal APIs, consider RPC for those high-performance connections. Use RPC when performance is critical (see [Networking Essentials](/learn/system-design/core-concepts/networking-essentials) for deeper protocol details).
+**RPC (Remote Procedure Call)** - RPC protocols like gRPC use binary serialization and HTTP/2 for efficient communication between services. While REST treats everything as resources, RPC lets you think in terms of actions and procedures - when your user service needs to quickly validate permissions with your auth service, an RPC call like checkPermission(userId, resource) is more natural than trying to model this as a REST resource. If the interviewer specifically mentions microservices or internal APIs, consider RPC for those high-performance connections. Use RPC when performance is critical (see [Networking Essentials](/learn/system-design/01-foundations/networking-essentials) for deeper protocol details).
 
 Default to REST unless you have a specific reason not to. It's well-understood, has great tooling, and works for 90% of use cases. If you're unsure, just say "I'll use REST APIs" and move on.
 
@@ -430,7 +430,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: Data Modeling](/learn/system-design/core-concepts/data-modeling)
+[Next: Data Modeling](/learn/system-design/01-foundations/data-modeling)
 
 Your account is free and you can post anonymously if you choose.
 

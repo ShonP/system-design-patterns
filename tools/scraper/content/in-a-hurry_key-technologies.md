@@ -25,7 +25,7 @@ Overall Structure
 
 In this section, we're going to walk through the key categories of technologies relevant to solving 90% of system design problems, together with some discussion of the possible options for each. You're generally free to choose which technology you want to use in each category, but we recommend you have at least one.
 
-Keep in mind that the amount of depth your interviewer is likely to probe is [proportional to the level you're interviewing at](/blog/the-system-design-interview-what-is-expected-at-each-level). A mid-level candidate who can roughly describe [ElasticSearch](/learn/system-design/deep-dives/elasticsearch) as a search index is likely to be fine, but a senior candidate who can't describe the inverted index or reason about its scaling is likely to be a yellow flag. In either case, focus on breadth before depth!
+Keep in mind that the amount of depth your interviewer is likely to probe is [proportional to the level you're interviewing at](/blog/the-system-design-interview-what-is-expected-at-each-level). A mid-level candidate who can roughly describe [ElasticSearch](/learn/system-design/03-technologies/databases/elasticsearch) as a search index is likely to be fine, but a senior candidate who can't describe the inverted index or reason about its scaling is likely to be a yellow flag. In either case, focus on breadth before depth!
 
 ## Core Database
 
@@ -55,7 +55,7 @@ Beyond simply storing data, relational databases come equipped with several feat
 
 ##### What are the most common relational databases?
 
-The most common relational databases are [Postgres](https://www.postgresql.org/) and [MySQL](https://www.mysql.com/). If you don't already have a favorite, we recommend you pick Postgres and we have a [great deep-dive to help you with the details](/learn/system-design/deep-dives/postgres), but either one is fine.
+The most common relational databases are [Postgres](https://www.postgresql.org/) and [MySQL](https://www.mysql.com/). If you don't already have a favorite, we recommend you pick Postgres and we have a [great deep-dive to help you with the details](/learn/system-design/03-technologies/databases/postgres), but either one is fine.
 
 ### NoSQL Databases
 
@@ -85,7 +85,7 @@ The places where NoSQL databases excel are not necessarily places where relation
 
 ##### What are the most common NoSQL databases?
 
-The most common NoSQL databases are [DynamoDB](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb), [Cassandra](https://www.hellointerview.com/learn/system-design/deep-dives/cassandra), and [MongoDB](https://www.mongodb.com/). DynamoDB is one of our favorites due to the breadth of features and how widely accepted it is, you can read our [DynamoDB deep-dive](/learn/system-design/deep-dives/dynamodb) to learn more. Cassandra is a good choice for write-heavy workloads due to its append-only storage model, but comes with some tradeoffs in functionality. We have a [Cassandra deep dive](/learn/system-design/deep-dives/cassandra) to help you dig in.
+The most common NoSQL databases are [DynamoDB](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb), [Cassandra](https://www.hellointerview.com/learn/system-design/03-technologies/databases/cassandra), and [MongoDB](https://www.mongodb.com/). DynamoDB is one of our favorites due to the breadth of features and how widely accepted it is, you can read our [DynamoDB deep-dive](/learn/system-design/03-technologies/databases/dynamodb) to learn more. Cassandra is a good choice for write-heavy workloads due to its append-only storage model, but comes with some tradeoffs in functionality. We have a [Cassandra deep dive](/learn/system-design/03-technologies/databases/cassandra) to help you dig in.
 
 ## Blob Storage
 
@@ -157,7 +157,7 @@ Sometimes you're tasked with implementing full-text search as a feature of your 
 
 This query is slow and inefficient, and it doesn't scale well because it requires a full table scan. That means the database has to grab each record and test it against your predicate rather than relying on an index or lookup. Slow!
 
-Search optimized databases, on the other hand, are specifically designed to handle full-text search. They use techniques like indexing, tokenization, and stemming to make search queries fast and efficient. In short, they work by building what are called [inverted indexes](/learn/system-design/deep-dives/elasticsearch#lucene-segment-features). Inverted indexes are a data structure that maps from words to the documents that contain them. This allows you to quickly find documents that contain a given word. A simple example of an inverted index might look like this:
+Search optimized databases, on the other hand, are specifically designed to handle full-text search. They use techniques like indexing, tokenization, and stemming to make search queries fast and efficient. In short, they work by building what are called [inverted indexes](/learn/system-design/03-technologies/databases/elasticsearch#lucene-segment-features). Inverted indexes are a data structure that maps from words to the documents that contain them. This allows you to quickly find documents that contain a given word. A simple example of an inverted index might look like this:
 
 ```
 `{
@@ -185,9 +185,9 @@ Examples of search optimized databases are straightforward, consider an applicat
 
 ##### Examples of search optimized databases
 
-The clear leader in this space is [Elasticsearch](https://www.elastic.co/elasticsearch/). You can learn more in our [Elasticsearch deep dive](/learn/system-design/deep-dives/elasticsearch), but in short: Elasticsearch is a distributed, RESTful search and analytics engine that is built on top of Apache Lucene. It is designed to be fast, scalable, and easy to use, and is the most popular search optimized database and is used by companies like Netflix, Uber, and Yelp.
+The clear leader in this space is [Elasticsearch](https://www.elastic.co/elasticsearch/). You can learn more in our [Elasticsearch deep dive](/learn/system-design/03-technologies/databases/elasticsearch), but in short: Elasticsearch is a distributed, RESTful search and analytics engine that is built on top of Apache Lucene. It is designed to be fast, scalable, and easy to use, and is the most popular search optimized database and is used by companies like Netflix, Uber, and Yelp.
 
-Other options for search optimized databases include using full-text search capabilities of your database. Postgres has [GIN indexes which support full-text search](/learn/system-design/deep-dives/postgres#beyond-basic-indexes) and Redis has a (in my opinion, quite immature and bad) [full-text search capability](https://redis.io/docs/latest/develop/interact/search-and-query/). Using your existing database can be a good idea to reduce the footprint of your design, but knowing about these features are essential!
+Other options for search optimized databases include using full-text search capabilities of your database. Postgres has [GIN indexes which support full-text search](/learn/system-design/03-technologies/databases/postgres#beyond-basic-indexes) and Redis has a (in my opinion, quite immature and bad) [full-text search capability](https://redis.io/docs/latest/develop/interact/search-and-query/). Using your existing database can be a good idea to reduce the footprint of your design, but knowing about these features are essential!
 
 ## API Gateway
 
@@ -243,7 +243,7 @@ Queue Buffer
 
 ##### Things you should know about queues for your interview
 
-- **Message Ordering**: Most queues are FIFO (first in, first out), meaning that messages are processed in the order they were received. However, some queues (like [Kafka](https://www.hellointerview.com/learn/system-design/deep-dives/kafka)) allow for more complex ordering guarantees, such as ordering based on a specified priority or time.
+- **Message Ordering**: Most queues are FIFO (first in, first out), meaning that messages are processed in the order they were received. However, some queues (like [Kafka](https://www.hellointerview.com/learn/system-design/03-technologies/messaging/kafka)) allow for more complex ordering guarantees, such as ordering based on a specified priority or time.
 
 - **Retry Mechanisms**: Many queues have built-in retry mechanisms that attempt to redeliver a message a certain number of times before considering it a failure. You can configure retries, including the delay between attempts, and the maximum number of attempts.
 
@@ -255,7 +255,7 @@ Queue Buffer
 
 ##### What are the most common queueing technologies?
 
-The most common queueing technologies are [Kafka](https://kafka.apache.org/) and [SQS](https://aws.amazon.com/sqs/). Kafka is a distributed streaming platform that can be used as a queue ([we have a deep-dive which goes into significant detail about how to use it](/learn/system-design/deep-dives/kafka)), while SQS is a fully managed queue service provided by AWS.
+The most common queueing technologies are [Kafka](https://kafka.apache.org/) and [SQS](https://aws.amazon.com/sqs/). Kafka is a distributed streaming platform that can be used as a queue ([we have a deep-dive which goes into significant detail about how to use it](/learn/system-design/03-technologies/messaging/kafka)), while SQS is a fully managed queue service provided by AWS.
 
 ## Streams / Event Sourcing
 
@@ -285,7 +285,7 @@ In either case, you'll likely want to use a stream. Unlike message queues, strea
 
 ##### What are the most common streaming technologies?
 
-The most common streaming technologies are [Kafka](https://kafka.apache.org/), [Flink](https://flink.apache.org/), and [Kinesis](https://aws.amazon.com/kinesis/). Our [deep-dive on Kafka](/learn/system-design/deep-dives/kafka) goes into significant detail about how it can be used in system design questions.
+The most common streaming technologies are [Kafka](https://kafka.apache.org/), [Flink](https://flink.apache.org/), and [Kinesis](https://aws.amazon.com/kinesis/). Our [deep-dive on Kafka](/learn/system-design/03-technologies/messaging/kafka) goes into significant detail about how it can be used in system design questions.
 
 ## Distributed Lock
 
@@ -293,7 +293,7 @@ The most common streaming technologies are [Kafka](https://kafka.apache.org/), [
 
 When you're dealing with online systems like Ticketmaster, you might need a way to lock a resource - like a concert ticket - for a short time (~10 minutes in this case). This is so while one user is in the middle of buying a ticket, no one else can grab it. Traditional databases with ACID properties use transaction locks to keep data consistent, which is great for ensuring that while one user is updating a record, no one else can update it, but they're not designed for longer-term locking. This is where distributed locks come in handy.
 
-Distributed locks are perfect for situations where you need to lock something across different systems or processes for a reasonable period of time. They're often implemented using a distributed key-value store like Redis or [ZooKeeper](/learn/system-design/deep-dives/zookeeper). The basic idea is that you can use a key-value store to store a lock and then use the atomicity of the key-value store to ensure that only one process can acquire the lock at a time. For example, if you have a Redis instance with a key ticket-123 and you want to lock it, you can set the value of ticket-123 to locked. If another process tries to set the value of ticket-123 to locked, it will fail because the value is already set to locked. Once the first process is done with the lock, it can set the value of ticket-123 to unlocked and another process can acquire the lock.
+Distributed locks are perfect for situations where you need to lock something across different systems or processes for a reasonable period of time. They're often implemented using a distributed key-value store like Redis or [ZooKeeper](/learn/system-design/03-technologies/coordination/zookeeper). The basic idea is that you can use a key-value store to store a lock and then use the atomicity of the key-value store to ensure that only one process can acquire the lock at a time. For example, if you have a Redis instance with a key ticket-123 and you want to lock it, you can set the value of ticket-123 to locked. If another process tries to set the value of ticket-123 to locked, it will fail because the value is already set to locked. Once the first process is done with the lock, it can set the value of ticket-123 to unlocked and another process can acquire the lock.
 
 Another handy feature of distributed locks is that they can be set to expire after a certain amount of time. This is great for ensuring that locks don't get stuck in a locked state if a process crashes or is killed. For example, if you set the value of ticket-123 to locked and then the process crashes, the lock will expire after a certain amount of time (like 10 minutes) and another process can acquire the lock at that point.
 
@@ -361,7 +361,7 @@ Don't forget to be explicit about what data you are storing in the cache, includ
 
 ##### What are the most common distributed cache technologies?
 
-The two most common in-memory caches are [Redis](https://www.hellointerview.com/learn/system-design/deep-dives/redis) and [Memcached](https://memcached.org/). Redis is a key-value store that supports many different data structures, including strings, hashes, lists, sets, sorted sets, bitmaps, and hyperloglogs. Memcached is a simple key-value store that supports strings and binary objects.
+The two most common in-memory caches are [Redis](https://www.hellointerview.com/learn/system-design/03-technologies/databases/redis) and [Memcached](https://memcached.org/). Redis is a key-value store that supports many different data structures, including strings, hashes, lists, sets, sorted sets, bitmaps, and hyperloglogs. Memcached is a simple key-value store that supports strings and binary objects.
 
 ## CDN
 

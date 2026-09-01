@@ -43,7 +43,7 @@ Imagine you're designing a ticketing system like TicketMaster. Initially, your s
 
 Client Server Database
 
-But success brings challenges. As your platform grows popular and hosts more events, a single database can no longer handle the load. You need to distribute your data across multiple databases – a process called [sharding](/learn/system-design/core-concepts/sharding).
+But success brings challenges. As your platform grows popular and hosts more events, a single database can no longer handle the load. You need to distribute your data across multiple databases – a process called [sharding](/learn/system-design/01-foundations/sharding).
 
 Sharding
 
@@ -195,9 +195,9 @@ While our example focused on scaling a database, note that consistent hashing ap
 
 We see consistent hashing (or variations of it) used in many heavily relied on, scaled, systems. For example:
 
-- [Apache Cassandra](https://www.hellointerview.com/learn/system-design/deep-dives/cassandra): Uses consistent hashing to distribute data across the ring
+- [Apache Cassandra](https://www.hellointerview.com/learn/system-design/03-technologies/databases/cassandra): Uses consistent hashing to distribute data across the ring
 
-- [Amazon's DynamoDB](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb): Uses consistent hashing under the hood for partition placement
+- [Amazon's DynamoDB](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb): Uses consistent hashing under the hood for partition placement
 
 - [Content Delivery Networks (CDNs)](https://en.wikipedia.org/wiki/Content_delivery_network): Use consistent hashing to determine which edge server should cache specific content
 
@@ -205,7 +205,7 @@ Not every distributed system uses consistent hashing. Redis Cluster, for example
 
 ## When to use Consistent Hashing in an Interview
 
-Most modern distributed systems handle [sharding](/learn/system-design/core-concepts/sharding) and data distribution for you. When designing a system using DynamoDB, Cassandra, etc you typically just need to mention that these systems use consistent hashing (or a form of it) under the hood to handle scaling.
+Most modern distributed systems handle [sharding](/learn/system-design/01-foundations/sharding) and data distribution for you. When designing a system using DynamoDB, Cassandra, etc you typically just need to mention that these systems use consistent hashing (or a form of it) under the hood to handle scaling.
 
 However, consistent hashing becomes a crucial topic in infrastructure-focused interviews where you're asked to design distributed systems from scratch. Here are the common scenarios:
 
@@ -217,7 +217,7 @@ However, consistent hashing becomes a crucial topic in infrastructure-focused in
 
 In these deep infrastructure interviews, you should be prepared to explain several key concepts:
 
-- Why consistent hashing beats simple modulo-based [sharding](/learn/system-design/core-concepts/sharding) for data distribution
+- Why consistent hashing beats simple modulo-based [sharding](/learn/system-design/01-foundations/sharding) for data distribution
 
 - How virtual nodes improve load balancing across the cluster
 
@@ -244,7 +244,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: CAP Theorem](/learn/system-design/core-concepts/cap-theorem)
+[Next: CAP Theorem](/learn/system-design/01-foundations/cap-theorem)
 
 Your account is free and you can post anonymously if you choose.
 

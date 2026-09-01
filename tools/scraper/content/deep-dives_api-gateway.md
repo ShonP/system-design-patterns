@@ -296,7 +296,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: Cassandra](/learn/system-design/deep-dives/cassandra)
+[Next: Cassandra](/learn/system-design/03-technologies/databases/cassandra)
 
 Your account is free and you can post anonymously if you choose.
 

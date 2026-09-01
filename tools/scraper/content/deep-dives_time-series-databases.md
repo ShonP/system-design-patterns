@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/deep-dives/time-series-databases
+source: https://www.hellointerview.com/learn/system-design/03-technologies/databases/time-series-databases
 title: "Time Series Databases for System Design Interviews"
 category: deep-dives
 scraped_at: 2026-03-31T10:53:11.613Z
@@ -92,7 +92,7 @@ But wait - if we only append, how do organize the data for reading? This is wher
 
 ### LSM Trees (Log-Structured Merge Trees)
 
-LSM trees are the secret sauce behind many high-write-throughput databases, including InfluxDB, Cassandra, and LevelDB. You may recall this idea from our [Cassandra deep dive](/learn/system-design/deep-dives/cassandra) or [DB Indexing core concept](/learn/system-design/core-concepts/db-indexing) - the core idea is to transform expensive random writes into cheap sequential writes, then periodically reorganize the data in the background to make reads more efficient.
+LSM trees are the secret sauce behind many high-write-throughput databases, including InfluxDB, Cassandra, and LevelDB. You may recall this idea from our [Cassandra deep dive](/learn/system-design/03-technologies/databases/cassandra) or [DB Indexing core concept](/learn/system-design/core-concepts/db-indexing) - the core idea is to transform expensive random writes into cheap sequential writes, then periodically reorganize the data in the background to make reads more efficient.
 
 Here's how it works:
 
@@ -113,7 +113,7 @@ The beauty of this approach is that writes never block on reads. The memtable ha
 
 LSM trees aren't free. Read performance can suffer because you might need to check multiple SSTables to find a value. There's also write amplification - data gets rewritten multiple times during compaction. So reach for LSM trees when you have a high-write workload **and** you're willing to trade some read performance for write performance.
 
-Ok with append-only storage and LSM trees, we're starting to look like [Cassandra](/learn/system-design/deep-dives/cassandra). Let's add a few more pieces to the puzzle.
+Ok with append-only storage and LSM trees, we're starting to look like [Cassandra](/learn/system-design/03-technologies/databases/cassandra). Let's add a few more pieces to the puzzle.
 
 ### Delta Encoding and Compression
 
@@ -230,7 +230,7 @@ Downsampling and rollups frequently show up in interviews as a negotiation in re
 
 ### Block-Level Metadata
 
-Our last optimization is a twist on the query planning ideas we covered in our [Elasticsearch deep dive](/learn/system-design/deep-dives/elasticsearch). When scanning data files, time-series databases maintain metadata about each block's contents - particularly min/max timestamps and sometimes min/max values. This enables block pruning during queries.
+Our last optimization is a twist on the query planning ideas we covered in our [Elasticsearch deep dive](/learn/system-design/03-technologies/databases/elasticsearch). When scanning data files, time-series databases maintain metadata about each block's contents - particularly min/max timestamps and sometimes min/max values. This enables block pruning during queries.
 
 If a query asks for CPU usage above 10%, and a block's metadata shows it only contains data from 0-5%, the database skips that entire block without reading it. Combined with time-based partitioning (which already limits which partitions to check), this provides another layer of filtering that keeps queries fast even as data volumes grow.
 
@@ -395,7 +395,7 @@ In the data file, data for each series is stored together in compressed blocks. 
 
 Block 0 shows the full breakdown; the other blocks use a compact notation. Notice how each block stores ~13 bytes instead of 32 bytes - a 60% reduction just from these two techniques and this only becomes more significant as the data volume grows.
 
-The database also maintains an in-memory **tag index** that maps tag values to series. If this looks familiar, it's essentially an inverted index - the same data structure that powers [Elasticsearch](/learn/system-design/deep-dives/elasticsearch). Instead of mapping words to documents, we're mapping tag values to series.
+The database also maintains an in-memory **tag index** that maps tag values to series. If this looks familiar, it's essentially an inverted index - the same data structure that powers [Elasticsearch](/learn/system-design/03-technologies/databases/elasticsearch). Instead of mapping words to documents, we're mapping tag values to series.
 
 ```
 `Tag Index (in memory):

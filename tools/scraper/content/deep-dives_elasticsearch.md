@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/deep-dives/elasticsearch
+source: https://www.hellointerview.com/learn/system-design/03-technologies/databases/elasticsearch
 title: "Elasticsearch Deep Dive for System Design Interviews"
 category: deep-dives
 scraped_at: 2026-03-31T10:53:07.508Z
@@ -845,7 +845,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: Kafka](/learn/system-design/deep-dives/kafka)
+[Next: Kafka](/learn/system-design/03-technologies/messaging/kafka)
 
 Your account is free and you can post anonymously if you choose.
 

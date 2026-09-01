@@ -29,7 +29,7 @@ This is helpful for two reasons:
 
 Other system design materials are either ChatGPT spew or go to a level of depth that you'll never possibly cover in an interview (and might be a yellow flag if you do). We aimed to make 'System Design in a Hurry' dense, practical, and efficient.
 
-We've augmented System Design in a Hurry with premium content to help you go deeper into important topics and patterns, like how to handle [Realtime Updates](/learn/system-design/patterns/realtime-updates) in your applications, a deep-dive on [Vector Databases](/learn/system-design/deep-dives/vector-databases), a breakdown of [How to Design Instagram](/learn/system-design/problem-breakdowns/instagram), and more. We think it's a fantastic investment for your interviews but is in no way required for this course. You'll see these references denoted with a lock icon.
+We've augmented System Design in a Hurry with premium content to help you go deeper into important topics and patterns, like how to handle [Realtime Updates](/learn/system-design/patterns/realtime-updates) in your applications, a deep-dive on [Vector Databases](/learn/system-design/03-technologies/databases/vector-databases), a breakdown of [How to Design Instagram](/learn/system-design/problem-breakdowns/instagram), and more. We think it's a fantastic investment for your interviews but is in no way required for this course. You'll see these references denoted with a lock icon.
 
 Ready? Let's go.
 
@@ -115,7 +115,7 @@ The most common ways that candidates fail with this competency are:
 
 - Not recognizing common patterns and best practices.
 
-Hardware has not stood still over the last decade, but much system design material is still stuck in 2015. In our guide we'll carefully call out those places where outdated approaches are no longer applicable. You'll also learn [numbers to know](/learn/system-design/core-concepts/numbers-to-know) that will help you make better decisions.
+Hardware has not stood still over the last decade, but much system design material is still stuck in 2015. In our guide we'll carefully call out those places where outdated approaches are no longer applicable. You'll also learn [numbers to know](/learn/system-design/01-foundations/numbers-to-know) that will help you make better decisions.
 
 #### Communication and Collaboration
 

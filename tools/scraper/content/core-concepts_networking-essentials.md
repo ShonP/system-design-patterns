@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/core-concepts/networking-essentials
+source: https://www.hellointerview.com/learn/system-design/01-foundations/networking-essentials
 title: "Networking Essentials for System Design Interviews"
 category: core-concepts
 scraped_at: 2026-03-31T10:52:41.251Z
@@ -319,11 +319,11 @@ In REST, we want to think in terms of resources and the operations you can perfo
 
 ##### Where to Use It
 
-Overall REST is very flexible for a wide variety of use-cases and applications. [ElasticSearch](/learn/system-design/deep-dives/elasticsearch) uses it to manage documents, configure indexes, and more. Check out that deep dive if you want to see a great example of a RESTful API.
+Overall REST is very flexible for a wide variety of use-cases and applications. [ElasticSearch](/learn/system-design/03-technologies/databases/elasticsearch) uses it to manage documents, configure indexes, and more. Check out that deep dive if you want to see a great example of a RESTful API.
 
 REST is [not going to be the most performant solution](https://medium.com/@i.gorton/scaling-up-rest-versus-grpc-benchmark-tests-551f73ed88d4) for very high throughput services, and generally speaking JSON is a pretty inefficient format for serializing and deserializing data.
 
-That said, most applications aren't going to be bottlenecked by request serialization. Like TCP, **REST is where we'd suggest you default for your interviews**. It's well-understood and a good baseline for building scalable systems. You should reach for GraphQL, gRPC, SSE, or WebSockets if you have specific needs that REST can't meet. For practical REST API design patterns, see our [API Design](/learn/system-design/core-concepts/api-design) guide.
+That said, most applications aren't going to be bottlenecked by request serialization. Like TCP, **REST is where we'd suggest you default for your interviews**. It's well-understood and a good baseline for building scalable systems. You should reach for GraphQL, gRPC, SSE, or WebSockets if you have specific needs that REST can't meet. For practical REST API design patterns, see our [API Design](/learn/system-design/01-foundations/api-design) guide.
 
 ### GraphQL: Flexible Data Fetching
 
@@ -397,7 +397,7 @@ GraphQL is a great fit for use-cases where the frontend team needs to iterate qu
 
 For system design interviews specifically, the benefits of GraphQL are murky. In the interview you'll have a fixed set of requirements (not the moving targets of iterating on a mobile app or web frontend where GraphQL starts to shine). Additionally, the interviewer will frequently want to see how you optimize specific query patterns and while you can talk about custom resolvers — GraphQL is frequently just in the way.
 
-We recommend bringing up GraphQL in cases where the problem is clearly focused on flexibility (e.g. the interviewer tells us we need to be able to adapt our apps quickly to changing requirements) or when the requirements in the interview are deliberately uncertain. For more interview-focused GraphQL guidance, see our [API Design](/learn/system-design/core-concepts/api-design) article.
+We recommend bringing up GraphQL in cases where the problem is clearly focused on flexibility (e.g. the interviewer tells us we need to be able to adapt our apps quickly to changing requirements) or when the requirements in the interview are deliberately uncertain. For more interview-focused GraphQL guidance, see our [API Design](/learn/system-design/01-foundations/api-design) article.
 
 ### gRPC: Efficient Service Communication
 
@@ -593,7 +593,7 @@ For scaling, we have two options: bigger servers (vertical scaling) or more serv
 
 Vertical vs Horizontal Scaling
 
-My personal preference is to employ vertical scaling wherever possible. Modern hardware is incredibly powerful and the days of requiring thousands of tiny servers when a few larger ones can handle the load are over (read more about modern hardware capabilities in our [Numbers to Know](/learn/system-design/deep-dives/numbers-to-know) deep dive).
+My personal preference is to employ vertical scaling wherever possible. Modern hardware is incredibly powerful and the days of requiring thousands of tiny servers when a few larger ones can handle the load are over (read more about modern hardware capabilities in our [Numbers to Know](/learn/system-design/01-foundations/numbers-to-know) deep dive).
 
 That said, the reality for *interviews* is that **the most common pattern for scaling you'll see is horizontal scaling**: we're going to add more servers to handle the load. But just adding boxes to our whiteboard won't help if we don't tell our clients which server to talk to.
 
@@ -613,7 +613,7 @@ Client-side load balancing can be very fast and efficient. Since the client is m
 
 ##### Example: Redis Cluster
 
-A great example of this is Redis Cluster (read more in our [Redis deep dive](/learn/system-design/deep-dives/redis)). Redis cluster nodes maintain a gossip protocol between each other to share information about the cluster: which nodes are present, their status, etc. Every node knows about every other node!
+A great example of this is Redis Cluster (read more in our [Redis deep dive](/learn/system-design/03-technologies/databases/redis)). Redis cluster nodes maintain a gossip protocol between each other to share information about the cluster: which nodes are present, their status, etc. Every node knows about every other node!
 
 In order to connect to a Redis Cluster, the client will make a request to any of the nodes in the cluster and ask about both the nodes participating in the cluster and the shards of data they contain. When it comes time to read or write data, the client hashes the key to determine which shard to send the request to, then uses the locally retrieved node information to decide which node to talk to. If you send a request to the wrong node, Redis will helpfully send you a MOVED response to let you know you got the wrong node.
 
@@ -904,7 +904,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: API Design](/learn/system-design/core-concepts/api-design)
+[Next: API Design](/learn/system-design/01-foundations/api-design)
 
 Your account is free and you can post anonymously if you choose.
 

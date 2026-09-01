@@ -264,7 +264,7 @@ If we store the buckets in memory within each gateway instance, we're back to th
 
 For example, if Alice makes 50 requests that go to Gateway A and 50 requests that go to Gateway B, each gateway thinks Alice has only made 50 requests and allows them all. But globally, Alice has made 100 requests and should be rate limited. Our algorithm becomes useless without centralized state.
 
-We can use something like [Redis](/learn/system-design/deep-dives/redis). Redis is a fast, in-memory data store that all our gateway instances can access. Redis can become our central source of truth for all token bucket state. When any gateway needs to check or update a user's rate limit, it talks to Redis.
+We can use something like [Redis](/learn/system-design/03-technologies/databases/redis). Redis is a fast, in-memory data store that all our gateway instances can access. Redis can become our central source of truth for all token bucket state. When any gateway needs to check or update a user's rate limit, it talks to Redis.
 
 Here's exactly how the Token Bucket algorithm works with Redis:
 
@@ -482,7 +482,7 @@ The main downside is update delay. There's always a window between when you chan
 ### 
 
 Approach
-Use a push-based system where configuration changes are immediately sent to all API gateways. This is exactly what [ZooKeeper](/learn/system-design/deep-dives/zookeeper) was designed for - distributed configuration management with real-time notifications. ZooKeeper maintains configuration data and notifies all connected clients (your API gateways) immediately when any configuration changes. Other options include Redis pub/sub or custom configuration services that maintain persistent connections to gateways.
+Use a push-based system where configuration changes are immediately sent to all API gateways. This is exactly what [ZooKeeper](/learn/system-design/03-technologies/coordination/zookeeper) was designed for - distributed configuration management with real-time notifications. ZooKeeper maintains configuration data and notifies all connected clients (your API gateways) immediately when any configuration changes. Other options include Redis pub/sub or custom configuration services that maintain persistent connections to gateways.
 
 When an operator changes a rate limit rule, the configuration service immediately notifies all connected gateways, which update their rules within seconds.
 

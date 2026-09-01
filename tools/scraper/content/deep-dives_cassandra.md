@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/deep-dives/cassandra
+source: https://www.hellointerview.com/learn/system-design/03-technologies/databases/cassandra
 title: "Cassandra Deep Dive for System Design Interviews"
 category: deep-dives
 scraped_at: 2026-03-31T10:53:10.125Z
@@ -25,7 +25,7 @@ Watch the author walk through the problem step-by-step
 
 Databases are a fundamental and core aspect of system design, and one of the most versatile / popular databases to have in your toolbox is [Cassandra](https://cassandra.apache.org/_/index.html). Cassandra was originally built by Facebook to support its rapidly scaling inbox search feature. Since then, Cassandra has been adopted by [countless companies](https://cassandra.apache.org/_/case-studies.html) to rapidly scale data storage, throughput, and readback. From Discord (explored later in this post), to Netflix, to Apple, to Bloomberg, Cassandra is a NoSQL database that is here to stay, used by a wide array of firms for a large set of use-cases.
 
-Apache Cassandra is an open-source, distributed NoSQL database. It implements a partitioned wide-column storage model with eventually consistent semantics. It is a distributed database that runs in a cluster and can horizontally scale via commodity hardware. It combines elements of Dynamo (see our write-up on [DynamoDB](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb)) and [Bigtable](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf) to handle massive data footprints, query volume, and flexible storage requirements.
+Apache Cassandra is an open-source, distributed NoSQL database. It implements a partitioned wide-column storage model with eventually consistent semantics. It is a distributed database that runs in a cluster and can horizontally scale via commodity hardware. It combines elements of Dynamo (see our write-up on [DynamoDB](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb)) and [Bigtable](https://static.googleusercontent.com/media/research.google.com/en//archive/bigtable-osdi06.pdf) to handle massive data footprints, query volume, and flexible storage requirements.
 
 In this deep dive, we'll break down the features of Cassandra that make it attractive as a database, especially for system design. We'll discuss the most important internals of Cassandra to demystify how it provides said features. Finally, we'll discuss when and how to use Cassandra. Let's go!
 
@@ -103,7 +103,7 @@ CREATE TABLE t (a text, b text, c text, d text, PRIMARY KEY ((a), b, c));
 CREATE TABLE t (a text, b text, c text, d text, PRIMARY KEY (a, b, c));`
 ```
 
-The primary key concept and its subcomponents might remind you of DynamoDB's [primary key definition](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb#partition-key-and-sort-key). This concept is basically shared 1:1 between the 2 databases.
+The primary key concept and its subcomponents might remind you of DynamoDB's [primary key definition](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb#partition-key-and-sort-key). This concept is basically shared 1:1 between the 2 databases.
 
 ## Key Concepts
 
@@ -390,7 +390,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: DynamoDB](/learn/system-design/deep-dives/dynamodb)
+[Next: DynamoDB](/learn/system-design/03-technologies/databases/dynamodb)
 
 Your account is free and you can post anonymously if you choose.
 

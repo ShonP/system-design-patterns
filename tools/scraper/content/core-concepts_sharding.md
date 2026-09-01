@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/core-concepts/sharding
+source: https://www.hellointerview.com/learn/system-design/01-foundations/sharding
 title: "Sharding in System Design Interviews"
 category: core-concepts
 scraped_at: 2026-03-31T10:52:46.754Z
@@ -232,7 +232,7 @@ The TLDR is that most applications can be designed to avoid cross-shard transact
 
 I have some good news for you. You probably won't implement sharding from scratch. Most modern distributed databases handle sharding automatically.
 
-Common NoSQL databases like [Cassandra](/learn/system-design/deep-dives/cassandra), [DynamoDB](/learn/system-design/deep-dives/dynamodb), and [MongoDB](https://www.mongodb.com/) all let you specify a partition key and handle the rest, but they do not all use the same distribution mechanism:
+Common NoSQL databases like [Cassandra](/learn/system-design/03-technologies/databases/cassandra), [DynamoDB](/learn/system-design/03-technologies/databases/dynamodb), and [MongoDB](https://www.mongodb.com/) all let you specify a partition key and handle the rest, but they do not all use the same distribution mechanism:
 
 - Cassandra uses a partitioner (e.g., Murmur3Partitioner) with virtual nodes, which is a form of consistent hashing to map partition keys to token ranges on nodes.
 
@@ -272,7 +272,7 @@ The formula is simple:
 
 - Propose sharding
 
-You can use our [Numbers to Know](/learn/system-design/core-concepts/numbers-to-know) in order to get a good sense of when you may hit reasonable limits with a single database.
+You can use our [Numbers to Know](/learn/system-design/01-foundations/numbers-to-know) in order to get a good sense of when you may hit reasonable limits with a single database.
 
 By far the number one sharding mistake I see in interviews is candidates introducing sharding before they've proven it's necessary. Slow down, do the math, and make sure sharding is actually needed before you start explaining how you'd do it.
 

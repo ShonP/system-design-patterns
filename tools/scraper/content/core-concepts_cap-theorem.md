@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/core-concepts/cap-theorem
+source: https://www.hellointerview.com/learn/system-design/01-foundations/cap-theorem
 title: "CAP Theorem for System Design Interviews"
 category: core-concepts
 scraped_at: 2026-03-31T10:52:48.878Z
@@ -115,11 +115,11 @@ If you prioritize consistency, your design might include:
 
 - **Technology Choices**:
 
-Traditional RDBMSs ([PostgreSQL](https://www.hellointerview.com/learn/system-design/deep-dives/postgres), MySQL)
+Traditional RDBMSs ([PostgreSQL](https://www.hellointerview.com/learn/system-design/03-technologies/databases/postgres), MySQL)
 
 - Google Spanner
 
-- [DynamoDB](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb) (in strong consistency mode)
+- [DynamoDB](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb) (in strong consistency mode)
 
 On the other hand, if you prioritize availability, your design can include:
 
@@ -129,11 +129,11 @@ On the other hand, if you prioritize availability, your design can include:
 
 - **Technology Choices**:
 
-[Cassandra](https://www.hellointerview.com/learn/system-design/deep-dives/cassandra)
+[Cassandra](https://www.hellointerview.com/learn/system-design/03-technologies/databases/cassandra)
 
-- [DynamoDB](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb) (in multiple availability zone configuration)
+- [DynamoDB](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb) (in multiple availability zone configuration)
 
-- [Redis](https://www.hellointerview.com/learn/system-design/deep-dives/redis) clusters
+- [Redis](https://www.hellointerview.com/learn/system-design/03-technologies/databases/redis) clusters
 
 Most modern distributed databases offer configuration options for both consistency and availability. The key is understanding which to choose for your use case.
 

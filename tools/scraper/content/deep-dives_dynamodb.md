@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb
+source: https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb
 title: "DynamoDB Deep Dive for System Design Interviews"
 category: deep-dives
 scraped_at: 2026-03-31T10:53:10.795Z
@@ -422,7 +422,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: PostgreSQL](/learn/system-design/deep-dives/postgres)
+[Next: PostgreSQL](/learn/system-design/03-technologies/databases/postgres)
 
 Your account is free and you can post anonymously if you choose.
 

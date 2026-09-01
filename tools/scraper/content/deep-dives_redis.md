@@ -1,5 +1,5 @@
 ---
-source: https://www.hellointerview.com/learn/system-design/deep-dives/redis
+source: https://www.hellointerview.com/learn/system-design/03-technologies/databases/redis
 title: "Redis Deep Dive for System Design Interviews"
 category: deep-dives
 scraped_at: 2026-03-31T10:53:06.495Z
@@ -244,7 +244,7 @@ Take a quick 15 question quiz to test what you've learned.
 
 Mark as read
 
-[Next: Elasticsearch](/learn/system-design/deep-dives/elasticsearch)
+[Next: Elasticsearch](/learn/system-design/03-technologies/databases/elasticsearch)
 
 Your account is free and you can post anonymously if you choose.
 

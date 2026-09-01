@@ -27,7 +27,7 @@ Overall Structure
 
 This page provides a quick overview of each core concept with just enough context to understand what it is, why it matters, and when to reach for it. Each section links to a deeper article where you can learn the full details, common pitfalls, and interview-specific guidance. If you're short on time, this overview will get you functional knowledge. If you're serious about mastering system design, read the full articles.
 
-## [Networking Essentials](/learn/system-design/core-concepts/networking-essentials)
+## [Networking Essentials](/learn/system-design/01-foundations/networking-essentials)
 
 Networking is one of those topics where you can go incredibly deep, but for system design interviews you need to know the practical bits that come up when you're designing distributed systems. At a basic level, you need to understand how services talk to each other and what happens when those connections fail or get slow.
 
@@ -47,9 +47,9 @@ A common mistake is proposing WebSockets when HTTP with long polling or Server-S
 
 Geography and latency matter more than most candidates realize. A request from New York to London has a minimum latency of around 80ms just from the speed of light through fiber optic cables, before you even process anything. If your system needs low latency globally, you'll need regional deployments with data replicated or partitioned by geography. This is why CDNs exist - to serve static content from edge servers close to users.
 
-Learn the full details in our [Networking Essentials](/learn/system-design/core-concepts/networking-essentials) guide.
+Learn the full details in our [Networking Essentials](/learn/system-design/01-foundations/networking-essentials) guide.
 
-## [API Design](/learn/system-design/core-concepts/api-design)
+## [API Design](/learn/system-design/01-foundations/api-design)
 
 In almost every system design interview, you'll need to sketch out the APIs that clients use to interact with your system. The good news is that most interviewers don't care about perfect API design. They want to see that you can create reasonable endpoints and move on to the harder architectural problems. That said, sloppy API design can signal inexperience, so it's worth knowing the basics.
 
@@ -59,9 +59,9 @@ A common mistake is spending too much time designing APIs in interviews. You sho
 
 There are a few concepts worth mentioning when they come up. If you're returning large result sets, you'll need pagination. Cursor-based works better for real-time data where new items get added frequently, but offset-based is fine for most cases. For authentication, use JWT tokens for user sessions and API keys for service-to-service calls. And if your system could get hammered by bots or abuse, mention rate limiting. But don't go deep on any of these unless the interviewer specifically asks.
 
-Read our full [API Design](/learn/system-design/core-concepts/api-design) breakdown for interview-focused guidance.
+Read our full [API Design](/learn/system-design/01-foundations/api-design) breakdown for interview-focused guidance.
 
-## [Data Modeling](/learn/system-design/core-concepts/data-modeling)
+## [Data Modeling](/learn/system-design/01-foundations/data-modeling)
 
 Data modeling is one of those things that sounds simple but has massive downstream effects on your system. The decisions you make about what data to store and how to structure it directly affect performance, scalability, and how painful it is to build and maintain your system.
 
@@ -77,7 +77,7 @@ In interviews, a safe default is to start with a normalized relational model and
 
 NoSQL databases force you to think differently. DynamoDB requires you to design your partition key and sort key based on your access patterns. If you're building a social media app and your most common query is "get all posts for user X," you'd use user_id as the partition key. This makes that query a fast single-partition lookup. But now queries like "get all posts mentioning hashtag Y" require scanning the entire table because you didn't design for that access pattern. You have to know your queries upfront and design around them.
 
-Learn more in our [Data Modeling](/learn/system-design/core-concepts/data-modeling) article.
+Learn more in our [Data Modeling](/learn/system-design/01-foundations/data-modeling) article.
 
 ## [Database Indexing](/learn/system-design/core-concepts/db-indexing)
 
@@ -93,7 +93,7 @@ For specialized needs beyond what your primary database supports, you'll need ex
 
 Get the full breakdown in our [Database Indexing](/learn/system-design/core-concepts/db-indexing) guide.
 
-## [Caching](/learn/system-design/core-concepts/caching)
+## [Caching](/learn/system-design/01-foundations/caching)
 
 Caching comes up in almost every system design interview, usually when you identify that your database is getting hammered with reads. The idea is simple. Store frequently accessed data in fast memory (like Redis) so you can skip the database entirely for most reads.
 
@@ -111,9 +111,9 @@ A common mistake is caching everything. Cache only data that's read frequently a
 
 CDN caching is different. It's for static assets like images, videos, and JavaScript files served from edge locations close to users. In-process caching works for small values that change rarely, like feature flags or config data. But for your core application data, external caching with Redis is the default.
 
-Dive deeper in our [Caching](/learn/system-design/core-concepts/caching) article, or see how caching fits into the [Scaling Reads](/learn/system-design/patterns/scaling-reads) pattern.
+Dive deeper in our [Caching](/learn/system-design/01-foundations/caching) article, or see how caching fits into the [Scaling Reads](/learn/system-design/patterns/scaling-reads) pattern.
 
-## [Sharding](/learn/system-design/core-concepts/sharding)
+## [Sharding](/learn/system-design/01-foundations/sharding)
 
 Sharding comes up when you've outgrown a single database and need to split your data across multiple independent servers. This happens when you hit storage limits (a single Postgres instance maxes out around a few TB), write throughput limits (tens of thousands of writes per second), or read throughput that even replicas can't handle.
 
@@ -129,7 +129,7 @@ Sharding creates new problems you need to address. Cross-shard transactions beco
 
 In interviews, bring up sharding after you've justified why a single database won't work. Then clearly state your shard key choice and explain the tradeoff (fast for X queries, slow for Y queries). That's all most interviewers need to see.
 
-Get the full breakdown in our [Sharding](/learn/system-design/core-concepts/sharding) guide, or see how sharding fits into the [Scaling Writes](/learn/system-design/patterns/scaling-writes) pattern.
+Get the full breakdown in our [Sharding](/learn/system-design/01-foundations/sharding) guide, or see how sharding fits into the [Scaling Writes](/learn/system-design/patterns/scaling-writes) pattern.
 
 ## [Consistent Hashing](/learn/system-design/core-concepts/consistent-hashing)
 
@@ -149,7 +149,7 @@ The main time to bring it up is when you're discussing elastic scaling. If your 
 
 Learn the details in our [Consistent Hashing](/learn/system-design/core-concepts/consistent-hashing) article.
 
-## [CAP Theorem](/learn/system-design/core-concepts/cap-theorem)
+## [CAP Theorem](/learn/system-design/01-foundations/cap-theorem)
 
 The CAP theorem comes up when you're designing distributed systems and need to make tradeoffs about how your data behaves during failures. It states you can only have two of three properties at once. Consistency (all nodes see the same data), Availability (every request gets a response), and Partition tolerance (system works even when network connections fail between nodes). Since network partitions are unavoidable in distributed systems, you're really choosing between consistency and availability.
 
@@ -167,9 +167,9 @@ It's worth knowing that the CAP theorem only describes behavior during network p
 
 In interviews, when you mention replication or distributed data, your interviewer might ask about consistency. The safe answer is eventual consistency unless the problem specifically involves money, inventory, or booking limited resources.
 
-Read more in our [CAP Theorem](/learn/system-design/core-concepts/cap-theorem) breakdown.
+Read more in our [CAP Theorem](/learn/system-design/01-foundations/cap-theorem) breakdown.
 
-## [Numbers to Know](/learn/system-design/core-concepts/numbers-to-know)
+## [Numbers to Know](/learn/system-design/01-foundations/numbers-to-know)
 
 As discussed in the [Delivery Framework](/learn/system-design/in-a-hurry/delivery), you don't need to do back-of-the-envelope calculations at the start of an interview. That's not what interviewers care about. What matters is doing them when you need to make a decision. Should you shard the database? Can a single Redis instance handle the cache load? You can't answer these questions without rough numbers.
 
@@ -201,7 +201,7 @@ ComponentKey MetricsScale Triggers**Caching**- ~1 millisecond latency
 - Partition count ~200k per cluster
 - Growing consumer lag
 
-Get the full reference in our [Numbers to Know](/learn/system-design/core-concepts/numbers-to-know) guide.
+Get the full reference in our [Numbers to Know](/learn/system-design/01-foundations/numbers-to-know) guide.
 
 Mark as read
 
