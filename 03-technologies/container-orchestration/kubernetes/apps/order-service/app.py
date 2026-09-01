@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import PlainTextResponse
 
 app = FastAPI(title="Order Service", version="1.0.0")
 
@@ -36,7 +37,10 @@ async def get_user_orders(user_id: str) -> dict[str, object]:
     return {"orders": user_orders, "count": len(user_orders)}
 
 
-@app.get("/metrics")
+# A bare `str` return value is serialised as JSON by FastAPI, which would emit
+# "\"# HELP ...\\n...\"" -- not the Prometheus exposition format. PlainTextResponse
+# is required for Prometheus to be able to scrape this endpoint at all.
+@app.get("/metrics", response_class=PlainTextResponse)
 async def metrics() -> str:
     lines = [
         "# HELP order_service_total_orders Total number of orders",

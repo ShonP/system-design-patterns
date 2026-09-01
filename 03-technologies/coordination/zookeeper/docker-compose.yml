@@ -8,11 +8,16 @@ services:
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+      # ZK 3.5+ blocks four-letter-word commands unless whitelisted. Without
+      # this the `ruok` healthcheck below can never pass ("ruok is not executed
+      # because it is not in the whitelist") and notebook 5's `mntr` probe fails.
+      ZOO_4LW_COMMANDS_WHITELIST: "srvr,ruok,stat,mntr,conf,cons,wchs"
     healthcheck:
       test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 20s
 
   zoo2:
     image: zookeeper:3.9
@@ -23,11 +28,16 @@ services:
     environment:
       ZOO_MY_ID: 2
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+      # ZK 3.5+ blocks four-letter-word commands unless whitelisted. Without
+      # this the `ruok` healthcheck below can never pass ("ruok is not executed
+      # because it is not in the whitelist") and notebook 5's `mntr` probe fails.
+      ZOO_4LW_COMMANDS_WHITELIST: "srvr,ruok,stat,mntr,conf,cons,wchs"
     healthcheck:
       test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 20s
 
   zoo3:
     image: zookeeper:3.9
@@ -38,8 +48,13 @@ services:
     environment:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
+      # ZK 3.5+ blocks four-letter-word commands unless whitelisted. Without
+      # this the `ruok` healthcheck below can never pass ("ruok is not executed
+      # because it is not in the whitelist") and notebook 5's `mntr` probe fails.
+      ZOO_4LW_COMMANDS_WHITELIST: "srvr,ruok,stat,mntr,conf,cons,wchs"
     healthcheck:
       test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 20s

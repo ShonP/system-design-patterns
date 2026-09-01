@@ -1,6 +1,6 @@
 # Time-Series Databases
 
-📖 **Source**: [Hello Interview – Time Series Databases for System Design Interviews](https://www.hellointerview.com/learn/system-design/deep-dives/time-series-databases)
+📖 **Source**: [Hello Interview – Time Series Databases for System Design Interviews](https://www.hellointerview.com/learn/system-design/03-technologies/databases/time-series-databases)
 
 ## Overview
 
@@ -29,13 +29,14 @@ This lab uses **TimescaleDB** — a PostgreSQL extension — so you get the powe
 cd 03-technologies/databases/time-series-databases
 
 # Start TimescaleDB + Grafana + Adminer
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=tsdb --display-name="TSDB (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

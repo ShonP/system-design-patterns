@@ -46,7 +46,10 @@ services:
       postgresql:
         condition: service_healthy
     environment:
-      - DB=postgresql
+      # Must be a driver name the auto-setup image knows: mysql8, postgres12,
+      # postgres12_pgx or cassandra. 'postgresql' is rejected at startup with
+      # "Unsupported driver specified" and the server exits(1).
+      - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal

@@ -1,6 +1,6 @@
 # DynamoDB
 
-📖 **Source**: [Hello Interview – DynamoDB Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/deep-dives/dynamodb)
+📖 **Source**: [Hello Interview – DynamoDB Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/03-technologies/databases/dynamodb)
 
 ## Overview
 
@@ -31,7 +31,7 @@ In this lab you'll work with **DynamoDB Local** — an offline version of Dynamo
 cd 03-technologies/databases/dynamodb
 
 # Start DynamoDB Local + Admin GUI
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies (creates .venv managed by uv)
 uv sync

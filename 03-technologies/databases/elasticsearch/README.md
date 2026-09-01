@@ -1,6 +1,6 @@
 # Elasticsearch
 
-📖 **Source**: [Hello Interview – Elasticsearch Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/deep-dives/elasticsearch)
+📖 **Source**: [Hello Interview – Elasticsearch Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/03-technologies/databases/elasticsearch)
 
 ## Overview
 
@@ -29,10 +29,10 @@ This lab walks you through Elasticsearch from zero — indexing documents, writi
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/elasticsearch
+cd 03-technologies/databases/elasticsearch
 
 # Start Elasticsearch + Kibana
-docker-compose up -d
+docker compose up -d
 
 # Wait for Elasticsearch to be healthy (may take 30–60 seconds)
 curl -s http://localhost:9200/_cluster/health | python -m json.tool
@@ -40,8 +40,9 @@ curl -s http://localhost:9200/_cluster/health | python -m json.tool
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=elasticsearch --display-name="Elasticsearch (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

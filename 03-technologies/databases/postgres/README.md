@@ -1,6 +1,6 @@
 # PostgreSQL Deep Dive
 
-📖 **Source**: [Hello Interview – PostgreSQL Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/deep-dives/postgres)
+📖 **Source**: [Hello Interview – PostgreSQL Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/03-technologies/databases/postgres)
 
 ## Overview
 
@@ -32,7 +32,7 @@ Each notebook follows the **BAD → BETTER → BEST** pattern with real `EXPLAIN
 │  PostgreSQL      │────▶│  PostgreSQL      │
 │  PRIMARY         │ WAL │  REPLICA         │
 │  (read + write)  │     │  (read-only)     │
-│  localhost:5432  │     │  localhost:5433   │
+│  localhost:5432  │     │  localhost:55433   │
 └─────────────────┘     └─────────────────┘
         │
         │
@@ -46,18 +46,19 @@ Each notebook follows the **BAD → BETTER → BEST** pattern with real `EXPLAIN
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/postgres
+cd 03-technologies/databases/postgres
 
 # Start PostgreSQL primary + replica + visualization tools
-docker-compose up -d
+docker compose up -d
 
 # Wait ~30 seconds for the replica to finish base backup
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=postgres-deep-dive --display-name="PostgreSQL Deep Dive (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -120,7 +121,7 @@ The lab uses a **social media platform** schema:
 
 ```bash
 # Stop all containers and remove data
-docker-compose down -v
+docker compose down -v
 ```
 
 ## License

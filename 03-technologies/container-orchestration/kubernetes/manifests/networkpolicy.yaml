@@ -1,4 +1,30 @@
-# Default deny all ingress and egress traffic
+# ---------------------------------------------------------------------------
+# NetworkPolicy reference for the k8s-lab namespace.
+#
+# READ THIS FIRST: a NetworkPolicy is enforced by the CNI plugin, not by
+# Kubernetes itself. The API server happily stores these objects on ANY cluster,
+# and `kubectl get netpol` will show them as if they were active -- but on a CNI
+# that does not implement policy (including minikube's default), nothing is
+# blocked. Verify enforcement, never assume it. In minikube:
+#     minikube start --cni=calico
+#
+# Second rule: policies are ADDITIVE and there is no "deny" rule. A pod selected
+# by at least one policy for a direction (Ingress/Egress) can only receive/send
+# what the union of those policies allows. A pod selected by NO policy is
+# completely unrestricted in that direction.
+# ---------------------------------------------------------------------------
+
+# Default deny all ingress and egress traffic.
+# `podSelector: {}` selects EVERY pod in the namespace; listing a policyType with
+# no matching rules below means "allow nothing in that direction".
+#
+# THE CLASSIC MISTAKE: this also blocks egress to CoreDNS on port 53. Every pod in
+# the namespace instantly loses name resolution, and the symptom is not "connection
+# refused" -- it is application timeouts and `Name or service not known`, which
+# sends people hunting for a Service bug that does not exist. Any pod that must
+# resolve a hostname needs an explicit egress allow for UDP+TCP 53 (see
+# allow-gateway-to-backends below). user-service and order-service get no egress
+# rule here on purpose: they make no outbound calls, so they need no DNS.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -10,7 +36,9 @@ spec:
     - Ingress
     - Egress
 ---
-# Allow api-gateway to receive traffic from anywhere
+# Allow api-gateway to receive traffic from anywhere.
+# An ingress rule with `ports` but no `from` means "any source, that port only" --
+# which is what lets the ingress-nginx controller (a different namespace) reach it.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -51,6 +79,9 @@ spec:
               app: order-service
       ports:
         - port: 8002
+    # DNS. Without this rule the two rules above are useless, because
+    # api-gateway cannot resolve `user-service` to an IP in the first place.
+    # An egress rule with `ports` but no `to` means "any destination, those ports".
     - ports:
         - port: 53
           protocol: UDP

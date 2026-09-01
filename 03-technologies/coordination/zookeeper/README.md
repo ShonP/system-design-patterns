@@ -1,6 +1,6 @@
 # ZooKeeper Deep Dive
 
-📖 **Source**: [Hello Interview – ZooKeeper Deep Dive](https://www.hellointerview.com/learn/system-design/deep-dives/zookeeper)
+📖 **Source**: [Hello Interview – ZooKeeper Deep Dive](https://www.hellointerview.com/learn/system-design/03-technologies/coordination/zookeeper)
 
 ## Overview
 
@@ -62,27 +62,28 @@ Each notebook follows a **Bad → Better → Best** pattern:
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/zookeeper
+cd 03-technologies/coordination/zookeeper
 
 # Start a 3-node ZooKeeper ensemble
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=zookeeper --display-name="ZooKeeper (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
 
 ## Verify ZooKeeper Is Running
 
-After `docker-compose up -d`, verify all 3 nodes are healthy:
+After `docker compose up -d`, verify all 3 nodes are healthy:
 
 ```bash
 # Check that all containers are running
-docker-compose ps
+docker compose ps
 
 # Ask each node "are you ok?" (ZooKeeper's built-in health check)
 echo ruok | nc localhost 2181    # should print "imok"
@@ -118,10 +119,10 @@ echo ruok | nc localhost 2183    # should print "imok"
 
 ```bash
 # Stop all containers
-docker-compose down
+docker compose down
 
 # Remove all data (if you want a fresh start)
-docker-compose down -v
+docker compose down -v
 ```
 
 ## License

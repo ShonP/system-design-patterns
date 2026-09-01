@@ -1,6 +1,6 @@
 # Cassandra Deep Dive
 
-📖 **Source**: [Hello Interview – Cassandra Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/deep-dives/cassandra)
+📖 **Source**: [Hello Interview – Cassandra Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/03-technologies/databases/cassandra)
 
 ## Overview
 
@@ -28,19 +28,25 @@ Originally built by Facebook for inbox search, Cassandra is now used by Discord,
 
 ```bash
 # Navigate to the lab directory
-cd deep-dives/cassandra
+cd 03-technologies/databases/cassandra
 
-# Start the 3-node Cassandra cluster (first start takes ~2 minutes)
-docker-compose up -d
+# Start the 3-node Cassandra cluster.
+# Brings up all 3 nodes and blocks until every one has joined the ring.
+# Expect this to take 3-5 minutes: Cassandra nodes bootstrap one at a time.
+docker compose up -d --wait
 
-# Wait for node1 to be healthy before running notebooks
-docker-compose exec cassandra-node1 cqlsh -e "DESCRIBE CLUSTER"
+# Confirm all 3 nodes report UN (Up / Normal). Notebooks 3 and 5 use
+# QUORUM consistency with RF=3, which needs at least 2 live replicas --
+# they will fail with "Cannot achieve consistency level QUORUM" if you
+# start running them while only node1 is up.
+docker compose exec cassandra-node1 nodetool status
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=cassandra --display-name="Cassandra (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

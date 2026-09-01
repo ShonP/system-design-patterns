@@ -10,9 +10,13 @@ spec:
   selector:
     app: api-gateway
   ports:
-    - port: 8000
-      targetPort: 8000
-      nodePort: 30080
+    # The port NAME matters: a Prometheus ServiceMonitor's `endpoints[].port`
+    # is the *name* of a Service port, not a number. Unnamed ports cannot be
+    # selected by a ServiceMonitor at all (notebook 05 depends on this).
+    - name: http
+      port: 8000        # the port the Service answers on
+      targetPort: 8000  # the containerPort traffic is forwarded to
+      nodePort: 30080   # NodePort only: the port opened on every node
 ---
 apiVersion: v1
 kind: Service
@@ -26,7 +30,8 @@ spec:
   selector:
     app: user-service
   ports:
-    - port: 8001
+    - name: http
+      port: 8001
       targetPort: 8001
 ---
 apiVersion: v1
@@ -41,5 +46,6 @@ spec:
   selector:
     app: order-service
   ports:
-    - port: 8002
+    - name: http
+      port: 8002
       targetPort: 8002

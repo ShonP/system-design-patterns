@@ -1,5 +1,21 @@
 # Helm values for kube-prometheus-stack in minikube
 # Install: helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace -f prometheus-values.yaml
+#
+# These numbers are deliberately smaller than the chart's defaults. On a 6 GB
+# single-node cluster that also has to hold Istio (notebook 08) and a sidecar per
+# pod, the stock values are the difference between "tight" and "the node stops
+# responding". Two of them matter more than the resource limits:
+#
+#   retention: 2h        -- the TSDB is the busiest writer in the cluster, and on
+#                           minikube's hostPath storage that write amplification
+#                           is what actually hurts. Two hours is plenty for a lab
+#                           and cuts both disk and page cache substantially.
+#   defaultRules.create  -- the chart ships ~100 recording and alerting rules that
+#                           are re-evaluated every 30s. Notebook 05 writes its own
+#                           PrometheusRule, so nothing here needs them.
+#
+# Turn them back up if you want the full production-shaped install and have the
+# memory for it.
 
 prometheus:
   prometheusSpec:
@@ -7,13 +23,15 @@ prometheus:
     resources:
       requests:
         cpu: 200m
-        memory: 512Mi
+        memory: 400Mi
       limits:
         cpu: 500m
-        memory: 1Gi
-    retention: 24h
+        memory: 800Mi
+    retention: 2h
+    walCompression: true
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
 
 grafana:
   adminPassword: admin
@@ -45,8 +63,9 @@ kubeStateMetrics:
 nodeExporter:
   enabled: true
 
+# Notebook 05 creates the only alert rules this lab needs. The chart's ~100
+# built-in rules are pure overhead here, and several of them fire constantly on a
+# single-node cluster (no etcd HA, no scheduler metrics), which is noise that
+# teaches nothing.
 defaultRules:
-  create: true
-  rules:
-    etcd: false
-    kubeScheduler: false
+  create: false

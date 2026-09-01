@@ -39,6 +39,17 @@ services:
         condition: service_healthy
     volumes:
       - cassandra_node2_data:/var/lib/cassandra
+    healthcheck:
+      # `grep -q '^UN'` is not enough: a node reports one UN line for ITSELF the
+      # moment it boots, so the check passed while the ring still had a single
+      # member and every QUORUM read failed. Require the node to actually see
+      # the peers that should be up by now -- 2 here, 3 on node3 -- so
+      # `docker compose up --wait` returns a genuinely formed 3-node ring.
+      test: ["CMD-SHELL", "[ \"$$(nodetool status | grep -c '^UN')\" -ge 2 ]"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 90s
 
   cassandra-node3:
     image: cassandra:4.1
@@ -53,9 +64,15 @@ services:
       HEAP_NEWSIZE: "128M"
     depends_on:
       cassandra-node2:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - cassandra_node3_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "[ \"$$(nodetool status | grep -c '^UN')\" -ge 3 ]"]
+      interval: 15s
+      timeout: 10s
+      retries: 40
+      start_period: 90s
 
 volumes:
   cassandra_node1_data:

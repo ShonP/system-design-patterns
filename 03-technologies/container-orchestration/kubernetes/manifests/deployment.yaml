@@ -1,3 +1,28 @@
+# Shared workload manifests for the k8s-lab namespace. Notebook 02 applies these
+# at the end of its cleanup cell; notebooks 03-10 assume they are running.
+#
+# imagePullPolicy: IfNotPresent below is LOAD-BEARING, not a style choice. These
+# images are built straight into the cluster's own container runtime (notebook 02)
+# and are never pushed to a registry. Kubernetes defaults imagePullPolicy to
+# `Always` for any tag named `:latest`, so without this line the kubelet ignores
+# the local copy, tries to pull `docker.io/k8s-lab/user-service:latest`, and every
+# pod sits in ImagePullBackOff -- while `minikube image ls` cheerfully shows the
+# image is right there. `:latest` + a locally built image is the exact combination
+# that trips it.
+#
+# Requires ../manifests/configmap.yaml (order-service pulls its environment from
+# the `app-config` ConfigMap with envFrom) and ../manifests/namespace.yaml.
+#
+# Probe rules applied below:
+#   readinessProbe -> gates Service endpoints. Without it a pod is "Ready" as soon
+#                     as its process starts, so traffic is routed to an app that
+#                     cannot serve yet and `maxUnavailable: 0` protects nothing.
+#   livenessProbe  -> RESTARTS the container. It must test only "is this process
+#                     still able to make progress?" -- never a downstream
+#                     dependency, or one database blip restarts every replica at
+#                     once and turns a recoverable outage into a self-inflicted
+#                     one. /health here is a trivial handler that touches nothing.
+#                     Note it is deliberately lazier than readiness (15s vs 10s).
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,6 +43,7 @@ spec:
       containers:
         - name: api-gateway
           image: k8s-lab/api-gateway:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:
@@ -65,6 +91,7 @@ spec:
       containers:
         - name: user-service
           image: k8s-lab/user-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8001
           resources:
@@ -101,6 +128,7 @@ spec:
       containers:
         - name: order-service
           image: k8s-lab/order-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8002
           envFrom:

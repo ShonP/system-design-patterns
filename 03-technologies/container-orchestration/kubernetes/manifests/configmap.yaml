@@ -1,3 +1,9 @@
+# order-service consumes this whole ConfigMap with `envFrom`, so renaming a key
+# here changes that container's environment. Note that environment variables are
+# copied in at container start: editing this ConfigMap does NOT update a running
+# pod, and a `kubectl rollout restart` is required. (A ConfigMap mounted as a
+# VOLUME does update in place, within about a minute -- unless it was mounted with
+# subPath, which freezes it.)
 apiVersion: v1
 kind: ConfigMap
 metadata:

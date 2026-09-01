@@ -1,6 +1,6 @@
 # Kafka Deep Dive
 
-📖 **Source**: [Hello Interview – Kafka Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/deep-dives/kafka)
+📖 **Source**: [Hello Interview – Kafka Deep Dive for System Design Interviews](https://www.hellointerview.com/learn/system-design/03-technologies/messaging/kafka)
 
 ## Overview
 
@@ -33,13 +33,14 @@ This lab walks you through Kafka hands-on — from sending your first message to
 cd 03-technologies/messaging/kafka
 
 # Start Kafka + Kafka UI
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=kafka --display-name="Kafka (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -49,7 +50,7 @@ uv run python -m ipykernel install --user --name=kafka --display-name="Kafka (Py
 ### Kafka UI
 - **URL**: http://localhost:8080
 - **Use for**: Browse topics, view messages, inspect partitions, monitor consumer groups
-- No login needed — just open the URL after `docker-compose up -d`
+- No login needed — just open the URL after `docker compose up -d`
 
 ## Architecture (What Docker Sets Up)
 
@@ -111,17 +112,17 @@ Your Python notebooks connect to localhost:9092
 ### Kafka won't start
 ```bash
 # Check if the container is running
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs kafka
+docker compose logs kafka
 
 # Restart everything
-docker-compose down -v && docker-compose up -d
+docker compose down -v && docker compose up -d
 ```
 
 ### Can't connect from Python
-- Make sure Docker is running and healthy: `docker-compose ps`
+- Make sure Docker is running and healthy: `docker compose ps`
 - The broker should show `(healthy)` status
 - Python connects to `localhost:9092` (the external listener)
 

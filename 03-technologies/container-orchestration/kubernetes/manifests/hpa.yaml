@@ -1,3 +1,20 @@
+# autoscaling/v2 is the current version. v2beta1 and v2beta2 were REMOVED in
+# Kubernetes 1.25 and 1.26 respectively, and autoscaling/v1 supports only a
+# single CPU target.
+#
+# REQUIREMENTS, both of which fail silently as `TARGETS: <unknown>/60%`:
+#   1. metrics-server must be installed. `type: Resource` metrics come from the
+#      metrics.k8s.io API and from nowhere else -- Prometheus does not substitute
+#      for it. (`minikube addons enable metrics-server`)
+#   2. The target's pods must set resource REQUESTS. `averageUtilization` is a
+#      percentage OF THE REQUEST, so a pod with no cpu request has no denominator
+#      and the HPA can never compute a value.
+#
+# desiredReplicas = ceil( currentReplicas * ( currentMetric / targetMetric ) )
+#
+# With two metrics listed, the HPA computes a desired count for EACH and takes the
+# HIGHEST. Memory usage rarely falls after load stops, so a memory metric can pin
+# the replica count at its high-water mark -- know that before adding one.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -23,6 +40,8 @@ spec:
         target:
           type: Utilization
           averageUtilization: 75
+  # `behavior` is what stops the autoscaler flapping: react fast on the way up,
+  # retreat slowly on the way down.
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300

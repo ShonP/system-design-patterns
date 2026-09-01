@@ -3,7 +3,7 @@ name = "long-running-jobs-temporal"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
-    "temporalio>=1.7.0",
+    "temporalio>=1.26.0,<2",  # pinned: 1.26 moved WorkflowAlreadyStartedError and tightened start_workflow() args
     "jupyter>=1.0.0",
     "ipykernel>=6.28.0",
 ]

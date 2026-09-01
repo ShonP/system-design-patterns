@@ -1,6 +1,6 @@
 # Vector Databases
 
-📖 **Source**: [Hello Interview – Vector Databases Deep Dive](https://www.hellointerview.com/learn/system-design/deep-dives/vector-databases)
+📖 **Source**: [Hello Interview – Vector Databases Deep Dive](https://www.hellointerview.com/learn/system-design/03-technologies/databases/vector-databases)
 
 ## Overview
 
@@ -34,7 +34,7 @@ Each notebook follows a **BAD → BETTER → BEST** progression: we start with t
 cd 03-technologies/databases/vector-databases
 
 # Start PostgreSQL (with pgvector) + Adminer
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies (creates a .venv managed by uv)
 uv sync

@@ -20,7 +20,7 @@ New content is **added**, never destructively replaced.
   `INFO replication` on ports 6380/6381/6382) instead of hardcoding `:6380`.
   Makes the notebook idempotent — re-running after a previous failover demo
   no longer crashes with `ReadOnlyError`.
-- Fixed stale setup paths (`cd deep-dives/redis` → `cd 03-technologies/databases/redis`)
+- Fixed stale setup paths (`cd 03-technologies/databases/redis` → `cd 03-technologies/databases/redis`)
   in notebooks 1–4.
 - README: corrected notebook filenames, added notebook 5, added a "re-run
   notebook 4" reset command, replaced the obsolete `redis-deep-dive` kernel

@@ -1,4 +1,36 @@
-# ServiceAccount for application workloads
+# ---------------------------------------------------------------------------
+# RBAC reference for the k8s-lab namespace.
+#
+# Role vs ClusterRole:        WHAT permissions are described.
+# RoleBinding vs ClusterRoleBinding: WHERE those permissions apply.
+#
+#   Role        + RoleBinding        -> permissions in ONE namespace.
+#   ClusterRole + ClusterRoleBinding -> permissions in EVERY namespace, plus
+#                                        cluster-scoped objects (nodes, PVs,
+#                                        namespaces, CRDs).
+#   ClusterRole + RoleBinding        -> the useful subtle one: the ClusterRole's
+#                                        rules are applied but SCOPED DOWN to the
+#                                        RoleBinding's namespace. This is how you
+#                                        reuse one shared role definition (e.g.
+#                                        the built-in `view` or `edit`) across
+#                                        many teams without granting anything
+#                                        cluster-wide. Cluster-scoped resources
+#                                        in that ClusterRole simply do not apply.
+#   Role        + ClusterRoleBinding -> INVALID. A ClusterRoleBinding's roleRef
+#                                        must be a ClusterRole; the API server
+#                                        rejects it.
+#
+# roleRef is immutable. To point a binding at a different role you must delete
+# and recreate the binding.
+# ---------------------------------------------------------------------------
+
+# ServiceAccount for application workloads.
+# automountServiceAccountToken: false means pods using this SA get NO API
+# credentials mounted at /var/run/secrets/kubernetes.io/serviceaccount. That is
+# the right default for an app that never calls the Kubernetes API -- an app that
+# does need to call it must set `automountServiceAccountToken: true` on the pod
+# spec, otherwise the Role below grants permissions it can never present a token
+# to use.
 apiVersion: v1
 kind: ServiceAccount
 metadata:

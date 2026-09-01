@@ -1,3 +1,19 @@
+# Reference ArgoCD Application. Notebook 07 generates its own copy beside the
+# notebook -- deliberately NOT here.
+#
+# Two things to understand before copying this anywhere real:
+#
+# 1. Never store an Application manifest inside the path that Application watches.
+#    This one watches `path: manifests` and deploys into `namespace: k8s-lab`, so if
+#    it lived in that directory ArgoCD would try to create an Application object in
+#    k8s-lab -- a namespace where the ArgoCD controller does not look for them.
+#
+# 2. `prune: true` DELETES live objects that disappear from Git, and `selfHeal: true`
+#    reverts any manual `kubectl edit` within minutes. Both are the point of GitOps and
+#    both are how people accidentally delete production. Start with prune: false.
+#
+# ArgoCD's repo-server clones from inside the cluster, so repoURL must be reachable
+# from there -- not a path on your laptop and not anything on your localhost.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

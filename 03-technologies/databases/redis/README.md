@@ -1,6 +1,6 @@
 # 🔴 Redis Deep Dive
 
-> **Learning Source**: [Hello Interview — Redis Deep Dive](https://www.hellointerview.com/learn/system-design/deep-dives/redis)
+> **Learning Source**: [Hello Interview — Redis Deep Dive](https://www.hellointerview.com/learn/system-design/03-technologies/databases/redis)
 
 ## Overview
 

@@ -4,10 +4,25 @@ metadata:
   name: api-gateway-ingress
   namespace: k8s-lab
   annotations:
+    # CAREFUL: rewrite-target rewrites EVERY matched path to "/" before it reaches
+    # the backend. With `path: /` + `pathType: Prefix` below, a request for
+    # /api/users arrives at api-gateway as "/" and returns 404 from the app.
+    # That is right only when the backend expects to be mounted at the root.
+    # If you want the path passed through unchanged, delete this annotation.
+    # If you want to strip a prefix, use a capture group:
+    #   path: /gw(/|$)(.*)      pathType: ImplementationSpecific
+    #   nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  # An Ingress object does nothing on its own -- an Ingress CONTROLLER has to be
+  # running and watching. ingressClassName selects which one. In minikube:
+  #   minikube addons enable ingress
   ingressClassName: nginx
   rules:
+    # Host-based routing: nginx matches on the HTTP Host header, so a plain
+    # `curl http://$(minikube ip)/` will NOT match this rule and returns the
+    # default backend's 404. Either add k8s-lab.local to /etc/hosts pointing at
+    # `minikube ip`, or use `curl -H 'Host: k8s-lab.local' http://$(minikube ip)/`.
     - host: k8s-lab.local
       http:
         paths:
