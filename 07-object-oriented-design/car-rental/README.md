@@ -10,8 +10,11 @@ OOD of a car rental service: vehicles, reservations with a state machine, and av
 
 - Vehicle class hierarchy with polymorphic rates
 - Reservation state machine (pending → confirmed → active → returned / cancelled)
-- Availability via overlapping-date checks
-- Pricing by duration
+- Availability via overlapping-date checks (with the boundary cases asserted)
+- **Strategy** -- `PricingPolicy`: flat vs weekend-surcharge + weekly-discount
+- **Factory** -- `VehicleFactory` registry turns fleet data rows into subclasses
+- Invariants in constructors (`end` may not precede `start`)
+- Payments with their own charge / refund state, plus late-return fees
 
 ## Setup
 

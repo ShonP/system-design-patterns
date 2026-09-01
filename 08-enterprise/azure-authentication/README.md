@@ -21,12 +21,32 @@ Real Entra ID (formerly Azure AD) requires a tenant. To make this lab fully runn
 
 For the real thing, see [`scripts/azure-setup.sh`](scripts/azure-setup.sh).
 
+### What is real and what is simulated
+
+Be precise about this before you copy anything into production:
+
+| | Real | Simulated |
+|-|------|-----------|
+| Token signing | ✅ genuine RS256 JWTs, RSA keypair generated at startup | |
+| Signature + `iss`/`aud`/`exp`/`nbf` validation in `common/auth.py` | ✅ this is production-shaped code | |
+| JWKS publication and `kid`-based key selection | ✅ | key *rotation* never actually happens |
+| `client_credentials` and On-Behalf-Of grants | ✅ same wire format as Entra | |
+| Sign-in | | ROPC only. No authorization code, no PKCE, no browser, no consent screen |
+| Managed identity | | **not simulated at all** — notebook 3 substitutes a client secret and says so |
+| Conditional Access, MFA, claims challenges, CAE / revocation | | **none.** Every token the mock issues is valid for its full hour, no matter what |
+| Consent, admin consent, app-role assignment | | pre-seeded in `fake-entra/apps.json` |
+| `DefaultAzureCredential` / MSAL against the mock | | impossible — both SDKs refuse non-HTTPS authorities, so those cells are documentation-only |
+
+Anywhere a notebook decodes a JWT with `base64.urlsafe_b64decode`, that is **inspection, not
+validation** — it proves nothing about the token. The only real validator in this repo is
+[`common/auth.py`](common/auth.py).
+
 ## Architecture
 
 ```
 ┌─────────────┐     1. get token       ┌──────────────────┐
 │  Notebook   │───────────────────────▶│  Mock Entra ID   │
-│  or CLI     │                         │  :9000           │
+│  or CLI     │                         │  :9100           │
 └─────────────┘                         │  /oauth2/token   │
        │                                │  /jwks           │
        │ 2. call API-A                  └──────────────────┘
@@ -69,17 +89,19 @@ For the real thing, see [`scripts/azure-setup.sh`](scripts/azure-setup.sh).
 ## Quick start
 
 ```bash
-cd enterprise-patterns/azure-authentication
+cd 08-enterprise/azure-authentication
 
 # Start mock Entra, API-A, API-B
-docker-compose up -d
+docker compose up -d --build
 
 # Python env for the notebooks
 uv sync
-uv run python -m ipykernel install --user --name=azure-auth --display-name="Azure Auth (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 ```
 
-Then open any notebook and select the `Azure Auth (Python)` kernel (top-right of VS Code notebook). If it doesn't show up, `Cmd+Shift+P` → **Reload Window**.
+Then open any notebook and select the lab's `.venv` interpreter as the kernel (it shows as `Python 3 (.venv)` in the top-right of a VS Code notebook). If it doesn't show up, `Cmd+Shift+P` → **Reload Window**.
 
 ### Verify it's running
 
@@ -122,7 +144,10 @@ API-B exposes:
   - *User-assigned*: standalone resource you can attach to many.
 - **OAuth2 scope (delegated permission)** — "this app may act on behalf of a signed-in user to do X".
 - **App role (application permission)** — "this app itself may do X, no user involved".
-- **Access token** — a signed JWT your app sends to downstream APIs in `Authorization: Bearer <token>`.
+- **Access token** — a signed JWT your app sends to downstream APIs in `Authorization: Bearer <token>`. Its `aud` is the *resource API*.
+- **ID token** — a signed JWT that tells a *client app* who just signed in. Its `aud` is the client's own client ID, and it carries no `scp`/`roles`. **Never send an ID token to an API, and never accept one as a bearer credential** — a validator that checks `aud` rejects it automatically. See notebook 1.
+- **Authorization code + PKCE** — the flow for getting a user token. PKCE (RFC 7636) is mandatory for public clients (SPA, mobile, CLI) which cannot hold a secret. The older **implicit flow** and **ROPC** (`grant_type=password`) are deprecated by RFC 9700 / OAuth 2.1 — this lab uses ROPC in notebook 4 *only* because a notebook cannot do a browser redirect.
+- **Conditional Access** — tenant policies (require MFA, compliant device, trusted location) evaluated **per resource**. They can fail an On-Behalf-Of exchange at runtime with a *claims challenge* that only the user's browser can satisfy. See notebook 4.
 - **DefaultAzureCredential** — an SDK helper that tries several credential sources in order (env vars → managed identity → Azure CLI → …) so the same code runs locally and in Azure.
 
 ## Running against real Azure (optional)
@@ -132,5 +157,5 @@ After you've explored locally, see [scripts/azure-setup.sh](scripts/azure-setup.
 ## Cleanup
 
 ```bash
-docker-compose down -v
+docker compose down -v
 ```

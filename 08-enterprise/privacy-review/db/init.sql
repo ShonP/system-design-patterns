@@ -47,7 +47,12 @@ CREATE TABLE users (
     -- Privacy tracking fields
     consent_marketing BOOLEAN DEFAULT FALSE,
     consent_analytics BOOLEAN DEFAULT TRUE,
-    data_retention_category VARCHAR(20) DEFAULT 'standard'
+    data_retention_category VARCHAR(20) DEFAULT 'standard',
+
+    -- When the user asked to be erased. This is the clock the 30-day GDPR
+    -- grace period runs on -- NOT created_at. An account created three years
+    -- ago and deleted this morning still gets its 30 days.
+    deletion_requested_at TIMESTAMP
 );
 
 -- =============================================================================
@@ -253,6 +258,13 @@ SELECT
     (i % 3 = 0),
     (i % 5 != 0)
 FROM generate_series(1, 50) AS i;
+
+-- Deleted accounts asked to be erased at different times, so some are still
+-- inside the 30-day grace period and some are past it. The retention engine in
+-- notebook 4 must erase the second group and leave the first alone.
+UPDATE users
+SET deletion_requested_at = NOW() - ((id / 6) * 12 * INTERVAL '1 day')
+WHERE account_status = 'deleted';
 
 -- ── Payment Methods ──────────────────────────────────────────────────────────
 INSERT INTO payment_methods (user_id, card_number_encrypted, card_last_four, card_brand, expiry_month, expiry_year, billing_zip, is_default)

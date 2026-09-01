@@ -16,3 +16,15 @@ New content is **added**, never destructively replaced.
   observer, and an assertion-based test suite.
 - Updated `README.md` concepts section. Both notebooks verified with
   `uv run jupyter nbconvert --execute`.
+
+## 2026-08-20
+- QA pass: re-verified every notebook executes end to end with
+  `uv run jupyter nbconvert --execute`; normalized the kernelspec to
+  `Python 3 (.venv)` and stripped saved outputs.
+- Replaced the monkey-patched observer (`_with_observers(Innings)`, which mutated the
+  class globally and double-fired on re-run) with a real `ObservableInnings` subject:
+  `subscribe` / `unsubscribe` / `_publish`, a `runtime_checkable BallObserver` protocol
+  that is now actually enforced, and two independent observers (`Commentary`, `RunRate`).
+- Made `Ball` a frozen dataclass — a bowled ball is a historical event.
+- Extended the test suite: observer fan-out and detach, protocol rejection, and the
+  "no scoring after the innings closes" invariant.

@@ -8,10 +8,12 @@ OOD of a flight booking platform: aircraft, flights, seats with class, bookings.
 
 ## Concepts covered
 
-- Flight / Aircraft / Seat modeling
-- Per-flight seat availability
-- SeatClass as an enum (avoid subclass explosion)
-- Booking and ticket generation
+- Flight / Aircraft / Seat modelling; per-flight seat availability
+- SeatClass as an enum + pricing table (avoid subclass explosion)
+- Subclass for *behaviour*, enum for *data* -- and how to tell them apart
+- **Strategy** -- injectable `RefundPolicy` instead of a hard-coded refund table
+- Invariant enforcement: `Booking.mark_cancelled()`, `Flight.assign_crew()`
+- Booking and ticket generation; a check-then-act race and the lock that fixes it
 
 ## Setup
 

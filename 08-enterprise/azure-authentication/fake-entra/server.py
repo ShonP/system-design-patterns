@@ -215,6 +215,8 @@ def token(
                 algorithms=["RS256"],
                 audience=caller["identifier_uri"],
                 issuer=ISSUER,
+                # python-jose skips claims that are absent, so demand them.
+                options={"require_aud": True, "require_exp": True, "require_sub": True},
             )
         except Exception as e:
             raise HTTPException(401, f"invalid assertion: {e}")
@@ -244,7 +246,14 @@ def token(
 
 @app.get("/debug/decode/{token_str}")
 def debug_decode(token_str: str):
-    """Developer convenience: see the claims in a token without verifying."""
+    """DEBUGGING ONLY - decodes without verifying the signature.
+
+    This endpoint tells you what a token *says*, never whether it is *true*.
+    Anyone can hand-craft base64 that decodes to `roles: ["Global.Admin"]`.
+    A real identity provider would never expose this; it exists here so the
+    notebooks can show token shapes. Never copy this pattern into an API that
+    makes an authorization decision - use `common.auth.validate_token`.
+    """
     header = jwt.get_unverified_header(token_str)
     payload = jwt.get_unverified_claims(token_str)
     return JSONResponse({"header": header, "payload": payload})

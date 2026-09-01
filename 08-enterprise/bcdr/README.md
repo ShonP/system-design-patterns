@@ -83,6 +83,37 @@ Enterprises must regularly:
 | 3 | Backup Strategies | Full/incremental/differential backups, point-in-time recovery, verification |
 | 4 | Disaster Recovery Drill | Simulating failure, executing failover, measuring actual RTO |
 
+### Run them in order — and mind the state notebook 2 leaves behind
+
+Notebook 2 ends **mid-disaster on purpose**: it fences the primary (stops the
+container — the STONITH step of a real failover) and promotes the standby.
+That is the state an on-call engineer is actually handed, and it is not a
+state notebooks 3 and 4 can run in: port 5432 is dead, and the promoted node
+on 55433 now holds a write the fenced node has never seen.
+
+Notebooks 3 and 4 therefore open with a **failback** cell. It captures the
+writes made on the promoted node during the outage, un-fences the old primary,
+replays those writes onto it, re-clones the standby, and verifies the result.
+Running it when nothing is wrong is a no-op, so you can start from notebook 3
+on a cold stack without thinking about it.
+
+Notebook 4 also *ends* with a failback (Phase 6), so a completed drill leaves
+the cluster back in a shape that could survive the next failure — and the
+whole series is re-runnable without `docker compose down -v`.
+
+## ⚖️ What this lab does NOT do
+
+Being honest about the gap between a laptop and a real BCDR programme:
+
+| Concern | This lab | Production |
+|---------|----------|------------|
+| Failover trigger | A human runs a notebook cell | Patroni / pg_auto_failover with leader leases and consensus |
+| Quorum | None — two nodes, split-brain prevented by fencing by hand | 3 or 5 nodes, majority required to promote |
+| Failback | Row-level carry-back of the one table this lab writes during a failover | `pg_rewind` + WAL replay, which handles every table and preserves row identity |
+| Off-site copy | Nothing leaves the laptop | Second region / account / provider, plus an immutable copy |
+| Replication mode | Asynchronous only, so RPO is structurally > 0 | Synchronous where RPO 0 is a real requirement — paid for on every write |
+| Scale | 500 orders, sub-second replication lag | Terabytes, WAL shipping over a WAN, lag measured in seconds |
+
 ## Prerequisites
 
 - Python 3.10+
@@ -93,10 +124,10 @@ Enterprises must regularly:
 
 ```bash
 # Navigate to the lab directory
-cd enterprise-patterns/bcdr
+cd 08-enterprise/bcdr
 
 # Start all services (PostgreSQL primary + standby, Redis primary + replica, etc.)
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies (creates .venv automatically)
 uv sync
@@ -134,7 +165,7 @@ uv sync
 
     ┌──────────────────┐         ┌──────────────────┐
     │  PostgreSQL       │ ──WAL──▶│  PostgreSQL       │
-    │  PRIMARY (:5432)  │ Stream  │  STANDBY (:5433)  │
+    │  PRIMARY (:5432)  │ Stream  │  STANDBY (:55433)  │
     │  (reads + writes) │         │  (read-only)      │
     └──────────────────┘         └──────────────────┘
 

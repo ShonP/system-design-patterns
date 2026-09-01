@@ -1,12 +1,16 @@
 # GDPR Compliance & Azure Paired Regions
 
-📖 **Pattern Source**: [Microsoft Azure — Paired Regions](https://learn.microsoft.com/en-us/azure/reliability/cross-region-replication-azure)
+📖 **Pattern Source**: [Microsoft Azure — Region pairs and nonpaired regions](https://learn.microsoft.com/en-us/azure/reliability/regions-paired)
 
 ## Overview
 
-The **General Data Protection Regulation (GDPR)** is a European Union law that controls how companies collect, store, and process personal data of EU citizens. It came into effect on May 25, 2018, and applies to **any** company that handles EU citizen data — even if the company is based outside the EU.
+The **General Data Protection Regulation (GDPR)** is a European Union law that controls how organisations collect, store, and process personal data. It came into effect on May 25, 2018.
 
-Microsoft Azure solves the hardest GDPR challenge — **keeping data inside the EU while still having disaster recovery** — through a concept called **Paired Regions**. Each Azure region is paired with another region in the **same geography** (e.g., West Europe 🇳🇱 is paired with North Europe 🇮🇪). Data never leaves the geography, even during failovers.
+> ⚖️ **Who it protects — a detail almost every tutorial gets wrong.** GDPR does **not** protect "EU citizens". Article 3 ties the regulation to *data subjects who are in the Union*, whatever their nationality, and to controllers/processors established in the Union. A US citizen living in Berlin is protected; an Irish citizen living in Tokyo, using a service with no EU establishment and no EU targeting, generally is not. This lab says **data subject** where it means the person the data is about.
+
+> ⚖️ **GDPR is not a data-localisation law.** There is no article that says "EU personal data must stay in the EU". What GDPR does is restrict *transfers to third countries*: Chapter V (Articles 44–50) says you may only transfer personal data outside the EU/EEA if there is an adequacy decision, appropriate safeguards (Standard Contractual Clauses, Binding Corporate Rules), or a derogation — and, after *Schrems II*, only if a transfer impact assessment shows the destination's law does not undermine those safeguards. Keeping data in-region is a popular *engineering strategy* for reducing that burden, and is sometimes required by sector-specific or national law, but it is a design choice, not a GDPR requirement in itself.
+
+Azure's **Paired Regions** are one building block for that strategy: some Azure services replicate to a designated partner region, and Microsoft states that *almost all* regions sit in the same geography as their pair. The caveats matter, and are spelled out below.
 
 This lab teaches you:
 - What GDPR requires and why it matters
@@ -27,7 +31,7 @@ GDPR is built around these key principles:
 | **Integrity** | Keep data accurate and secure | Encrypt PII, use access controls |
 | **Accountability** | Prove you're compliant | Audit logs, consent records, data maps |
 
-### Key Rights of EU Citizens
+### Key Rights of Data Subjects
 
 1. **Right to Access** (Article 15) — "Show me all data you have on me"
 2. **Right to Rectification** (Article 16) — "Fix my incorrect data"
@@ -37,29 +41,46 @@ GDPR is built around these key principles:
 
 ### What Happens If You Don't Comply?
 
-Fines up to **€20 million** or **4% of global annual revenue** (whichever is higher). In 2023, Meta was fined **€1.2 billion** for transferring EU data to the US.
+For the most serious infringements, Article 83(5) allows fines up to **€20 million** or **4% of total worldwide annual turnover**, whichever is higher (a lower €10m / 2% tier applies to other infringements). In May 2023 the Irish DPC fined Meta **€1.2 billion** over transfers of EU user data to the US under Standard Contractual Clauses that, post-*Schrems II*, could not compensate for US surveillance law. Note what that case was actually about: **the legal basis for the transfer**, not the absence of an EU data centre.
 
 ## Why Azure Paired Regions Matter for GDPR
 
 ### The Problem
 
-GDPR requires that EU citizen data stays within the EU (or in countries with equivalent data protection). But you also need:
+Suppose you have decided — for Chapter V reasons, for a customer contract, or because a national regulator told you to — that a given dataset will stay inside the EU/EEA. You still need:
 - **Disaster recovery** — if a data center floods, your data must survive
 - **High availability** — users expect near-zero downtime
 - **Backups** — stored in a different physical location
 
+Each of those puts a *second copy* of the data somewhere. The engineering problem is making sure that second somewhere is inside the boundary you committed to.
+
 ### The Solution: Paired Regions
 
-Azure pairs regions **within the same geography**:
+Microsoft associates *some* Azure regions with a partner region. European pairs, as documented by Microsoft:
 
 | Primary Region | Paired Region | Geography |
 |---------------|---------------|-----------|
 | West Europe (Netherlands 🇳🇱) | North Europe (Ireland 🇮🇪) | Europe |
-| France Central (Paris 🇫🇷) | France South (Marseille 🇫🇷) | France |
-| Germany West Central (Frankfurt 🇩🇪) | Germany North (Berlin 🇩🇪) | Germany |
+| North Europe (Ireland 🇮🇪) | West Europe (Netherlands 🇳🇱) | Europe |
+| France Central (Paris 🇫🇷) | France South (Marseille 🇫🇷) — restricted access | France |
+| Germany West Central (Frankfurt 🇩🇪) | Germany North (Berlin 🇩🇪) — restricted access | Germany |
+| Norway East | Norway West — restricted access | Norway |
+| Sweden Central | Sweden South — restricted access | Sweden |
+| Switzerland North | Switzerland West — restricted access | Switzerland |
 | UK South (London 🇬🇧) | UK West (Cardiff 🇬🇧) | United Kingdom |
 
-**Key guarantee**: Data replicated between paired regions **never leaves the geography**. A Dutch user's data goes Netherlands → Ireland, never to the US.
+**These European regions have no pair at all**: Austria East, Belgium Central, Denmark East, Italy North, Poland Central, Spain Central. Newer Azure regions generally ship without a pair and use **availability zones** as their redundancy story instead.
+
+### ⚠️ Four things "paired regions" does *not* mean
+
+Read these before you repeat the phrase "paired regions make us GDPR compliant" in a design doc.
+
+1. **It is not a residency guarantee.** Microsoft's own wording is *"To meet data residency requirements, **almost all** regions reside within the same geography as their pair."* Almost. The documented counter-example is **Brazil South, which is paired with South Central US** — outside the Brazil geography, and an asymmetric pair at that (South Central US is *not* paired back to Brazil South). If you need a residency guarantee you get it from your own region choices, contractual commitments, and controls like Azure Policy — not from the pairing table.
+2. **It is not global.** Only *"a small number of Azure services use these region pairs"* — geo-redundant storage (GRS) is the canonical one. Most services either replicate between arbitrary regions you choose, or do not replicate cross-region at all. "We're on a paired region" tells you nothing about where a *specific* service's second copy lands; you have to check that service.
+3. **It is not automatic DR.** Microsoft states plainly: *"Deploying resources to a region in a pair doesn't automatically make them more resilient, nor does it provide automatic high availability, disaster recovery capabilities, or failover."* Microsoft-managed failover of GRS is reserved for catastrophic situations.
+4. **It is not the EU residency product.** The thing Microsoft actually sells as an EU-residency commitment is the **EU Data Boundary**, a separate, contractual programme — plus per-service data-residency documentation. Region pairing is a reliability feature that *happens to be* geography-aware most of the time.
+
+What paired regions genuinely give you, per Microsoft: a prioritised **region recovery sequence** during a geography-wide outage, **sequential updating** so a bad platform update does not hit both halves of a pair at once, and same-geography placement for the services that use pairs.
 
 ### How It Works
 
@@ -86,7 +107,7 @@ EU Citizen (Netherlands)
 |---|----------|-------------------|
 | 1 | Data Residency Basics | Storing PII in the correct region, geo-routing writes |
 | 2 | Cross-Region Replication | Async replication between paired regions, failover |
-| 3 | Right to Erasure | Implementing GDPR Article 17 with cascading deletes |
+| 3 | Right to Erasure | Article 17 across replicas and backups; pseudonymisation vs anonymisation |
 | 4 | Data Sovereignty Audit | Auditing where data lives, generating compliance reports |
 
 ## Prerequisites
@@ -99,16 +120,17 @@ EU Citizen (Netherlands)
 
 ```bash
 # Navigate to the lab directory
-cd enterprise-patterns/gdpr-paired-regions
+cd 08-enterprise/gdpr-paired-regions
 
 # Start both region databases + Adminer
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=gdpr-paired-regions --display-name="GDPR Paired Regions (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -132,7 +154,7 @@ uv run python -m ipykernel install --user --name=gdpr-paired-regions --display-n
 │  ┌─────────────┐    ┌──────────────┐  ┌──────────────┐  │
 │  │  Jupyter     │    │ postgres     │  │ postgres     │  │
 │  │  Notebooks   │───►│ eu-west      │  │ eu-north     │  │
-│  │  (Python)    │───►│ :5433        │  │ :5434        │  │
+│  │  (Python)    │───►│ :55433        │  │ :55434        │  │
 │  └─────────────┘    └──────────────┘  └──────────────┘  │
 │                           │                   │          │
 │                     ┌─────┴───────────────────┘          │
@@ -148,17 +170,33 @@ Both Postgres instances start with the **same schema and seed data**. The notebo
 
 ## Real-World Examples
 
-| Company | GDPR Challenge | How Paired Regions Help |
-|---------|---------------|------------------------|
-| **Microsoft** | Azure serves millions of EU customers | Paired regions keep data in-geography |
-| **Spotify** | Swedish company, EU users worldwide | Stockholm + Ireland pairing |
-| **SAP** | German enterprise data sovereignty laws | Frankfurt + Berlin pairing |
-| **Stripe** | Payment data for EU merchants | Must keep financial PII in EU |
+Rather than guess at named companies' internal architectures, here are the *patterns* and where they come from — with the Azure facts checked against Microsoft's docs.
+
+| Pattern | Driver | What the architecture does |
+|---------|--------|----------------------------|
+| **In-geography DR pair** | Customer contracts or a regulator that will not accept a non-EU secondary | Primary + secondary both inside the EU/EEA, e.g. West Europe ↔ North Europe. Verified per service, not assumed from the pairing table. |
+| **In-country DR pair** | National/sector rules (e.g. German public-sector and some health/social-data rules) that want the secondary in the same country | Germany West Central ↔ Germany North, France Central ↔ France South. Note the secondary in each of these is a **restricted-access** region. |
+| **Single-region + zones** | A newer EU region with no pair at all (Poland Central, Italy North, Spain Central, …) | Availability zones for intra-region redundancy; any cross-region copy is one you design and place yourself. |
+| **Contractual EU boundary** | Enterprise/public-sector procurement | Microsoft's **EU Data Boundary** commitments layered on top of region choice — a contract, not a replication topology. |
+
+> 🙅 We deliberately do **not** claim "Company X uses region pair Y". Public architecture claims about named companies age badly and are usually wrong in the details. (For the record: an earlier version of this README claimed Spotify uses a "Stockholm + Ireland" Azure pairing. Sweden Central's documented pair is **Sweden South**, not Ireland — and Spotify has publicly run on Google Cloud since 2016. Both halves of that claim were wrong.)
+
+## 🚧 What This Lab Is Not
+
+This is a teaching lab. Please read this section before borrowing anything from it.
+
+- **Nothing here makes a system "GDPR compliant."** Compliance is an organisational and legal state — lawful basis, records of processing, DPIAs, contracts with processors, transfer assessments, security measures, governance. Code can *support* compliance; it cannot confer it. Where the notebooks print a score or a ✅, read it as *"this technical control is present and behaving"*, never as *"we are compliant"*.
+- **This is not legal advice.** Article citations are here so you can go read the actual text at [gdpr-info.eu](https://gdpr-info.eu/). Retention periods, national derogations, and what counts as a valid lawful basis all vary by member state and by sector. Ask a real DPO.
+- **The two Postgres containers are not Azure.** They are two independent databases on one laptop. Replication is done by hand in Python so you can watch it and break it. Real Azure geo-replication is inside the storage engine, has different failure modes, and does not lose a row because a Python cell raised an exception.
+- **The threat model is missing.** Everything here runs unencrypted, with one shared superuser, no TLS, no key management, no access control, no tenant isolation, and no logging of *reads*. Integrity/confidentiality (Article 5(1)(f)) is a whole separate lab.
+- **Backups are simulated.** Notebook 3 models a backup as a table copy so the erasure gap is visible in a few seconds. Real backup erasure involves retention windows, immutability/WORM policies, restore-time suppression lists, and offline media.
 
 ## Further Reading
 
 - [GDPR Full Text](https://gdpr-info.eu/)
-- [Azure Paired Regions Documentation](https://learn.microsoft.com/en-us/azure/reliability/cross-region-replication-azure)
+- [Azure region pairs and nonpaired regions](https://learn.microsoft.com/en-us/azure/reliability/regions-paired) — the authoritative pair list and the asymmetric-pair exceptions
+- [Microsoft EU Data Boundary](https://learn.microsoft.com/en-us/privacy/eudb/eu-data-boundary-learn) — the actual EU residency commitment
+- [Article 29 WP Opinion 05/2014 on Anonymisation Techniques](https://ec.europa.eu/justice/article-29/documentation/opinion-recommendation/files/2014/wp216_en.pdf) — why most "anonymised" data is really pseudonymised
 - [Microsoft GDPR Compliance](https://learn.microsoft.com/en-us/compliance/regulatory/gdpr)
 - [Azure Data Residency](https://azure.microsoft.com/en-us/explore/global-infrastructure/data-residency/)
 

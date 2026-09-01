@@ -11,7 +11,8 @@ OOD of a brokerage: accounts, portfolios, market/limit/stop orders, and a toy ex
 - Account / Portfolio / Position model
 - Order polymorphism (Market / Limit / Stop)
 - Trade recording
-- Simplified matching engine
+- Simplified matching engine (the exchange owns market data; `tick()` drives fills)
+- Price-time priority order book, Observer and Decorator risk guards
 
 ## Setup
 

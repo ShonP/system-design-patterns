@@ -8,8 +8,14 @@ OOD of an Amazon-style online store.
 
 ## Concepts covered
 
-- Catalog, cart, order, payment
-- Shipping
+- God class -> split responsibilities (bad -> better -> best progression)
+- `Product`, `Cart`, `Order`, `Store` with single responsibilities
+- **Strategy** -- pluggable `PaymentMethod` and `Discount`
+- **Observer** -- notifiers react to order status changes
+- **State** -- a legal-transition table on `Order`
+- Order as an immutable snapshot (prices frozen at checkout)
+- Checkout as a transaction boundary: stock rolled back when a charge declines
+- Shipping, tax and coupons; concurrency notes on check-then-deduct
 
 ## Setup
 
@@ -23,7 +29,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 ## Notebooks
 
 - [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- Product, Cart, Order, Payment
-- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- Add-to-cart, checkout, simple payment flow
+- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- v1 buggy -> v2 Strategy -> v3 Observer/State, plus a "verify the design" assertion cell
 
 ## References
 

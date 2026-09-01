@@ -9,7 +9,8 @@ OOD of Stack Overflow.
 ## Concepts covered
 
 - Clarifying questions, actors, use-cases, UML, SOLID check
-- `User`, `Post`, `Question`, `Answer`, `Comment`, `Vote`
+- A runnable **class skeleton** that turns the diagram into checkable assertions
+- `User`, `Post`, `Question`, `Answer`, `Comment`, `Vote`, `Badge`
 - Bad → Good → Best progression (god class → proper classes → enums/statuses)
 - Tags + search (inverted index)
 - Badges via the **observer** pattern
@@ -28,7 +29,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 
 ## Notebooks
 
-- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- clarifying questions, actors, entities, UML, SOLID
+- [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- clarifying questions, actors, entities, UML, SOLID, plus a runnable class skeleton whose assertions check every relationship in the diagram
 - [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- Bad → Good → Best implementation walkthrough
 - [`notebooks/03_extensions.ipynb`](./notebooks/03_extensions.ipynb) -- tags/search, badges (observer), moderation, concurrency, strategy
 

@@ -8,8 +8,12 @@ OOD of a chess game.
 
 ## Concepts covered
 
-- Pieces and movement rules
-- Board and game state
+- God class with string piece types -> "Replace Conditional with Polymorphism"
+- When subtype polymorphism is right and when **Strategy** would be (they are not the same)
+- All six pieces owning their own movement rules, sharing a `slide` helper
+- `Board` as a thin container; dependency direction `Game -> Board -> Piece`
+- `Move` as a data object, which makes undo and history trivial
+- Check detection by reusing `valid_moves`; geometry vs legality (self-check, pins)
 
 ## Setup
 
@@ -23,7 +27,7 @@ Select the `.venv` kernel in VS Code (top-right of the notebook). If it doesn't 
 ## Notebooks
 
 - [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) -- Board, Piece hierarchy, Move
-- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- Legal moves for a few pieces and a simple game loop
+- [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) -- All six pieces, `Board`, `Move`/undo, turn order, check detection, and a "verify the design" assertion cell
 
 ## References
 

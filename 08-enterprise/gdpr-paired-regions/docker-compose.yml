@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: gdpr_eu_west
     ports:
-      - "5433:5432"
+      - "55433:5432"
     volumes:
       - eu_west_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -31,7 +31,7 @@ services:
       POSTGRES_PASSWORD: demo
       POSTGRES_DB: gdpr_eu_north
     ports:
-      - "5434:5432"
+      - "55434:5432"
     volumes:
       - eu_north_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql

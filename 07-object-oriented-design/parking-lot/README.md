@@ -12,6 +12,7 @@ Classic OOD interview — a parking-lot system.
 - Class design + UML-style diagram
 - SOLID principles applied to a concrete problem
 - **Bad → good → best** refactor (God class → OOD → Strategy pattern)
+- Invariant enforcement (single-use tickets, guarded spots) and the template-method seam
 - Thread safety / concurrency (race reproduction + lock fix)
 - Reserved spots via a composable `SpotRule` hierarchy
 - Pluggable payment providers (cash / card / mock)

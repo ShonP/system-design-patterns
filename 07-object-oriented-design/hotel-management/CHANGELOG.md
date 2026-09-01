@@ -24,3 +24,16 @@ New content is **added**, never destructively replaced.
   (composable via Decorator), Factory for room construction from config,
   Observer for booking notifications, plus explicit SOLID framing
   (Open/Closed, Dependency Inversion). Runs clean via nbconvert.
+
+## 2026-08-20
+- QA pass: re-verified every notebook executes end to end with
+  `uv run jupyter nbconvert --execute`; normalized the kernelspec to
+  `Python 3 (.venv)` and stripped saved outputs.
+- Fixed `Hotel.is_available`: it read only `MAINTENANCE`, so `NEEDS_CLEAN` was dead state
+  and the notebook's claim that housekeeping prevents same-day turnover was false.
+  Dirty rooms are now unsellable until `complete_housekeeping`, demonstrated in the walkthrough.
+- Fixed reservation ids: `_rid` was a class attribute shared by every `Hotel` instance, so a
+  second hotel's first reservation was not #1. Now per-instance (notebooks 2 and 3).
+- Added invariant cells to notebook 2 (date validation, half-open overlap, cancel/refund
+  boundary, lifecycle state machine, derived billing) and to notebook 3 (Strategy swap,
+  Decorator composition order, Factory validation, late-subscribing Observer).

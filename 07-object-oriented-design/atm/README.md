@@ -8,9 +8,13 @@ OOD of an ATM.
 
 ## Concepts covered
 
-- States and transitions
-- Card, PIN, transactions
-- Hardware abstractions
+- God class -> separated hardware / bank / transaction / controller layers
+- **State machine** -- `IDLE -> CARD_INSERTED -> AUTHENTICATED <-> TRANSACTING`, with guards
+- **Command pattern** -- `BalanceInquiry` / `Deposit` / `Withdraw` / `Transfer` as classes
+- **Dependency injection** -- the ATM receives its dispenser, slot, screen and bank
+- Encapsulation: `balance` only moves through `Account.debit` / `deposit` / `withdraw`
+- Card + PIN auth with a 3-strikes block rule owned by the `Bank`
+- Daily cash limit, empty dispenser, and other error paths, backed by assertions
 
 ## Setup
 

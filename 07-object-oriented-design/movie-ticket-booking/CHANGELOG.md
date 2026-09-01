@@ -21,3 +21,16 @@ New content is **added**, never destructively replaced.
 - Added real-world mapping table (`threading.Lock` -> DB row lock -> Redis lock)
   and an edge-cases section (idempotency, clock skew, per-seat locking, payment failure).
 - Verified both notebooks execute end to end with `uv run jupyter nbconvert --execute`.
+
+## 2026-08-20
+- QA pass: re-verified every notebook executes end to end with
+  `uv run jupyter nbconvert --execute`; normalized the kernelspec to
+  `Python 3 (.venv)` and stripped saved outputs.
+- Added a "verify the design" cell proving the invariant the lab claims: under 30 concurrent
+  threads exactly one booking wins a seat, all-or-nothing multi-seat batches leave no partial
+  hold, holds cannot be stolen or confirmed after expiry, and BOOKED is terminal. The same
+  test is run against `NaiveBookingService` and asserted to FAIL, so the lock is proven to
+  do real work.
+- Explained why the race reproduces deterministically (`time.sleep` releases the GIL) and
+  why it would still be a bug without the sleep.
+- Rewrote the README's two-bullet "Concepts covered" to match what the notebooks teach.

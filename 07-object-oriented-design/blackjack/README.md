@@ -16,6 +16,8 @@ Object-oriented design of the classic card game, with correct Ace handling and a
 - **Strategy Pattern** — swap playing styles without subclassing
 - **Composition over inheritance** — `Player` *has a* `Strategy` and `Chips`
 - Betting with a `Chips` class, blackjack 3:2 payout, pushes
+- Stateless strategies: why a shared strategy object must not remember rounds
+- Pure settlement rule (`outcome()`) separated from printing, so every branch is testable
 - Discussion of splits / Open-Closed Principle for future extensions
 
 ## Setup

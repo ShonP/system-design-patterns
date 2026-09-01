@@ -14,7 +14,8 @@ OOD of a cricket match: teams, innings, overs, balls, and score computation.
 - Enums instead of magic strings (catching typos at write-time)
 - Encoding cricket rules (legal balls, extras, wickets, over-limit termination)
 - Winner reporting in cricket's own language (by runs / by wickets / tied)
-- Observer pattern via a live `Commentary` feed
+- Observer pattern done properly: `ObservableInnings` subclass with a subscriber list, plus why monkey-patching `Innings.record` is the wrong way to do it
+- Immutable `Ball` (frozen dataclass) — a bowled ball is history and must not be rewritten
 - Assertion-based mini test suite
 
 ## Setup

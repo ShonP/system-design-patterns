@@ -26,7 +26,7 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 - [`notebooks/01_class_design.ipynb`](./notebooks/01_class_design.ipynb) — Bad (god class) → good domain model; state machines; SOLID tour
 - [`notebooks/02_implementation.ipynb`](./notebooks/02_implementation.ipynb) — Runnable Python: `MenuItem`, `Table`, `Order`, `Bill`, `Staff`, `Kitchen`, `Reservation` + end-to-end dinner demo
-- [`notebooks/03_polymorphism_and_patterns.ipynb`](./notebooks/03_polymorphism_and_patterns.ipynb) — **Strategy** (pricing / happy-hour / loyalty), **Factory** (menu from JSON), **Observer** (kitchen, SMS, manager dashboard)
+- [`notebooks/03_polymorphism_and_patterns.ipynb`](./notebooks/03_polymorphism_and_patterns.ipynb) — **Strategy** (pricing / happy-hour / loyalty, composable and applied *pre-tax*), **Factory** (menu from JSON), **Observer** (kitchen, SMS, manager dashboard, with an injected event hub)
 
 ## References
 

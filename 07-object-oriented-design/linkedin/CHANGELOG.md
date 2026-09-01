@@ -18,3 +18,15 @@ New content is **added**, never destructively replaced.
   combines skill match with an "someone you know works there" bonus.
 - Both notebooks verified with `uv run jupyter nbconvert --execute`.
 - Updated README concept list to reflect new content.
+
+## 2026-08-20
+- QA pass: re-verified every notebook executes end to end with
+  `uv run jupyter nbconvert --execute`; normalized the kernelspec to
+  `Python 3 (.venv)` and stripped saved outputs.
+- Fixed `JobRecommender.score`, which constructed a throwaway `Application` just to compute
+  a skill match — burning an application id and implying a submission that never happened.
+  `match_score` now lives on `Job` (where the data is); `Application.match_score` delegates.
+- Added a "verify the design" cell: terminal-state guards on both state machines, the
+  `ConnectionService` duplicate/self-connect rules, skill normalization, endorsement
+  dedup + self-endorsement guard, DM gating, and an assertion that recommending creates
+  no phantom `Application`.

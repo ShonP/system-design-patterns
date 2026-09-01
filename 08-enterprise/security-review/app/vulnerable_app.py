@@ -18,7 +18,7 @@ import jwt
 import hashlib
 import bcrypt
 import requests as http_requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from flask import Flask, request, jsonify, render_template_string, redirect, make_response
 import psycopg2
 import redis
@@ -107,12 +107,16 @@ def show_comments_vulnerable(product_id):
     cur.close()
     conn.close()
 
-    # 🚨 BAD: Rendering user content directly into HTML without escaping
+    # 🚨 BAD: two bugs stacked on top of each other.
+    #   (a) user content goes into HTML with no escaping        -> stored XSS
+    #   (b) that same string is then COMPILED AS A JINJA TEMPLATE -> SSTI
+    # (b) is the worse one: a comment containing {{ 7*7 }} is *evaluated on the
+    # server*, which is a foothold for remote code execution, not just a popup.
     html = "<h2>Product Comments</h2>"
     for username, content, created_at in comments:
         html += f"<div><b>{username}</b>: {content} <small>({created_at})</small></div>"
 
-    return render_template_string(html)
+    return render_template_string(html)  # 🚨 user data reaches the template compiler
 
 
 @app.route("/comments/<int:product_id>/safe")
@@ -132,7 +136,7 @@ def show_comments_safe(product_id):
     cur.close()
     conn.close()
 
-    # ✅ GOOD: Escape all user-provided content
+    # ✅ GOOD: escape all user-provided content...
     html = "<h2>Product Comments</h2>"
     for username, content, created_at in comments:
         html += (
@@ -140,7 +144,12 @@ def show_comments_safe(product_id):
             f"<small>({escape(str(created_at))})</small></div>"
         )
 
-    return render_template_string(html)
+    # ✅ GOOD: ...and then hand the finished HTML straight to the browser.
+    # escape() neutralises < > & " ' — it does NOT neutralise Jinja's {{ }} or
+    # {% %}. Passing this string to render_template_string() would still compile
+    # user content as a template (SSTI), so escaping alone would NOT be a fix.
+    # Rule: user data is a template *variable*, never part of the template text.
+    return make_response(html)
 
 
 @app.route("/api/comments", methods=["POST"])
@@ -167,7 +176,10 @@ def add_comment():
 @app.route("/api/transfer", methods=["POST"])
 def transfer_vulnerable():
     """VULNERABLE: No CSRF token validation — any site can submit this form."""
-    data = request.json or request.form
+    # NOTE: request.json raises 415 when the body is form-encoded, and a
+    # cross-site <form> POST is *always* form-encoded. Use silent parsing so the
+    # endpoint accepts the request shape a real CSRF attack actually sends.
+    data = request.get_json(silent=True) or request.form
     from_user = data.get("from_user")
     to_user = data.get("to_user")
     amount = data.get("amount")
@@ -197,7 +209,7 @@ def transfer_safe():
     if not csrf_token or csrf_token != expected_token:
         return jsonify({"error": "Invalid CSRF token"}), 403
 
-    data = request.json or request.form
+    data = request.get_json(silent=True) or request.form
     return jsonify({
         "status": "transferred",
         "from": data.get("from_user"),
@@ -258,8 +270,18 @@ def fetch_url_safe():
     if parsed.hostname not in allowed_domains:
         return jsonify({"error": f"Domain not in allowlist: {parsed.hostname}"}), 403
 
+    # ⚠️  HONEST LIMITATION: this is still not airtight. We resolve the hostname
+    # once for the check and requests resolves it again for the fetch, so an
+    # attacker controlling DNS can return a public IP to us and a private IP to
+    # requests (DNS rebinding). Production fix: resolve once, pin the validated
+    # IP, and connect to that IP with the Host header set — or put the fetch
+    # behind an egress proxy that enforces the allowlist.
+
     try:
-        response = http_requests.get(url, timeout=5)
+        # ✅ GOOD: do NOT follow redirects. Without this, an allowlisted host can
+        # answer 302 -> http://169.254.169.254/ and every check above is bypassed,
+        # because requests re-resolves and re-fetches the redirect target itself.
+        response = http_requests.get(url, timeout=5, allow_redirects=False)
         return jsonify({
             "status_code": response.status_code,
             "content": response.text[:1000],
@@ -308,11 +330,15 @@ def login_vulnerable():
     return jsonify({"token": token})
 
 
+# ✅ GOOD: a real bcrypt hash of a value nobody can log in with. Comparing
+# against it makes the "no such user" path cost the same as the "wrong password"
+# path, closing the timing side channel. Computed once at import.
+_DUMMY_PASSWORD_HASH = bcrypt.hashpw(b"no-such-user", bcrypt.gensalt())
+
+
 @app.route("/api/login/safe", methods=["POST"])
 def login_safe():
     """FIXED: Proper password hashing, rate limiting via Redis, secure JWT."""
-    import bcrypt
-
     data = request.json
     username = data.get("username", "")
     password = data.get("password", "")
@@ -332,8 +358,13 @@ def login_safe():
     cur.close()
     conn.close()
 
-    # ✅ GOOD: Same error message whether user exists or not
-    if not user or not bcrypt.checkpw(password.encode(), user[1].encode()):
+    # ✅ GOOD: same error message AND same amount of work whether the user
+    # exists or not. Always run one bcrypt comparison — against the real hash if
+    # we have one, against the dummy hash if we don't — so response time does not
+    # leak which usernames are registered.
+    stored_hash = user[1].encode() if user else _DUMMY_PASSWORD_HASH
+    password_ok = bcrypt.checkpw(password.encode(), stored_hash)
+    if not user or not password_ok:
         r.incr(attempts_key)
         r.expire(attempts_key, 900)  # 15-minute window
         return jsonify({"error": "Invalid credentials"}), 401
@@ -347,8 +378,8 @@ def login_safe():
             "user_id": user[0],
             "username": username,
             "role": user[2],
-            "exp": datetime.utcnow() + timedelta(hours=1),
-            "iat": datetime.utcnow(),
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+            "iat": datetime.now(timezone.utc),
         },
         os.getenv("JWT_SECRET", SECRET_KEY),
         algorithm="HS256",
@@ -403,7 +434,7 @@ def profile_page_safe():
 
 @app.route("/health")
 def health():
-    return jsonify({"status": "ok", "timestamp": datetime.utcnow().isoformat()})
+    return jsonify({"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()})
 
 
 @app.route("/api/audit-log")

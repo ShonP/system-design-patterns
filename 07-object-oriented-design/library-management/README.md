@@ -11,10 +11,12 @@ Object-oriented design of a library management system, taught as a **bad → bet
 - Domain modeling: `Book`, `BookItem`, `Member`, `Loan`, `Reservation`
 - Single Responsibility Principle (god class → separated classes)
 - Strategy pattern (pluggable `FineCalculator`)
-- Observer-style notifier (reservation-ready, overdue)
+- Observer pattern: `Library` owns a subscriber list (`subscribe` / `unsubscribe` / `_publish`), so a notifier and an audit log can both listen
+- Strategy vs. Observer — why `FineCalculator` is one and `LibraryObserver` is the other
 - In-memory `Catalog` search (title / author / subject)
 - Reservation queue (FIFO) with auto-notify on return
-- Edge cases: loan limits, unknown ISBN/member, on-time returns
+- Edge cases: loan limits (enforced *and* asserted), unknown ISBN/member, on-time returns, FIFO queue-jumping
+- Named limitations: reservations never expire; `Member.active_loans` is per-object, so one `Member` must not be shared across two `Library` instances
 
 ## Setup
 

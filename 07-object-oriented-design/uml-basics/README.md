@@ -14,6 +14,7 @@ A gentle introduction to the three UML diagrams you'll actually use: class, sequ
 - Activity diagrams for process flow
 - Use case diagrams (actors, `<<include>>`, `<<extend>>`)
 - State diagrams for object lifecycles
+- Mermaid versions of the class / sequence / state diagrams for docs and PRs
 - Mapping UML to Python code (ABCs, dataclasses, composition vs aggregation)
 - Using UML to drive a **bad → better → best** refactor
 
@@ -28,7 +29,7 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 ## Notebooks
 
-- [`notebooks/01_diagrams.ipynb`](./notebooks/01_diagrams.ipynb) — Class, sequence, activity, **use case**, and state diagrams with ASCII examples, plus a visibility/stereotype cheat-sheet
+- [`notebooks/01_diagrams.ipynb`](./notebooks/01_diagrams.ipynb) — Class, sequence, activity, **use case**, and state diagrams with ASCII examples, a visibility/stereotype cheat-sheet, and a Mermaid appendix (markdown only — this one teaches by diagram, not by code)
 - [`notebooks/02_uml_to_python.ipynb`](./notebooks/02_uml_to_python.ipynb) — Turn a UML sketch into runnable Python (Library + Loan), composition vs aggregation in code
 - [`notebooks/03_bad_to_best.ipynb`](./notebooks/03_bad_to_best.ipynb) — Drive a refactor with UML: God class → single-responsibility split → ports & adapters
 

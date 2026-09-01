@@ -34,9 +34,15 @@ Not all data is equally sensitive. Companies use a **classification system** to 
 | 🟢 **Public** | Safe to share with anyone | Product names, public docs, blog posts | Everyone |
 | 🔵 **Internal** | OK within the company | Employee count, office locations, internal wikis | All employees |
 | 🟡 **Confidential** | Personal or business-sensitive | Customer names, emails, phone numbers, revenue | Authorized teams only |
-| 🔴 **Restricted** | Highest sensitivity | SSNs, credit cards, health records, passwords | Named individuals with audit trail |
+| 🔴 **Restricted** | Highest sensitivity | SSNs, credit cards, health records, passwords, exact dates of birth | Named individuals with audit trail |
 
 **The rule**: every database column, every API field, every log entry must be classified. If you don't know what level a piece of data is, treat it as **Restricted** until classified.
+
+Date of birth sits in Restricted for a reason that is easy to miss: on its own it
+looks like a birthday, but combined with a ZIP code and sex it re-identifies most
+of the US population (Sweeney, 2000). Notebook 1's scanner and the registry in
+`db/init.sql` agree on this — when a taxonomy disagrees with itself, the registry
+becomes a coin flip.
 
 ### Why Classification Matters
 
@@ -87,7 +93,7 @@ The principle is simple: **don't keep data longer than you need it**. Every day 
 | Activity logs | 90 days | Enough for debugging, not worth the risk longer |
 | Support tickets | 1 year | May need for follow-up or disputes |
 | Order history | 7 years | Tax law requires financial records |
-| Deleted accounts | 30 days grace | Allow account recovery, then hard delete |
+| Deleted accounts | 30 days grace | Allow account recovery, then hard delete — counted from the **deletion request**, not from account creation |
 | Payment cards | Delete on removal | No reason to keep after customer removes |
 
 ### Purge Strategies
@@ -95,6 +101,12 @@ The principle is simple: **don't keep data longer than you need it**. Every day 
 - **Hard Delete**: Remove the rows entirely. Used when no legal hold applies.
 - **Soft Delete**: Mark as deleted but keep in database. Used during grace periods.
 - **Anonymize**: Replace PII with fake/hashed values but keep the record for analytics.
+
+Each policy also has to name the **clock** it runs on. "One year after
+resolution" is `resolved_at`; "30-day grace period" is the deletion request
+timestamp. Running everything off `created_at` is a different policy that happens
+to compile — and it deletes accounts that were still inside the recovery window
+you promised them.
 
 ## Anonymization vs Pseudonymization
 
@@ -126,10 +138,10 @@ Alice Smith, age 34, Seattle → [removed], age 30-40, Pacific Northwest
 
 | Technique | Type | How It Works |
 |-----------|------|--------------|
-| **k-Anonymity** | Anonymization | Every record looks like at least k-1 other records |
-| **l-Diversity** | Anonymization | Each group has at least l different sensitive values |
-| **Differential Privacy** | Anonymization | Add calibrated noise so individual records can't be identified |
-| **Tokenization** | Pseudonymization | Replace values with random tokens, store mapping separately |
+| **k-Anonymity** | Anonymization | Every record looks like at least k-1 others **on the quasi-identifiers you declared** — reached by generalizing, and by suppressing the records that generalizing cannot hide |
+| **l-Diversity** | Anonymization | Each group has at least l different sensitive values (the distinct form still leaks when one value dominates) |
+| **Differential Privacy** | Anonymization | Add calibrated noise so individual records can't be identified — meaningful only with a **privacy budget** tracked across every query |
+| **Tokenization** | Pseudonymization | Replace values with random tokens, store mapping separately. Still personal data: the tokens link records together |
 
 ## Notebooks in This Series
 
@@ -139,6 +151,27 @@ Alice Smith, age 34, Seattle → [removed], age 30-40, Pacific Northwest
 | 2 | Privacy Impact Assessment | Build a PIA workflow, score risks, document data flows |
 | 3 | Anonymization Techniques | k-anonymity, l-diversity, differential privacy, tokenization |
 | 4 | Data Retention & Purging | Implement retention policies, automated purging, audit trails |
+
+## What This Lab Demonstrates — and What It Doesn't
+
+Everything here runs against one PostgreSQL database with 50 synthetic users, and
+the code is deliberately readable rather than complete. Four things to keep in
+mind before borrowing any of it:
+
+- **The PII scanner misses a lot.** Notebook 1 measures its own recall against a
+  human-labelled ground truth and finds roughly a third of the PII. Regex cannot
+  see a person's name or a free-form address. "The scan found nothing" is not
+  evidence that a column is clean, and any process that treats it that way is
+  worse than no scanner at all.
+- **Anonymization here is a demonstration, not a release process.** A real data
+  release needs a threat model, a review of what auxiliary datasets it could be
+  joined against, and someone who tries to break it before it ships.
+- **Erasure reaches further than one database.** Backups, replicas, WAL, search
+  indexes, caches, warehouses, trained models, object storage and third-party
+  processors all hold copies. Notebook 4 lists them; it only implements the
+  database.
+- **Legal hold is not implemented.** An active litigation hold overrides
+  retention, and a purge engine that does not check for one is a liability.
 
 ## Prerequisites
 
@@ -150,16 +183,17 @@ Alice Smith, age 34, Seattle → [removed], age 30-40, Pacific Northwest
 
 ```bash
 # Navigate to the lab directory
-cd enterprise-patterns/privacy-review
+cd 08-enterprise/privacy-review
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=privacy-review --display-name="Privacy Review (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

@@ -30,7 +30,7 @@ services:
       -c max_replication_slots=10
       -c hot_standby=on
       -c archive_mode=on
-      -c archive_command='test ! -f /var/lib/postgresql/archive/%f && cp %p /var/lib/postgresql/archive/%f'
+      -c archive_command='test -f /var/lib/postgresql/archive/%f || cp %p /var/lib/postgresql/archive/%f'
       -c log_replication_commands=on
     ports:
       - "5432:5432"
@@ -44,6 +44,32 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    depends_on:
+      pg-archive-init:
+        condition: service_completed_successfully
+
+  # ---------------------------------------------------------------------------
+  # Archive volume owner fix — runs once, before the primary
+  # ---------------------------------------------------------------------------
+  # Docker creates a named volume's mount point owned by root. The PostgreSQL
+  # archiver runs as the `postgres` user, so without this the archive_command
+  # above fails on EVERY segment: `pg_stat_archiver` shows failed_count
+  # climbing and archived_count stuck at 0, while `archive_mode = on` in the
+  # config looks perfectly healthy. That is a silently broken PITR capability,
+  # and it is one of the most common ways real deployments discover they have
+  # no point-in-time recovery at all — usually while trying to use it.
+  #
+  # Notebook 3 asserts that archiving actually succeeds, rather than trusting
+  # the setting.
+  pg-archive-init:
+    image: postgres:16
+    container_name: bcdr-pg-archive-init
+    command: >
+      sh -c "mkdir -p /var/lib/postgresql/archive
+      && chown -R postgres:postgres /var/lib/postgresql/archive
+      && chmod 700 /var/lib/postgresql/archive"
+    volumes:
+      - pg_archive:/var/lib/postgresql/archive
 
   # ---------------------------------------------------------------------------
   # PostgreSQL Standby — hot standby that streams WAL from primary
@@ -59,7 +85,7 @@ services:
       - pg_standby_data:/var/lib/postgresql/data
       - ./db/standby-entrypoint.sh:/standby-entrypoint.sh
     ports:
-      - "5433:5432"
+      - "55433:5432"
     depends_on:
       pg-primary:
         condition: service_healthy

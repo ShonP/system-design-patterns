@@ -12,12 +12,25 @@ We've built an **intentionally vulnerable Flask web app** that you'll attack and
 
 > ⚠️ **WARNING**: The Flask app in this lab contains **deliberate security vulnerabilities** for educational purposes. Never deploy it to a real environment.
 
+### How to read the vulnerable/fixed pairs
+
+Every vulnerable endpoint has a `/safe` twin, and the notebooks fire the *same*
+payload at both. Read them as a matched pair — the interesting question is never
+"does the attack work?" but "does the fix close the whole hole, or only the part
+the demo happened to test?". Notebook 2's XSS section is the worked example: HTML
+escaping stops the `<script>` tag and does **nothing** about `{{ 7*191 }}`, so a
+page that escapes and then calls `render_template_string` is still exploitable.
+
+Each `/safe` endpoint is also asserted as a **control** in the notebook 4 DAST
+scanner: if a fix ever regresses, the lab fails loudly instead of quietly teaching
+the wrong thing.
+
 ## Notebooks in This Series
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Threat Modeling (STRIDE) | How to systematically identify threats before writing code |
-| 2 | Common Vulnerabilities | SQL injection, XSS, CSRF, SSRF, missing security headers — attack and fix each one |
+| 1 | Threat Modeling (STRIDE) | STRIDE-per-element, trust boundaries, and deriving severity from a risk matrix |
+| 2 | Common Vulnerabilities | SQL injection, XSS, SSTI, CSRF, SSRF, missing security headers — attack and fix each one |
 | 3 | Secrets Management | Why hardcoded secrets are dangerous and how to fix it |
 | 4 | Security Gates in CI/CD | Automated SAST/DAST scanning, dependency checks, sign-off |
 
@@ -52,7 +65,7 @@ The **Security Development Lifecycle** is a set of security practices that Micro
 | Concept | What It Means | Why It Matters |
 |---------|---------------|----------------|
 | **Threat Modeling** | Structured way to find what can go wrong | Finds design-level bugs before code is written |
-| **STRIDE** | Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation of Privilege | Framework for categorizing threats |
+| **STRIDE** | Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation of Privilege | Framework for categorizing threats — applied *per DFD element type*, since not every letter applies to every element |
 | **OWASP Top 10** | Most critical web application security risks | Industry standard vulnerability checklist |
 | **SAST** | Static Application Security Testing — scans source code | Finds bugs without running the app |
 | **DAST** | Dynamic Application Security Testing — scans running app | Finds bugs that only appear at runtime |
@@ -87,16 +100,17 @@ The [OWASP Top 10](https://owasp.org/www-project-top-ten/) lists the most critic
 
 ```bash
 # Navigate to the lab directory
-cd enterprise-patterns/security-review
+cd 08-enterprise/security-review
 
 # Start PostgreSQL + Redis + Flask App + Visualization Tools
-docker-compose up -d
+docker compose up -d --build
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=security-review --display-name="Security Review (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

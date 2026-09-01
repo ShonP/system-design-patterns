@@ -13,7 +13,7 @@ OOD of a hotel management system.
 - `Enum` and `@dataclass` for typo-proof, low-boilerplate domain types
 - Interval-overlap math for reservations and double-booking prevention
 - State machines via `ReservationStatus` / `RoomStatus`
-- Cancellation policy (24-hour refund rule) and housekeeping log
+- Cancellation policy (24-hour refund rule) and a housekeeping log that genuinely blocks booking a dirty room
 - Room service extras and a tiny invoice
 - Polymorphism via `ABC` + design patterns (Strategy, Decorator, Factory, Observer)
 - SOLID principles applied: Open/Closed, Dependency Inversion, Single-Responsibility
