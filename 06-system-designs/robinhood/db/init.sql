@@ -128,6 +128,16 @@ INSERT INTO orders (user_id, symbol_id, side, order_type, quantity, limit_price_
     (3, 4, 'buy',  'market', 30,  NULL,  'filled', 30, 17500, NOW() - INTERVAL '10 days'),
     (4, 6, 'buy',  'limit', 100,  22000, 'filled',100, 22000, NOW() - INTERVAL '5 days');
 
+-- ...and the trade rows that back them. An order marked 'filled' with no
+-- matching row in `trades` is a hole in the ledger: the positions above could
+-- never be rebuilt or audited from history. Every fill gets an execution.
+INSERT INTO trades (order_id, symbol_id, price_cents, quantity, executed_at) VALUES
+    (1, 1, 18000,  50, NOW() - INTERVAL '30 days'),
+    (2, 3, 50000,  20, NOW() - INTERVAL '20 days'),
+    (3, 7, 85000,  10, NOW() - INTERVAL '15 days'),
+    (4, 4, 17500,  30, NOW() - INTERVAL '10 days'),
+    (5, 6, 22000, 100, NOW() - INTERVAL '5 days');
+
 -- Seed some price history (last 24 hours, every 30 min) for charting demos
 INSERT INTO price_history (symbol_id, price_cents, recorded_at)
 SELECT

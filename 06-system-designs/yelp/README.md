@@ -17,9 +17,9 @@ This lab walks you through all three with real, runnable code.
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Geospatial Search | PostGIS spatial indexes, Elasticsearch geo_distance, Redis caching, why B-trees fail for 2D data |
-| 2 | Review & Rating Aggregation | Running average formula, optimistic locking for concurrent updates, database constraints |
-| 3 | Search Ranking & Relevance | BM25 text scoring, fuzzy matching, autocomplete (search-as-you-type), multi-signal ranking with function_score |
+| 1 | Geospatial Search | PostGIS spatial indexes, Elasticsearch geo_distance, Redis caching, why B-trees fail for 2D data, why a lat/lon box is not a circle |
+| 2 | Review & Rating Aggregation | Running average formula, a reproducible lost update, optimistic locking, drift-free integer sums, cache invalidation |
+| 3 | Search Ranking & Relevance | BM25 text scoring, fuzzy matching, autocomplete (search-as-you-type), multi-signal ranking with function_score, index-vs-source-of-truth reconciliation |
 
 ## Prerequisites
 
@@ -31,16 +31,17 @@ This lab walks you through all three with real, runnable code.
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/yelp
+cd 06-system-designs/yelp
 
 # Start PostgreSQL + Redis + Elasticsearch + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=yelp --display-name="Yelp (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -65,13 +66,23 @@ uv run python -m ipykernel install --user --name=yelp --display-name="Yelp (Pyth
 - **B-tree indexes** — work for 1D data but fail for lat/lon queries
 - **R-tree / GIST indexes** (PostGIS) — designed for multi-dimensional spatial data
 - **Elasticsearch geo_distance** — purpose-built for location search at scale
+- **Bounding box ≠ circle** — a box with equal deltas on both axes is too narrow east–west
+  (`lon_delta = lat_delta / cos(latitude)`) and too wide at the corners. Size it to *contain*
+  the circle, then run an exact second-pass distance filter
 - **Geohashing & Quadtrees** — alternative spatial indexing strategies (discussed conceptually)
 
 ### Rating Aggregation
 - **On-the-fly AVG()** — simple but doesn't scale (joins millions of rows)
 - **Cron batch update** — fast reads but stale data
 - **Running average formula** — `new_avg = (old_avg × n + rating) / (n + 1)` — real-time updates
-- **Optimistic locking** — prevents data corruption from concurrent reviews
+- **The lost update** — reproduced deterministically with a `threading.Barrier`: application-side
+  read-modify-write silently drops concurrent reviews from the summary
+- **Single-statement updates** — Postgres re-evaluates `SET` expressions under `READ COMMITTED`,
+  so the same formula inside one `UPDATE` is already safe
+- **Optimistic locking** — use `num_reviews` as a version number when the arithmetic must live in
+  application code
+- **Integer `rating_sum`** — addition commutes, so the average stops drifting with every rounding
+- **Cache invalidation** — the write path has to delete the read path's cache entry
 - **Database constraints** — enforce one-review-per-user-per-business at the persistence layer
 
 ### Search Ranking
@@ -79,11 +90,14 @@ uv run python -m ipykernel install --user --name=yelp --display-name="Yelp (Pyth
 - **Fuzzy matching** — handles typos using edit distance
 - **Autocomplete (search-as-you-type)** — `match_phrase_prefix` for instant suggestions
 - **Multi-signal ranking** — combine text match + distance + rating + review count
-- **`function_score`** — Elasticsearch's custom ranking query
+- **`function_score`** — Elasticsearch's custom ranking query, with the score recomputed by hand
+  and checked against Elasticsearch (`log1p` is base 10; gaussian decay reaches `decay` at
+  `offset + scale`, not at `scale`)
 
 ### Architecture Patterns
 - **Scaling reads** — cache-aside pattern with Redis for search results and business details
-- **Data sync** — Change Data Capture (CDC) to keep Elasticsearch in sync with Postgres
+- **Data sync** — Change Data Capture (CDC) to keep Elasticsearch in sync with Postgres, plus a
+  runnable audit-and-repair pass that diffs the index against Postgres and re-indexes the drift
 - **Filter sequence** — apply the most restrictive filter first (distance → category → text)
 
 ## Architecture
@@ -115,6 +129,19 @@ User Search Request
 | Data size is small (~1 TB) | No need for sharding — single Postgres instance works |
 | Read:write ratio is ~1000:1 | Caching + read replicas solve the scaling problem |
 | Postgres extensions (PostGIS, pg_trgm) | Can avoid Elasticsearch entirely for simpler setups |
+
+## Honest Limits of This Toy
+
+- **500 businesses, 3,000 reviews.** At that size a sequential scan beats every index in the lab.
+  Query *plans*, not wall-clock numbers, are the evidence that the indexes matter — the notebooks
+  say so where it counts.
+- **Synthetic text.** Every business shares one description, so BM25 has almost nothing to work
+  with and relevance quality can't be measured here.
+- **No relevance evaluation, no personalisation, no review moderation.**
+- **Flat Earth-ish maths.** The hand-rolled bounding box uses 111,320 m per degree of latitude and
+  breaks near the poles and across the antimeridian; PostGIS and Elasticsearch don't.
+- **Seeded data.** `db/init.sql` calls `setseed(0.42)`, so `docker compose down -v && up -d`
+  rebuilds essentially the same businesses and reviews rather than a fresh random world.
 
 ## License
 

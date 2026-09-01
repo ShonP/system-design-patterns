@@ -93,8 +93,19 @@ def db_execute(query, params=None):
 # Presence helpers (Redis-based)
 # ---------------------------------------------------------------------------
 def set_online(user_id: int):
-    """Mark user as online with a TTL (acts as a heartbeat lease)."""
-    redis_client.set(f"presence:{user_id}", "online", ex=60)
+    """Mark user as online with a TTL (acts as a heartbeat lease).
+
+    We also stamp `last_seen` on every refresh. That looks redundant while the
+    client is alive, but it is what makes "last seen" survive a HARD crash:
+    if the phone dies without a clean disconnect, nobody ever calls
+    set_offline(), the presence key just expires -- and without this stamp the
+    user would show as "offline, last seen: never".
+    """
+    now = datetime.now(timezone.utc).isoformat()
+    pipe = redis_client.pipeline()
+    pipe.set(f"presence:{user_id}", "online", ex=60)
+    pipe.set(f"last_seen:{user_id}", now)
+    pipe.execute()
 
 
 def set_offline(user_id: int):
@@ -117,40 +128,66 @@ def get_presence(user_id: int) -> dict:
 # ---------------------------------------------------------------------------
 # Message helpers
 # ---------------------------------------------------------------------------
-def next_sequence(chat_id: int) -> int:
-    """Atomically increment and return the next sequence number for a chat."""
-    row = db_execute(
-        "UPDATE chat_sequences SET last_sequence = last_sequence + 1 "
-        "WHERE chat_id = %s RETURNING last_sequence",
-        (chat_id,),
-    )
-    return row["last_sequence"] if row else 1
-
-
 def store_message(chat_id: int, sender_id: int, content: str, encrypted: str = None):
-    """Persist a message and create inbox entries for every recipient."""
-    seq = next_sequence(chat_id)
-    msg = db_execute(
-        "INSERT INTO messages (chat_id, sender_id, content, encrypted_content, sequence_number) "
-        "VALUES (%s, %s, %s, %s, %s) RETURNING id, server_timestamp",
-        (chat_id, sender_id, content, encrypted, seq),
-    )
-    msg_id = msg["id"]
-    ts = msg["server_timestamp"].isoformat()
+    """Persist a message and create inbox entries for every recipient.
 
-    # Create inbox entries for every participant except the sender
-    participants = db_fetch_all(
-        "SELECT user_id FROM chat_participants WHERE chat_id = %s AND user_id != %s",
-        (chat_id, sender_id),
-    )
+    ALL THREE writes -- bump the sequence, insert the message, fan out the
+    inbox rows -- happen in ONE transaction. That matters for two reasons:
+
+    1. Atomicity. A crash halfway through must not leave a message with no
+       inbox rows (nobody would ever receive it), nor burn a sequence number
+       with no message behind it (every client would report a permanent gap).
+
+    2. Per-chat ORDERING. `UPDATE chat_sequences ... RETURNING` takes a row
+       lock on this chat's counter and holds it until COMMIT. So a second
+       sender in the same chat blocks until we are done. Sequence order then
+       equals commit order equals server_timestamp order -- they can never
+       disagree. Allocating the sequence in its own transaction (as an earlier
+       version of this server did) lets sender A grab seq=5, sender B grab
+       seq=6, and then B commit FIRST -- so a reader ordering by timestamp
+       would show message 6 before message 5.
+
+    Note this serialises writes per chat, not globally. Two different chats
+    still write concurrently, because they lock different counter rows.
+    """
     conn = get_db()
     try:
-        with conn.cursor() as cur:
-            for p in participants:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # 1. Take the per-chat sequence lock and allocate the next number.
+            cur.execute(
+                "UPDATE chat_sequences SET last_sequence = last_sequence + 1 "
+                "WHERE chat_id = %s RETURNING last_sequence",
+                (chat_id,),
+            )
+            row = cur.fetchone()
+            if row is None:
+                # First message in a chat created outside create_chat.
                 cur.execute(
-                    "INSERT INTO inbox (user_id, message_id) VALUES (%s, %s)",
-                    (p["user_id"], msg_id),
+                    "INSERT INTO chat_sequences (chat_id, last_sequence) VALUES (%s, 1) "
+                    "RETURNING last_sequence",
+                    (chat_id,),
                 )
+                row = cur.fetchone()
+            seq = row["last_sequence"]
+
+            # 2. Insert the message itself.
+            cur.execute(
+                "INSERT INTO messages (chat_id, sender_id, content, encrypted_content, "
+                "sequence_number) VALUES (%s, %s, %s, %s, %s) "
+                "RETURNING id, server_timestamp",
+                (chat_id, sender_id, content, encrypted, seq),
+            )
+            msg = cur.fetchone()
+            msg_id = msg["id"]
+            ts = msg["server_timestamp"].isoformat()
+
+            # 3. Fan out: one inbox row per participant except the sender.
+            cur.execute(
+                "INSERT INTO inbox (user_id, message_id) "
+                "SELECT user_id, %s FROM chat_participants "
+                "WHERE chat_id = %s AND user_id != %s",
+                (msg_id, chat_id, sender_id),
+            )
         conn.commit()
     finally:
         conn.close()
@@ -195,34 +232,67 @@ async def handle_send_message(ws, user_id: int, payload: dict):
 
 
 async def handle_ack(ws, user_id: int, payload: dict):
-    """Client acknowledges receiving a message — remove from inbox."""
+    """Client acknowledges receiving a message — mark the inbox row delivered.
+
+    The `status = 'pending'` guard is what keeps the receipt state machine
+    MONOTONE. Clients retry ACKs, and an ACK can arrive AFTER the read event
+    (the UI shows the message the instant it lands, so 'read' can legitimately
+    beat the delivery ACK on the wire). Without the guard, a late duplicate
+    ACK would rewrite 'read' back to 'delivered' and the sender's checkmarks
+    would go 🔵✓✓ -> ✓✓. Status only ever moves forwards.
+    """
     message_id = payload["message_id"]
-    db_execute(
+    row = db_execute(
         "UPDATE inbox SET status = 'delivered', delivered_at = NOW() "
-        "WHERE user_id = %s AND message_id = %s AND status = 'pending'",
+        "WHERE user_id = %s AND message_id = %s AND status = 'pending' "
+        "RETURNING id",
         (user_id, message_id),
     )
+    # Only tell the sender ✓✓ on the transition, not on retries.
+    if row:
+        msg = db_fetch_one(
+            "SELECT sender_id, chat_id FROM messages WHERE id = %s", (message_id,)
+        )
+        if msg:
+            redis_client.publish(f"user:{msg['sender_id']}", json.dumps({
+                "type": "delivery_receipt",
+                "message_id": message_id,
+                "recipient_id": user_id,
+                "chat_id": msg["chat_id"],
+            }))
     await send_json(ws, {"type": "ack_ok", "message_id": message_id})
 
 
 async def handle_read(ws, user_id: int, payload: dict):
-    """Client marks a message as read — update inbox and notify sender."""
+    """Client marks a message as read — update inbox and notify sender.
+
+    Two details that keep the state machine honest:
+      * `status != 'read'` makes a repeated read a no-op, so read_at records
+        the FIRST read rather than the most recent one.
+      * `COALESCE(delivered_at, NOW())` backfills delivery. A read implies a
+        delivery, so 'read' must never be reached with delivered_at NULL --
+        otherwise the sender's UI has a message that was read but never
+        delivered.
+    """
     message_id = payload["message_id"]
-    db_execute(
-        "UPDATE inbox SET status = 'read', read_at = NOW() "
-        "WHERE user_id = %s AND message_id = %s",
+    row = db_execute(
+        "UPDATE inbox SET status = 'read', read_at = NOW(), "
+        "delivered_at = COALESCE(delivered_at, NOW()) "
+        "WHERE user_id = %s AND message_id = %s AND status != 'read' "
+        "RETURNING id",
         (user_id, message_id),
     )
-    # Notify the original sender via pub/sub
-    msg = db_fetch_one("SELECT sender_id, chat_id FROM messages WHERE id = %s", (message_id,))
-    if msg:
-        event = json.dumps({
-            "type": "read_receipt",
-            "message_id": message_id,
-            "reader_id": user_id,
-            "chat_id": msg["chat_id"],
-        })
-        redis_client.publish(f"user:{msg['sender_id']}", event)
+    # Notify the original sender via pub/sub (only on the transition)
+    if row:
+        msg = db_fetch_one("SELECT sender_id, chat_id FROM messages WHERE id = %s", (message_id,))
+        if msg:
+            event = json.dumps({
+                "type": "read_receipt",
+                "message_id": message_id,
+                "reader_id": user_id,
+                "chat_id": msg["chat_id"],
+            })
+            redis_client.publish(f"user:{msg['sender_id']}", event)
 
     await send_json(ws, {"type": "read_ok", "message_id": message_id})
 
@@ -273,7 +343,11 @@ async def handle_sync(ws, user_id: int, payload: dict):
         "m.sequence_number, m.server_timestamp "
         "FROM inbox i JOIN messages m ON i.message_id = m.id "
         "WHERE i.user_id = %s AND i.status = 'pending' "
-        "ORDER BY m.server_timestamp",
+        # Order by (chat, sequence) -- NOT by timestamp. The per-chat sequence
+        # number is the ONLY authoritative order; a timestamp can tie, and it
+        # comes from the DB clock rather than from the chat's own counter.
+        # This also matches idx_messages_chat(chat_id, sequence_number).
+        "ORDER BY m.chat_id, m.sequence_number",
         (user_id,),
     )
     for r in rows:
@@ -302,20 +376,53 @@ HANDLERS = {
 # ---------------------------------------------------------------------------
 # Redis pub/sub listener — forwards messages to local WebSocket connections
 # ---------------------------------------------------------------------------
-async def redis_subscriber(user_id: int, ws):
-    """Subscribe to the user's Redis channel and forward messages."""
+async def redis_subscriber(user_id: int, ws, ready: asyncio.Event):
+    """Subscribe to the user's Redis channel and forward messages.
+
+    `ready` is not set until Redis has CONFIRMED the subscription. This is not
+    ceremony: `pubsub.subscribe()` only writes bytes to a socket. Until Redis
+    has actually processed that SUBSCRIBE, a PUBLISH arriving on a *different*
+    connection is dropped on the floor -- pub/sub keeps no backlog for a
+    channel nobody is listening to yet. Reading the subscribe confirmation
+    proves the round-trip completed, so a client that has been told
+    "connected" genuinely cannot miss a push that happens after it.
+    """
     pubsub = redis_client.pubsub()
     channel = f"user:{user_id}"
     pubsub.subscribe(channel)
     try:
+        # Drain the subscribe confirmation -- reading it is the proof.
+        for _ in range(200):                       # ~2s budget, never blocking
+            msg = pubsub.get_message(timeout=0)
+            if msg and msg["type"] == "subscribe":
+                break
+            await asyncio.sleep(0.01)
+        ready.set()
+        await asyncio.sleep(0)   # let the handler resume and greet the client
+
         while True:
-            msg = pubsub.get_message(ignore_subscribe_messages=True, timeout=0.5)
-            if msg and msg["type"] == "message":
-                await ws.send(msg["data"])
-            await asyncio.sleep(0.05)
+            # timeout=0 is a NON-BLOCKING poll, and that is the whole point.
+            # A non-zero timeout here blocks the entire asyncio event loop --
+            # not just this user, but every other connection and all request
+            # handling stalls behind it. With N connected users the cost
+            # compounds: each forwarded message waits behind up to N such
+            # blocking reads. At 0.5s x 5 connections that measured ~3.5s of
+            # added latency, against the ~50ms this design claims.
+            forwarded = False
+            while True:
+                msg = pubsub.get_message(ignore_subscribe_messages=True, timeout=0)
+                if not msg:
+                    break
+                if msg["type"] == "message":
+                    await ws.send(msg["data"])
+                    forwarded = True
+            # Yield immediately if we just drained a backlog, otherwise idle
+            # briefly so an idle connection is not a busy-wait.
+            await asyncio.sleep(0 if forwarded else 0.02)
     except (websockets.exceptions.ConnectionClosed, asyncio.CancelledError):
         pass
     finally:
+        ready.set()          # never leave the handler waiting on a dead task
         pubsub.unsubscribe(channel)
         pubsub.close()
 
@@ -340,8 +447,16 @@ async def handler(ws):
         connections.setdefault(user_id, set()).add(ws)
         set_online(user_id)
 
-        # Start Redis subscription in the background
-        sub_task = asyncio.create_task(redis_subscriber(user_id, ws))
+        # Start the Redis subscription and wait for Redis to confirm it BEFORE
+        # replying "connected". Otherwise a client can legitimately send a
+        # message the instant it is greeted and have the reply published into
+        # a channel it is not subscribed to yet -- silently lost.
+        sub_ready = asyncio.Event()
+        sub_task = asyncio.create_task(redis_subscriber(user_id, ws, sub_ready))
+        try:
+            await asyncio.wait_for(sub_ready.wait(), timeout=5)
+        except asyncio.TimeoutError:
+            print(f"[!] User {user_id}: Redis subscription not confirmed in 5s")
 
         await send_json(ws, {"type": "connected", "user_id": user_id})
         print(f"[+] User {user_id} connected  (total ws: {sum(len(v) for v in connections.values())})")

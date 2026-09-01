@@ -17,9 +17,9 @@ This lab walks you through all of it with real, runnable code.
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | URL Encoding & Hash Generation | Base62 encoding, hash-based vs counter-based short codes, collision handling |
-| 2 | Redirect Service with Caching | HTTP redirects (301 vs 302), Cache-Aside pattern, FastAPI redirect service |
-| 3 | Analytics & Click Tracking | Sync vs async tracking, Redis counters, write-behind pattern, SQL analytics |
+| 1 | URL Encoding & Hash Generation | Requirements + back-of-envelope, Base62, hash vs counter codes, birthday-paradox collisions |
+| 2 | Redirect Service with Caching | 301 vs 302, Cache-Aside, negative caching, custom-alias contention (TOCTOU race + fix) |
+| 3 | Analytics & Click Tracking | Sync vs async tracking, write-behind, Redis counter drift, real-time top-N |
 
 ## Prerequisites
 
@@ -31,16 +31,17 @@ This lab walks you through all of it with real, runnable code.
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/bitly
+cd 06-system-designs/bitly
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=bitly --display-name="Bitly (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -96,13 +97,21 @@ uv run python -m ipykernel install --user --name=bitly --display-name="Bitly (Py
 
 ## Real-World Numbers
 
-| Metric | Value |
-|--------|-------|
-| Read/Write ratio | 1000:1 |
-| Target redirect latency | < 100ms |
-| Short code length | 6–7 characters |
-| Code space (7 chars) | 62⁷ ≈ 3.5 trillion |
-| Availability target | 99.99% |
+Notebook 1 computes all of these from stated assumptions — run the cell rather
+than trusting the table.
+
+| Metric | Value | Where it comes from |
+|--------|-------|---------------------|
+| Read/Write ratio | 1000:1 | assumption |
+| New URLs/day | 100M | assumption |
+| Write throughput | ~1,157/s avg, ~3,472/s peak | 100M ÷ 86,400, ×3 for peak |
+| Read throughput | ~1.16M/s avg, ~3.47M/s peak | write QPS × 1000 |
+| Storage (5 years) | ~91 TB | 100M/day × 500 B × 365 × 5 |
+| Egress on redirects | ~4.6 Gbps | 1.16M/s × 500 B × 8 |
+| Short code length | **7 characters** | 182.5B codes needed; 62⁶ = 56.8B is too small, 62⁷ = 3.52T gives 19× headroom |
+| Hot cache working set | ~5 GB | 10M hot links × 500 B — fits one Redis node |
+| Target redirect latency | p99 < 100 ms | non-functional requirement |
+| Availability target | 99.99% (reads) | non-functional requirement |
 
 ## License
 

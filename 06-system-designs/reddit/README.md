@@ -8,10 +8,16 @@ Social news: subreddits, posts, votes, threaded comments, and hot ranking.
 
 ## Concepts covered
 
-- Hot-ranking formula (log + time bonus)
-- Denormalized vote counts
-- Sharded counters for hot posts
-- Threaded comment storage (parent_id + materialized path)
+- Back-of-envelope QPS, storage and bandwidth — all derived from one set of constants
+- **Hot ranking**, transcribed from Reddit's published formula
+  (`sign*log10(|net|) + seconds/45000`), plus a runnable demo of the classic
+  sign-placement mis-transcription and what it does to net-negative posts
+- The other sorts with their real formulas: **Top**, **Controversial**
+  (`magnitude ** balance`) and **Best** (Wilson score lower bound)
+- **Vote fuzzing** — why displayed counts are deliberately wrong, and what it costs
+- Denormalized vote counts vs. live aggregation (measured)
+- Vote-counter contention: single row → sharded counters → Redis write-behind (measured)
+- Threaded comment storage: adjacency list vs. materialized path vs. closure table
 
 ## Setup
 

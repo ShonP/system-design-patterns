@@ -49,12 +49,19 @@ This lab walks you through the core building blocks of such a system — step by
 | **CRDTs** | Operations commute — can be applied in any order | No central server needed; higher memory (tombstones) |
 
 ### Document Flow
-1. Client sends `edit` operation over WebSocket (e.g., INSERT at position 5)
-2. Server transforms it against any concurrent ops (OT)
-3. Server applies it to the in-memory document
-4. Server persists the operation to the **operations** table
-5. Server broadcasts the transformed op to all other editors
-6. Each client applies the remote op to their local document
+1. Client sends `edit` over WebSocket, quoting the **revision** it edited against
+   (e.g., INSERT at position 5, revision 12)
+2. Server transforms it against every op applied since that revision (OT)
+3. Server applies the transformed op(s) to the in-memory document
+4. Server transforms every *other* editor's cursor by the same op, so carets
+   follow their character instead of drifting to a stale offset
+5. Server persists the operation to the **operations** table
+6. Server ACKs the sender with the op it actually applied and the new revision
+7. Server broadcasts the transformed op to all other editors
+
+A delete can transform into **two** ops (someone typed inside the range being
+deleted) or **zero** (someone already deleted it), which is why the ACK carries
+a list rather than a single op.
 
 ### Versioning & Compaction
 - **Snapshots**: periodically compress the operations log into a full document text
@@ -72,16 +79,17 @@ This lab walks you through the core building blocks of such a system — step by
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/google-docs
+cd 06-system-designs/google-docs
 
 # Start PostgreSQL + Redis + Doc Server + Visualization Tools
-docker-compose up -d
+docker compose up -d --build
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=google-docs --display-name="Google Docs (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -108,6 +116,21 @@ uv run python -m ipykernel install --user --name=google-docs --display-name="Goo
 | Operations log | Append-only table | Captures every edit for replay, versioning, and OT |
 | Presence | Redis hashes | Fast reads, cross-server capable, naturally ephemeral |
 | Versioning | Snapshots table | Efficient loading, compact storage, supports history/restore |
+
+## Honest Scope
+
+This lab is small enough to read in an afternoon, which means it stops short of
+a real editor in specific ways. The notebooks call each of these out where they
+bite:
+
+| Not implemented | Where it matters |
+|-----------------|------------------|
+| **TP2** (three-way concurrency) | NB1 shows a 4-op counterexample. Real OT leans on the server's total order instead. |
+| Client-side pending queue | `DocClient` waits for the ACK instead of echoing keystrokes optimistically and transforming remote ops against un-ACKed ones. |
+| Rich text | Only insert/delete of plain characters. No bold/table/image attribute ops. |
+| Tombstone GC, causality | The CRDT keeps every tombstone forever and has no version vectors. |
+| Undo | Undo is "inverse of *my* last op, transformed against everything since" — not covered. |
+| Reconnect / resync | A dropped socket loses the client's revision; there is no fast-forward path. |
 
 ## Real-World Context
 

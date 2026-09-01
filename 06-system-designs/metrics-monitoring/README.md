@@ -26,16 +26,17 @@ This lab teaches you the core concepts by building a working monitoring stack fr
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/metrics-monitoring
+cd 06-system-designs/metrics-monitoring
 
 # Start PostgreSQL + Redis + Prometheus + Grafana + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=metrics-monitoring --display-name="Metrics Monitoring (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -90,6 +91,19 @@ Servers → Agent/Collector → Kafka → Ingestion Service → Time-Series DB
 - **Cardinality Explosion**: Too many unique label combinations create millions of series
 - **Alert Fatigue**: Too many noisy alerts cause engineers to ignore them
 - **Query Performance**: Scanning billions of raw data points for a 30-day dashboard panel
+- **Bad Percentile Math**: Averaging per-instance p99s does not give you the fleet p99 — you
+  must merge the histogram buckets first, then take the quantile. And `histogram_quantile()`
+  interpolates *inside* a bucket, so its precision is capped by your bucket boundaries; if the
+  highest finite bucket sits below the real p99, the graph pins to that boundary and lies to
+  you quietly. Notebook 1 measures both failure modes.
+
+### What This Lab Does NOT Do
+- No Alertmanager container — Notebook 2 hand-rolls dedup/grouping/silencing in Python so the
+  logic is readable, but real routing, inhibition and escalation live in Alertmanager.
+- No long-term storage or downsampling. Vanilla Prometheus has neither; that is exactly what
+  Thanos, Cortex and Mimir add. The rollup demo in Notebook 1 does it by hand in Postgres.
+- No high availability, sharding, or remote-write. One Prometheus, 15-day retention, 5 fake
+  hosts. The cardinality demo is arithmetic, not a real TSDB under load.
 
 ## Real-World Examples
 

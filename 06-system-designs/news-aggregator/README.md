@@ -14,8 +14,8 @@ This lab walks you through the three core pipelines — **ingestion**, **dedupli
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | RSS Feed Crawling & Parsing | Fetch and parse RSS/Atom feeds, normalise data, store articles, schedule crawls with Redis |
-| 2 | Content Deduplication & Ranking | Hash-based and text-similarity dedup, freshness/popularity ranking |
+| 1 | RSS Feed Crawling & Parsing | Requirements + capacity estimate, fetch/parse RSS, normalise, schedule crawls with Redis, polite crawling |
+| 2 | Content Deduplication & Ranking | Hash + Jaccard dedup, **a measured MinHash/LSH sweep (candidate reduction vs recall)**, persisting clusters, freshness/popularity ranking |
 | 3 | Personalised Feed Generation | User interest profiles, scoring articles, assembling and caching feeds with Redis |
 
 ## Architecture
@@ -72,16 +72,17 @@ RSS Feeds ──►  ┌──────────────┐  SQL   ┌
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/news-aggregator
+cd 06-system-designs/news-aggregator
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=newsagg --display-name="News Aggregator (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

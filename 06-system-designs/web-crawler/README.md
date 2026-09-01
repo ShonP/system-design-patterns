@@ -212,6 +212,18 @@ domains table:
   domain | robots_txt | crawl_delay | last_crawl_time
 ```
 
+**Gotcha — don't ship Python's stdlib robots parser.** `urllib.robotparser` normalises rule
+paths through `urlunparse`, which *drops the query string*. Google's `Disallow: /?` is stored
+as `Disallow: /`, so the parser reports all of google.com as off limits. It also only
+partially implements the `*` and `$` wildcards. Use `protego` or Google's open-sourced
+`robotstxt` matcher. Lab 3 demonstrates the failure against the live file.
+
+**The cost of politeness.** 1 req/sec/domain means a single 1M-page site takes ~11 days. All
+of the throughput in the capacity estimate below comes from **breadth** — thousands of
+domains in flight at once — not from crawling any one site quickly. This is also why the
+frontier should be partitioned *by domain*: a single global FIFO leaves workers blocked on
+hot domains while cold ones sit untouched.
+
 ### Deep Dive 3: Scaling to 10B Pages in Under 5 Days
 
 **The math:**
@@ -246,10 +258,20 @@ Early crawler research found DNS lookups = 70% of elapsed time per thread. At 10
 
 | Approach | How | Trade-off |
 |----------|-----|-----------|
-| **DB index on content hash** ✅ | Store `content_hash` in URL table, index it. Check before parsing. | Simple, practical. Modern DB indexes handle billions of rows efficiently. |
-| **Bloom filter (Redis)** | Probabilistic set — `BF.ADD` / `BF.EXISTS`. O(1) lookup. | Cool but overkill. False positives mean we might skip a page we haven't seen. Acceptable trade-off at scale. |
+| **DB index on content hash** ✅ | Store `content_hash` in URL table, index it. Check before parsing. | Exact — no false positives. But every check is a network round-trip to the DB, and at our crawl rate that is thousands of point lookups per second. |
+| **Bloom filter (Redis)** | Probabilistic set — `BF.ADD` / `BF.EXISTS`. O(1), ~10 bits/item. | Small false-positive rate: it will occasionally claim we've seen a page we haven't, and we silently drop it. In exchange, 10B entries fit in ~12 GB of RAM instead of ~1 TB. |
 
-> The DB index approach is simpler and more practical. Bloom filters are fun to discuss but rarely necessary with modern databases.
+**Use both, at different layers:**
+
+- **URL frontier seen-check** → Bloom filter. This is the hot path — every discovered link
+  hits it, and there are ~100 links per page × 10B pages. A false positive costs us one
+  skipped page out of billions, which is noise. Sending all of that to the DB is not.
+- **Content-hash dedup** → DB index. This runs once per *fetched* page, not per discovered
+  link, so the volume is 100× lower and the exactness is worth the round-trip.
+
+> The interview answer people usually give — "just index it in the database" — is right for
+> content dedup and wrong for the frontier. The distinction is the read volume, not the
+> data size. Lab 4 builds a Bloom filter and measures the actual false-positive rate.
 
 **Crawler traps:** Pages that link to themselves or generate infinite URL variations.
 

@@ -9,9 +9,22 @@ Object storage: buckets, versioning, replication, presigned URLs.
 ## Concepts covered
 
 - Object vs file vs block storage
+- Back-of-envelope for **both planes**: PB/day, peak QPS, and the 365-billion-row
+  metadata estimate that actually drives the design
 - Metadata plane vs data plane
-- Erasure coding basics
+- Erasure coding basics — with the costs it hides (k-way repair read
+  amplification, tail latency across k nodes, small-object overhead)
+- **Where "11 nines" comes from**: the naive whole-year model, why it is wrong,
+  the repair-window model that replaces it, and why the advertised number is a
+  floor set by correlated failure and operator error rather than by disk math
 - Versioning with tombstones
+- Multipart upload with the rules real S3 enforces (contiguity, 5 MiB minimum,
+  ETag verification, idempotent part retry) plus the incomplete-upload bill
+- Consistency, runnable: strong read-after-write on `GET` vs eventual `LIST`,
+  and why they differ
+- **Sharding the metadata plane**: hash vs range partitioning, measured against
+  `LIST` cost and write hot-spotting
+- Consistent hashing with vnodes, distinct-node placement, and load imbalance measured
 - Presigned URLs / HMAC
 
 ## Setup

@@ -12,9 +12,9 @@ Building a payment system is one of the most challenging system design problems 
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Payment Processing Pipeline | The full lifecycle of a payment: intent → transaction → settlement |
-| 2 | Idempotency & Exactly-Once Payments | Preventing double charges with idempotency keys |
-| 3 | Ledger & Double-Entry Bookkeeping | How every dollar is tracked with debits and credits |
+| 1 | Payment Processing Pipeline | Requirements + capacity estimate, the full lifecycle (intent → transaction → settlement), timeout reconciliation |
+| 2 | Idempotency & Exactly-Once Payments | Idempotency keys **proven under 8-way concurrency**, plus the same-key-different-payload trap and a request fingerprint to catch it |
+| 3 | Ledger & Double-Entry Bookkeeping | Debits == credits (**asserted**), a deferred constraint trigger that makes an unbalanced commit impossible, refunds, and **settlement reconciliation** |
 | 4 | Fraud Detection Basics | Simple rule-based signals to flag suspicious transactions |
 
 ## Prerequisites
@@ -27,16 +27,17 @@ Building a payment system is one of the most challenging system design problems 
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/payment-system
+cd 06-system-designs/payment-system
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=payment-system --display-name="Payment System (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -73,6 +74,8 @@ created → processing → succeeded
 ### Double-Entry Bookkeeping
 - Every charge creates **two** ledger rows: a debit and a credit
 - Total debits must **always** equal total credits (the fundamental accounting equation)
+- A `DEFERRABLE INITIALLY DEFERRED` constraint trigger rejects an unbalanced transaction at `COMMIT`, so the invariant is enforced rather than merely checked
+- **Balanced books can still be wrong.** Notebook 3 reconciles the ledger against a processor settlement file and surfaces the three break types: missing in ledger, missing in settlement, amount mismatch
 
 ### Fraud Detection
 - Velocity checks (too many charges in a short window)

@@ -8,11 +8,14 @@ Property rental marketplace: search, booking, availability calendar.
 
 ## Concepts covered
 
-- Two-sided marketplace requirements
-- Geo-search with bounding boxes
-- Availability calendar & double-booking prevention
-- Booking transactions with pessimistic locking
-- Read-heavy caching patterns
+- Two-sided marketplace requirements (functional + non-functional)
+- Back-of-envelope sizing: search QPS, index size, dense vs sparse availability rows
+- Availability calendar: why a sparse per-night table makes double-booking *structurally* impossible
+- **Runnable double-booking race**: five threads, five *overlapping* date ranges, real
+  per-thread SQLite connections, no application-level lock — the database is the only arbiter
+- Geo search: linear scan → grid buckets (verified against the scan) → S2/H3
+- Cache-aside with single-flight to survive a stampede
+- Token-bucket rate limiting
 
 ## Setup
 

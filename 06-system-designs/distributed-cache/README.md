@@ -17,7 +17,7 @@ This lab gives you three Redis nodes in Docker and Python notebooks that let you
 | 1 | Cache Partitioning Strategies | Modulo hashing, range partitioning, why naive approaches break on resize |
 | 2 | Cache Coherence & Invalidation | Replication, write propagation, invalidation across a multi-node cluster |
 | 3 | Consistent Hashing for Cache Routing | Hash rings, virtual nodes, minimal key movement on scale-up/down |
-| 4 | Cache Patterns & Stampede Protection | Cache-aside, read-through, write-through, write-behind, thundering-herd mitigation |
+| 4 | Cache Patterns & Stampede Protection | Cache-aside, read-through, write-through, write-behind, single-flight locks, TTL jitter |
 
 ## Prerequisites
 
@@ -28,16 +28,17 @@ This lab gives you three Redis nodes in Docker and Python notebooks that let you
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/distributed-cache
+cd 06-system-designs/distributed-cache
 
 # Start 3 Redis nodes + RedisInsight
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=distributed-cache --display-name="Distributed Cache (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -68,6 +69,7 @@ uv run python -m ipykernel install --user --name=distributed-cache --display-nam
 - **Hash Ring** — nodes and keys mapped to the same circular space
 - **Virtual Nodes** — multiple positions per physical node for better balance
 - **Minimal Disruption** — only K/N keys move when a node is added or removed
+- **What the toy ring omits** — no replication, no capacity weighting, no membership protocol; imbalance shrinks like 1/√(vnodes) and never reaches zero
 
 ### Hot Keys
 - **Read-heavy hot keys** — replicate to spread load
@@ -80,8 +82,10 @@ uv run python -m ipykernel install --user --name=distributed-cache --display-nam
 - **Write-behind** — writes hit cache first, DB flush happens asynchronously
 
 ### Stampede Protection
-- **Thundering herd** — when a hot key expires, N concurrent misses slam the DB
+- **Thundering herd (one key)** — when a hot key expires, N concurrent misses slam the DB
 - **Single-flight with Redis lock** — `SET NX EX` + token + Lua release so only one worker recomputes
+- **Mass expiry (many keys)** — a cold start warms the whole working set with the same TTL, so it all expires together, forever
+- **TTL jitter** — randomise each TTL by ±10% so expiries smear out; the lock cannot help here
 - **Negative caching** — store a sentinel for "not found" to avoid repeated DB misses
 
 ## Real-World Examples

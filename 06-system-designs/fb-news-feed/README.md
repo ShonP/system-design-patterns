@@ -12,10 +12,10 @@ This lab walks you through the core challenges — **fan-out**, **ranking**, **s
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Fan-Out on Write vs Read | The two strategies for building a feed, their trade-offs, and a hybrid approach |
-| 2 | News Feed Ranking | Sorting posts by relevance instead of just time, simple scoring models |
-| 3 | Social Graph Storage | Storing follow relationships, querying "who do I follow?" and "who follows me?" |
-| 4 | Feed Caching Strategies | Using Redis to cache feeds, handling hot keys, cache invalidation |
+| 1 | Fan-Out on Write vs Read | Requirements + capacity estimate, push vs pull, measured write amplification, the hybrid approach |
+| 2 | News Feed Ranking | Affinity/popularity/recency scoring, the N+1 query trap, and why ranked feeds break cursor pagination |
+| 3 | Social Graph Storage | Storing follow relationships, querying "who do I follow?" and "who follows me?", index impact |
+| 4 | Feed Caching Strategies | Redis sorted sets, hot keys (and what replication really costs), keyset pagination |
 
 ## Architecture
 
@@ -62,16 +62,17 @@ This lab walks you through the core challenges — **fan-out**, **ranking**, **s
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/fb-news-feed
+cd 06-system-designs/fb-news-feed
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=newsfeed --display-name="News Feed (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

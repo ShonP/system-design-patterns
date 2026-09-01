@@ -9,11 +9,13 @@ Serverless compute: cold start, container pooling, event triggers.
 ## Concepts covered
 
 - Control plane vs data plane split
-- Back-of-envelope sizing (QPS, storage, cold-start bandwidth)
+- Back-of-envelope sizing: Little's Law for concurrency, fleet RAM, worker count,
+  and the cold-start bandwidth number that justifies the whole data plane
 - Function registration + immutable versioning with aliases
 - Metadata cache on invokers (avoids DB on the hot path)
 - Cold start vs warm start (runnable simulation)
-- Warm pool with TTL-based eviction
+- Warm pool with TTL eviction that models **busy VMs**, so bursts cost cold starts and
+  steady state doesn't — the point most warm-pool sketches miss
 - Concurrency limits per function and per account (throttling with 429)
 - Async invocation: queue + exponential backoff + DLQ
 - Power-of-two-choices scheduling

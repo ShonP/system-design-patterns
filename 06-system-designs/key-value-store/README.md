@@ -8,11 +8,15 @@ Distributed KV store: partitioning, replication, tunable consistency.
 
 ## Concepts covered
 
+- Back-of-envelope sizing: QPS, storage with replication + LSM overhead, node count
+  (disk-bound vs write-bound), and east-west replication bandwidth
 - Naive `hash % N` vs consistent hashing (with runnable comparison)
-- Virtual nodes and load balance
-- Replication factor N with tunable W/R quorums
-- CAP tradeoff framing, with a quorum simulator
-- Versioning: silent data loss → last-write-wins → vector clocks with siblings
+- Virtual nodes: the load-balance win **and** what they cost (gossip, blast radius, no range scans)
+- Replica placement on the ring (preference lists) and replication factor N
+- Tunable W/R quorums, with a simulator that **measures** stale reads and unavailability
+  separately — showing `R+W>N` is about correctness, not availability
+- Versioning: no version (silent loss) → CAS (visible rejection) → **last-write-wins losing an
+  acknowledged write to clock skew** → vector clocks with siblings
 - Storage engine sketch: WAL + memtable + SSTables (toy LSM-tree)
 - Anti-entropy via Merkle trees (runnable diff)
 - Hinted handoff and read repair

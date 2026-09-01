@@ -14,9 +14,9 @@ This lab walks you through the building blocks — from clever data structures t
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Count-Min Sketch | A probabilistic data structure that counts items using way less memory than a hash map |
-| 2 | Heap-Based Top-K | Using a min-heap to efficiently track the K largest items from a stream |
-| 3 | Distributed Top-K | Sharding, tumbling windows, Redis sorted sets, and caching precomputed results |
+| 1 | Count-Min Sketch | A probabilistic data structure that counts items using way less memory than a hash map — including how to size it from ε and δ, and why its error is one-sided |
+| 2 | Heap-Based Top-K | Using a min-heap to efficiently track the K largest items from a stream — and the eviction bug that quietly drops heavy hitters |
+| 3 | Distributed Top-K | Sharding, tumbling windows, Redis sorted sets, caching — and why sketches merge across shards but top-K *lists* do not |
 
 ## Prerequisites
 
@@ -28,16 +28,17 @@ This lab walks you through the building blocks — from clever data structures t
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/top-k
+cd 06-system-designs/top-k
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=top-k --display-name="Top-K (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -70,7 +71,9 @@ YouTube gets ~70 billion video views per day. That's ~700K views per second. We 
 - **Queries must be fast** — users expect results in milliseconds, not minutes
 
 ### Data Structures
-- **Count-Min Sketch** — approximate frequency counting in fixed memory using hash functions
+- **Count-Min Sketch** — approximate frequency counting in fixed memory using hash functions.
+  Sized by `w = ⌈e/ε⌉`, `d = ⌈ln(1/δ)⌉`; the error is **one-sided** (it overcounts, never undercounts)
+  and bounded by `ε·N` where N is the whole stream, not the item's own count
 - **Min-Heap** — efficiently maintain the top K items from a stream in O(n log k)
 - **Redis Sorted Sets** — server-side sorted data structure perfect for leaderboards
 
@@ -78,6 +81,8 @@ YouTube gets ~70 billion video views per day. That's ~700K views per second. We 
 - **Tumbling Windows** — divide time into fixed, non-overlapping buckets (e.g., each hour)
 - **Sharding** — split data across multiple machines by video ID
 - **Precomputation + Caching** — compute top-K periodically, serve from cache
+- **Mergeable state** — sketches add element-wise across shards; a top-K list has already thrown
+  away everything below its local cut and cannot be merged unless you shard by the counting key
 - **Batching** — aggregate counts before writing to reduce database pressure
 
 ### Scale Estimates (from Hello Interview)
@@ -86,7 +91,8 @@ YouTube gets ~70 billion video views per day. That's ~700K views per second. We 
 | Views per day | 70 billion |
 | Views per second | ~700K |
 | Unique videos | ~3.6 billion |
-| Naive storage (ID + count) | ~64 GB |
+| Naive storage (raw ID + count, 16 B/entry) | ~54 GB |
+| Same counts in a live Python dict (~80 B/entry) | ~272 GB |
 | Target query latency | <50 ms |
 
 ## Real-World Examples

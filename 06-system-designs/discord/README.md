@@ -8,10 +8,13 @@ Real-time chat with WebSockets, channel fan-out, presence, and voice.
 
 ## Concepts covered
 
-- WebSocket gateway with heartbeats
-- Message partitioning by channel
+- Capacity estimation with a sanity check (and the `chatty_fraction` that stops you being 10× wrong)
+- Consistent hashing: **measured** reconnect blast radius on a scale-up vs `user_id % N`
+- Snowflake IDs, cursor pagination, heartbeats, resume, nonce idempotency
 - Pub/sub fan-out across shards
-- Presence optimization
+- **Large-server fan-out**: where topic pub/sub saturates, per-gateway batching,
+  lazy subscriptions, and the member-list window
+- Presence optimization (naive vs lazy)
 - Voice via UDP + SFU
 
 ## Setup

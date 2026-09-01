@@ -94,44 +94,122 @@ def db_execute(query, params=None):
 # ---------------------------------------------------------------------------
 # Operational Transformation (OT) — the heart of collaborative editing
 # ---------------------------------------------------------------------------
+def _make_delete(position, length, site):
+    return {"type": "delete", "position": position, "content": "",
+            "length": length, "site": site}
+
+
 def transform_operation(op_a, op_b):
     """
     Transform operation B against operation A.
 
-    Both ops happened concurrently. A has already been applied to the
-    document.  We need to adjust B so it still makes sense.
+    Both ops were created against the same document state; A has already been
+    applied. We adjust B so it still expresses the same intent afterwards.
 
     Each op is a dict: { "type": "insert"/"delete", "position": int,
-                         "content": str, "length": int }
+                         "content": str, "length": int, "site": int }
 
-    Returns the transformed version of op_b.
+    Returns a LIST of ops, to be applied in the order given:
+      * 1 op  -- the normal case (a shifted position)
+      * 2 ops -- A inserted inside the range B deletes, so B splits around it
+      * 0 ops -- A already deleted everything B wanted to delete
+
+    Notebook 1 derives these rules and checks them exhaustively (TP1).
     """
-    b = dict(op_b)  # don't mutate the original
+    if op_b["type"] == "insert":
+        return [_transform_insert(op_a, op_b)]
+    return _transform_delete(op_a, op_b)
+
+
+def _transform_insert(op_a, op_b):
+    """B is an INSERT. Inserts always survive -- only the position moves."""
+    b = dict(op_b)
 
     if op_a["type"] == "insert":
-        # A inserted text before B's position → shift B right
         insert_len = len(op_a.get("content", ""))
-        if b["position"] >= op_a["position"]:
-            b["position"] += insert_len
-
-    elif op_a["type"] == "delete":
-        delete_len = op_a.get("length", 1)
         if b["position"] > op_a["position"]:
-            # B is after the deleted region → shift B left
-            b["position"] = max(op_a["position"], b["position"] - delete_len)
+            b["position"] += insert_len
+        elif b["position"] == op_a["position"]:
+            # Both users typed at the same spot. The tie-break has to be
+            # symmetric or the two clients end up with the words swapped, so
+            # order by site (user) id -- a value both sides already agree on.
+            if op_a.get("site", 0) <= b.get("site", 0):
+                b["position"] += insert_len
+    else:
+        a_start = op_a["position"]
+        a_end = a_start + op_a.get("length", 1)
+        if b["position"] >= a_end:
+            b["position"] -= (a_end - a_start)
+        elif b["position"] > a_start:
+            b["position"] = a_start        # typed inside the deleted run
 
     return b
 
 
-def transform_operations(new_op, pending_ops):
+def _transform_delete(op_a, op_b):
+    """B is a DELETE of the half-open range [start, end). Returns 0, 1 or 2 ops."""
+    site = op_b.get("site", 0)
+    b_start = op_b["position"]
+    b_end = b_start + op_b.get("length", 1)
+
+    if op_a["type"] == "insert":
+        p = op_a["position"]
+        ins_len = len(op_a.get("content", ""))
+        if p <= b_start:
+            return [_make_delete(b_start + ins_len, b_end - b_start, site)]
+        if p >= b_end:
+            return [dict(op_b)]
+        # A typed inside the range B deletes. Inserts always survive, so B
+        # splits around the new text. Right half first: both positions are in
+        # the same frame, and deleting the right range leaves the left valid.
+        return [
+            _make_delete(p + ins_len, b_end - p, site),
+            _make_delete(b_start, p - b_start, site),
+        ]
+
+    # A is also a DELETE: B must only remove whatever A left behind, otherwise
+    # two users backspacing the same word delete twice as much as either asked.
+    a_start = op_a["position"]
+    a_end = a_start + op_a.get("length", 1)
+    overlap = max(0, min(a_end, b_end) - max(a_start, b_start))
+    remaining = (b_end - b_start) - overlap
+    if remaining <= 0:
+        return []
+    new_start = b_start - max(0, min(a_end, b_start) - a_start)
+    return [_make_delete(new_start, remaining, site)]
+
+
+def transform_operations(new_op, applied_ops):
     """
-    Transform a new operation against a list of already-applied ops.
-    Returns the transformed new_op.
+    Transform a new operation against the ops applied since the client's
+    revision, in application order. Returns a LIST of ops.
     """
-    result = dict(new_op)
-    for applied in pending_ops:
-        result = transform_operation(applied, result)
-    return result
+    pending = [dict(new_op)]
+    for applied in applied_ops:
+        pending = [t for p in pending for t in transform_operation(applied, p)]
+        # A split delete leaves two ops in the same coordinate frame; applying
+        # the rightmost first keeps the other one's position valid.
+        pending.sort(key=lambda o: -o["position"])
+    return pending
+
+
+def transform_cursor(position, op):
+    """Move a cursor so it keeps pointing at the same character after `op`.
+
+    Without this, every remote edit above your caret silently drags it to the
+    wrong place -- the presence dots in the notebook would lie.
+    """
+    if op["type"] == "insert":
+        if position >= op["position"]:
+            return position + len(op.get("content", ""))
+        return position
+    start = op["position"]
+    end = start + op.get("length", 1)
+    if position >= end:
+        return position - (end - start)
+    if position > start:
+        return start
+    return position
 
 
 def apply_operation(text, op):
@@ -184,8 +262,14 @@ def load_document(doc_id):
 
     doc_state = {
         "text": text,
-        "version": version,
-        "pending_ops": [],  # ops applied since last snapshot
+        "version": version,          # latest SNAPSHOT version
+        "pending_ops": [],           # ops applied since the last snapshot
+        # Every op applied since the doc was loaded, never cleared by a
+        # snapshot. Its length is the document's "revision": the number a
+        # client quotes so we know which ops it has not seen yet. Using the
+        # snapshot version for this instead (it only moves every 50 ops)
+        # means concurrent edits are never transformed at all.
+        "ops_log": [],
     }
     documents[doc_id] = doc_state
     return doc_state
@@ -224,9 +308,15 @@ async def send_json(ws, data):
 
 
 async def broadcast_to_doc(doc_id, message, exclude_user=None):
-    """Send a message to all users connected to a document."""
-    session = doc_sessions.get(doc_id, {})
-    for uid, info in session.items():
+    """Send a message to all users connected to a document.
+
+    The session dict is snapshotted first: every send is an await point, and a
+    client disconnecting during one mutates doc_sessions underneath the loop
+    ("dictionary changed size during iteration"), which kills the whole
+    connection handler mid-broadcast.
+    """
+    session = list(doc_sessions.get(doc_id, {}).items())
+    for uid, info in session:
         if uid != exclude_user:
             try:
                 await send_json(info["ws"], message)
@@ -278,6 +368,7 @@ async def handle_join_doc(ws, user_id, payload):
         "document_id": doc_id,
         "text": doc["text"],
         "version": doc["version"],
+        "revision": len(doc["ops_log"]),
         "role": collab["role"],
     })
 
@@ -312,6 +403,7 @@ async def handle_edit(ws, user_id, payload):
         "position": payload["position"],
         "content": payload.get("content", ""),
         "length": payload.get("length", 0),
+        "site": user_id,                  # tie-break for same-position inserts
     }
 
     doc = documents.get(doc_id)
@@ -328,42 +420,57 @@ async def handle_edit(ws, user_id, payload):
         })
         return
 
-    # Transform the operation against any ops that happened concurrently
-    client_version = payload.get("version", doc["version"])
-    if client_version < doc["version"]:
-        # Client is behind — transform against ops since their version
-        op = transform_operations(op, doc["pending_ops"])
+    # Transform against everything applied since the client's revision.
+    # A client that does not send one is treated as up to date (no transform).
+    revision = len(doc["ops_log"])
+    client_revision = payload.get("revision", revision)
+    client_revision = max(0, min(int(client_revision), revision))
+    concurrent = doc["ops_log"][client_revision:]
+    applied = transform_operations(op, concurrent) if concurrent else [dict(op)]
 
-    # Apply the operation to the server's copy
-    doc["text"] = apply_operation(doc["text"], op)
-    doc["pending_ops"].append(op)
+    for out in applied:
+        doc["text"] = apply_operation(doc["text"], out)
+        doc["ops_log"].append(out)
+        doc["pending_ops"].append(out)
 
-    # Persist the operation to the database
-    db_execute(
-        "INSERT INTO operations (document_id, user_id, version, op_type, position, content, length) "
-        "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-        (doc_id, user_id, doc["version"], op["type"], op["position"],
-         op.get("content", ""), op.get("length", 0)),
-    )
+        # Persist the operation to the database
+        db_execute(
+            "INSERT INTO operations (document_id, user_id, version, op_type, position, content, length) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (doc_id, user_id, doc["version"], out["type"], out["position"],
+             out.get("content", ""), out.get("length", 0)),
+        )
 
-    # ACK the sender
+    # Everyone else's caret has to move with the text they are looking at.
+    for out in applied:
+        move_cursors(doc_id, out, exclude_user=user_id)
+
+    # ACK the sender, telling it which revision the document is now at
     await send_json(ws, {
         "type": "ack",
         "document_id": doc_id,
         "version": doc["version"],
+        "revision": len(doc["ops_log"]),
+        "transformed": [
+            {"op_type": o["type"], "position": o["position"],
+             "content": o.get("content", ""), "length": o.get("length", 0)}
+            for o in applied
+        ],
         "op_count": len(doc["pending_ops"]),
     })
 
-    # Broadcast the (transformed) operation to other editors
-    await broadcast_to_doc(doc_id, {
-        "type": "remote_op",
-        "document_id": doc_id,
-        "user_id": user_id,
-        "op_type": op["type"],
-        "position": op["position"],
-        "content": op.get("content", ""),
-        "length": op.get("length", 0),
-    }, exclude_user=user_id)
+    # Broadcast the (transformed) operations to other editors
+    for out in applied:
+        await broadcast_to_doc(doc_id, {
+            "type": "remote_op",
+            "document_id": doc_id,
+            "user_id": user_id,
+            "op_type": out["type"],
+            "position": out["position"],
+            "content": out.get("content", ""),
+            "length": out.get("length", 0),
+            "revision": len(doc["ops_log"]),
+        }, exclude_user=user_id)
 
     # Auto-snapshot every 50 operations
     if len(doc["pending_ops"]) >= 50:
@@ -374,6 +481,22 @@ async def handle_edit(ws, user_id, payload):
                 "document_id": doc_id,
                 "version": new_ver,
             })
+
+
+def move_cursors(doc_id, op, exclude_user=None):
+    """Shift every other editor's cursor to follow the text it was pointing at."""
+    for uid, info in doc_sessions.get(doc_id, {}).items():
+        if uid == exclude_user:
+            continue
+        moved = transform_cursor(info["cursor"], op)
+        if moved == info["cursor"]:
+            continue
+        info["cursor"] = moved
+        redis_client.hset(f"doc:{doc_id}:presence", uid, json.dumps({
+            "name": info["name"],
+            "color": info["color"],
+            "cursor": moved,
+        }))
 
 
 async def handle_cursor_update(ws, user_id, payload):
@@ -486,6 +609,7 @@ async def handle_restore_version(ws, user_id, payload):
     doc = load_document(doc_id)
     doc["text"] = snap["content"]
     doc["pending_ops"] = []
+    doc["ops_log"] = []      # every client's revision is meaningless now
     new_ver = create_snapshot(doc_id, user_id)
 
     # Broadcast the restored document to all editors
@@ -494,6 +618,7 @@ async def handle_restore_version(ws, user_id, payload):
         "document_id": doc_id,
         "text": snap["content"],
         "version": new_ver,
+        "revision": 0,
         "role": "editor",
     })
 

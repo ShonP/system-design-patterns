@@ -43,11 +43,23 @@ CREATE TABLE messages (
     encrypted_content TEXT,                -- for E2E encryption demos
     message_type VARCHAR(50) DEFAULT 'text',  -- text, image, etc.
     sequence_number BIGINT,               -- per-chat ordering
+    client_message_id TEXT,               -- idempotency key minted by the sender
     server_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Idempotency: a client that never saw its ACK will retry the SAME
+-- client_message_id. This index turns that retry into a no-op instead of a
+-- duplicate message. Partial, so pre-existing/plaintext rows with NULL are
+-- unconstrained (Postgres would allow unlimited NULLs anyway; the WHERE
+-- clause keeps the index small).
+CREATE UNIQUE INDEX idx_messages_client_msg_id
+    ON messages (sender_id, client_message_id)
+    WHERE client_message_id IS NOT NULL;
+
 -- The "Inbox" — one row per recipient per message.
--- Rows are deleted once the client ACKs delivery.
+-- The row is NOT deleted on ACK; its status advances
+-- pending -> delivered -> read (monotone, never backwards).
+-- A real system would archive/prune rows that reached 'read'.
 CREATE TABLE inbox (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id),

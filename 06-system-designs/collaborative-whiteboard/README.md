@@ -8,10 +8,16 @@ Real-time collaborative drawing: CRDT, WebSocket.
 
 ## Concepts covered
 
-- WebSocket fan-out
-- Operational Transform vs CRDT
-- Last-writer-wins CRDT basics
-- Presence & cursors
+- Requirements + a **runnable** capacity model (ingress vs fan-out egress, op-log growth)
+- **OT vs CRDT, decided with code**: a working operational transform, the N² growth of its
+  rule set, and the five things choosing a CRDT actually costs you
+- Lamport clocks and a Last-Writer-Wins map CRDT
+- The **lost update**: why whole-shape LWW silently discards a concurrent edit, and how
+  per-field LWW fixes it (and what that costs)
+- Offline merge across a partition
+- Pub/Sub fan-out across WebSocket nodes
+- Snapshots + op log (and why the snapshot index and the snapshot lamport are different numbers)
+- Presence with TTL
 
 ## Setup
 

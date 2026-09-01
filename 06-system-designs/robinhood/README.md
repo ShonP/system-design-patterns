@@ -12,7 +12,7 @@ This lab walks you through the three core pillars of a brokerage system: **order
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Order Matching Engine | Order types (market/limit), order book mechanics, brokerage order lifecycle, consistency & failure handling |
+| 1 | Order Matching Engine | Order types (market/limit), order book mechanics, price-time priority, brokerage order lifecycle, consistency & failure handling |
 | 2 | Portfolio & Position Tracking | Positions table design, average cost, realized/unrealized P&L, cache-aside with Redis |
 | 3 | Market Data Streaming | Kafka trade feed, price processor, Redis pub/sub fan-out, SSE vs WebSockets |
 
@@ -43,16 +43,17 @@ This lab walks you through the three core pillars of a brokerage system: **order
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/robinhood
+cd 06-system-designs/robinhood
 
 # Start PostgreSQL + Redis + Kafka + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=robinhood --display-name="Robinhood (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -79,8 +80,10 @@ uv run python -m ipykernel install --user --name=robinhood --display-name="Robin
 - **Position** — how many shares a user holds of a given symbol
 
 ### Order Management
-- **Market orders** execute immediately at best available price
+- **Market orders** execute immediately at best available price (and never rest on the book)
 - **Limit orders** wait until a target price is reached
+- **Price-time priority** — best price first, then earliest arrival; a partial fill keeps
+  its place at the front of the queue
 - **Order lifecycle**: `pending → submitted → filled / cancelled / failed`
 - **Consistency**: save to DB before submitting to exchange (crash recovery)
 - **Cleanup jobs** reconcile stuck orders for eventual consistency
@@ -114,7 +117,26 @@ uv run python -m ipykernel install --user --name=robinhood --display-name="Robin
 | Kafka before Redis | Kafka is durable; Redis pub/sub is fire-and-forget. Kafka handles replays |
 | SSE over WebSockets | Price data is one-directional (server → client). SSE is simpler |
 | Positions table (materialized) | O(1) lookups vs O(n) trade scanning for portfolio views |
+| Order + trade + position + balance in one transaction | An order marked `filled` with no `trades` row behind it is the classic silent money bug |
 | Redis pub/sub per symbol | Servers subscribe only to symbols their users watch |
+
+## Honest Limits of This Lab
+
+The point of the lab is the mechanics, not fidelity. Each notebook ends with its own
+"What This Toy Does NOT Do" list; the headline omissions are:
+
+- **The matching engine is single-threaded, single-symbol and in memory.** No self-trade
+  prevention, no stop/IOC/FOK/iceberg orders, no auctions, halts or tick-size rules. A real
+  engine is a replicated state machine fed by a sequenced input log.
+- **No settlement or buying power.** Cash moves the instant a trade is processed; there is no
+  T+1, no settled-vs-unsettled distinction, and no margin.
+- **One blended average cost per symbol.** Real tax reporting needs lot-level cost basis
+  (FIFO/LIFO/specific-ID), and corporate actions rewrite it.
+- **No short positions** — quantity floors at zero.
+- **Redis pub/sub has no backpressure.** A slow subscriber is silently disconnected and loses
+  data. Notebook 3 spells out why the fix is conflation, not queueing — but it does not
+  implement it, and 25 trades is far too small to surface the problem.
+- **No SSE server is actually built.** The pipeline stops at the Redis subscriber.
 
 ## License
 

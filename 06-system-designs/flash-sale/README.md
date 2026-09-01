@@ -12,7 +12,8 @@ Handling a short window of massive concurrency without overselling.
 - Waiting-room pattern at the edge
 - Token-bucket rate limiting
 - Atomic stock reservation via Redis / Lua (simulated)
-- **Hot-key sharding** for stock counters
+- **Hot-key sharding** for stock counters — and its measured cost (stranded stock,
+  false sold-outs)
 - Bounded admission queue for backpressure
 - Reserve-now-pay-later flow with TTL + reaper
 - Idempotency keys for safe client retries

@@ -16,9 +16,9 @@ This lab walks you through three core challenges of running a system like Gopuff
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Inventory Management Across Micro-Fulfillment Centers | Aggregating stock from multiple DCs, atomic ordering with Postgres transactions, cache-aside with Redis |
-| 2 | Delivery Routing and ETA Estimation | Finding nearby DCs with the Haversine formula, estimating delivery times, zone-based routing |
-| 3 | Demand Forecasting and Dynamic Pricing | Analyzing historical demand, simple forecasting, surge pricing logic |
+| 1 | Inventory Management Across Micro-Fulfillment Centers | Requirements + capacity estimate, aggregated stock, a **demonstrated oversell** and its `SERIALIZABLE` fix, cache-aside with Redis |
+| 2 | Delivery Routing and ETA Estimation | Haversine vs Euclidean, zone-based ETAs, and a real **Redis `GEOSEARCH` spatial index** benchmarked against the linear scan |
+| 3 | Demand Forecasting and Dynamic Pricing | Moving-average forecasting, surge pricing tiers, the N+1 query trap, and why you never round before summing |
 
 ## Core Entities
 
@@ -51,16 +51,17 @@ This lab walks you through three core challenges of running a system like Gopuff
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/gopuff
+cd 06-system-designs/gopuff
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=gopuff --display-name="Gopuff (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

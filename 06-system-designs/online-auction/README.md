@@ -18,7 +18,7 @@ This lab lets you break these problems with real code, then fix them step by ste
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Bid Processing & Concurrency | Race conditions, row locking, optimistic concurrency control, Redis atomic operations |
+| 1 | Bid Processing & Concurrency | Requirements + capacity estimate, a **demonstrated lost bid**, row locking, **bids accepted after close** and the fix, OCC, Redis atomic CAS |
 | 2 | Auction Lifecycle Management | Creating auctions, state machines, ending auctions, fault tolerance |
 | 3 | Real-Time Bid Notifications | Polling vs push, Redis Pub/Sub, building a live notification system |
 | 4 | Reserve, Increments & Proxy Bidding | Hidden reserve prices, eBay-style bid increment ladders, proxy (automatic) bidding |
@@ -52,16 +52,17 @@ This lab lets you break these problems with real code, then fix them step by ste
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/online-auction
+cd 06-system-designs/online-auction
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=online-auction --display-name="Online Auction (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -98,12 +99,19 @@ The `auctions.max_bid_amount` column is a **denormalized cache**. Instead of run
 
 ## Real-World Scale
 
-| Metric | Value |
-|--------|-------|
-| Concurrent auctions | 10M |
-| Bids per auction | ~100 |
-| Peak bid throughput | ~15K bids/second |
-| Storage per year | ~25 TB |
+Notebook 1 computes all of these from stated assumptions — run the cell rather
+than trusting the table.
+
+| Metric | Value | Where it comes from |
+|--------|-------|---------------------|
+| Concurrent auctions | 10M | assumption |
+| Average auction length | 7 days | assumption |
+| Bids per auction | ~100 | assumption |
+| Bid throughput | ~1,650/s avg | 10M ÷ 7 days × 100 bids ÷ 86,400 |
+| Peak bid throughput | ~16,500/s | ×10, because bids pile up in the final minute (sniping) |
+| Auction page reads | ~165,000/s | 100 views per bid — a 100:1 read:write ratio |
+| Bid storage | ~10 TB/year | 143M bids/day × 200 B × 365 |
+| **Contention on one hot auction row** | ~50 bids/s | The number that actually limits the design — these must serialise |
 
 ## License
 

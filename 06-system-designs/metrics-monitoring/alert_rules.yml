@@ -4,8 +4,17 @@
 # How it works:
 #   1. Prometheus evaluates each rule's "expr" (a PromQL expression)
 #   2. If the result is true, a timer starts ("for" duration)
-#   3. If still true after "for" duration, the alert fires
+#   3. If it is STILL true at every evaluation until the timer expires, the alert fires.
+#      A single evaluation where the expression is false (including a failed scrape
+#      that returns no data) resets the alert to inactive and the timer to zero.
 #   4. Labels and annotations attach metadata for notifications
+#
+# Which of these actually fire against the notebook's simulator:
+#   HighCpuUsage      -> yes, roughly once per ~10.5-minute CPU cycle
+#   HighMemoryUsage   -> yes, roughly once per ~12-minute memory sawtooth
+#   CriticalCpuUsage  -> rare by design (only noise reaches 95%)
+#   HighErrorRate     -> rare by design (error spikes are independent 3% events)
+#   HighAvgLatency    -> effectively never, and that is the point (see its comment)
 
 groups:
   - name: server_alerts
@@ -49,12 +58,26 @@ groups:
           summary: "Error rate is high on {{ $labels.host }}"
           description: "Error rate above 5%. Current value: {{ $value }}%"
 
-      # Alert when request latency is too high
-      - alert: HighLatency
+      # Alert when request latency is too high.
+      #
+      # NOTE: demo_request_latency is a GAUGE holding the *average* request
+      # duration, not a percentile. The old description here claimed "p50", which
+      # was wrong twice over: it is a mean, not a median, and a mean is the one
+      # statistic guaranteed to stay green while your tail is on fire. The
+      # simulator's average sits near 0.45s while its p99 is close to 4s, so this
+      # rule essentially never fires. It is kept deliberately, as the worked
+      # example of an alert that cannot do its job.
+      #
+      # The correct version alerts on the histogram:
+      #   histogram_quantile(0.99,
+      #     sum by (host, le) (rate(demo_request_duration_seconds_bucket[5m]))) > 5
+      # Note the buckets are summed BEFORE the quantile is taken. Averaging
+      # per-host p99s would be meaningless — see notebook 1.
+      - alert: HighAvgLatency
         expr: demo_request_latency > 2.0
         for: 1m
         labels:
           severity: warning
         annotations:
-          summary: "High request latency on {{ $labels.host }}"
-          description: "p50 latency above 2s. Current value: {{ $value }}s"
+          summary: "High average request latency on {{ $labels.host }}"
+          description: "Mean request latency above 2s. Current value: {{ $value }}s"

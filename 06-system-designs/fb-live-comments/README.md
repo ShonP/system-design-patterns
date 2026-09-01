@@ -14,9 +14,9 @@ This lab walks you through the core challenges step by step with runnable code.
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Real-Time Comment Streaming | SSE vs WebSockets, pub/sub with Redis, building a live comment feed |
-| 2 | Comment Ordering & Pagination | Cursor vs offset pagination, why ordering matters, infinite scroll |
-| 3 | Scaling Live Comments | Horizontal scaling, pub/sub fan-out, mega-stream strategies |
+| 1 | Real-Time Comment Streaming | Requirements + fan-out back-of-envelope, SSE vs WebSockets, Redis pub/sub, catch-up on reconnect |
+| 2 | Comment Ordering & Pagination | Offset vs cursor pagination, and the commit-order gap cursors *don't* fix |
+| 3 | Scaling Live Comments | Pub/sub fan-out amplification, channel partitioning, co-location, sampling, CDN snapshots, real batched writes |
 
 ## Core Entities
 
@@ -45,16 +45,17 @@ SSE  /stream/:liveVideoId             # Real-time comment stream
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/fb-live-comments
+cd 06-system-designs/fb-live-comments
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=fb-live-comments --display-name="FB Live Comments (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

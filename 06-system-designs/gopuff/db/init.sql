@@ -136,6 +136,12 @@ CREATE INDEX idx_dynamic_prices_dc_item ON dynamic_prices(dc_id, item_id);
 -- Seed data
 -- ============================================================
 
+-- Pin the random sequence. Every notebook in this lab reads specific
+-- (dc_id, item_id) pairs, so "random" seed data means a lab that works on
+-- Monday and mysteriously breaks on Tuesday. setseed() makes the whole
+-- dataset byte-identical on every `docker compose up`.
+SELECT setseed(0.42);
+
 -- 8 distribution centers across a metro area
 INSERT INTO distribution_centers (name, city, state, zip_code, latitude, longitude, capacity_sqft) VALUES
     ('DC Downtown',      'Austin', 'TX', '78701', 30.2672,  -97.7431, 5000),
@@ -222,6 +228,14 @@ CROSS JOIN items it
 -- Some DCs don't carry every item (80% chance of stocking)
 WHERE random() < 0.80;
 
+-- DC 1 is the one every notebook demos against, so guarantee it carries the
+-- full catalog. Without this, a notebook that reads (dc_id=1, item_id=17)
+-- silently no-ops whenever the 80% roll went the other way.
+INSERT INTO inventory (dc_id, item_id, quantity, reorder_point, max_capacity)
+SELECT 1, it.id, 40, CASE WHEN it.is_perishable THEN 5 ELSE 10 END, 100
+FROM items it
+ON CONFLICT (dc_id, item_id) DO NOTHING;
+
 -- Generate 60 days of hourly demand history
 INSERT INTO demand_log (dc_id, item_id, hour_bucket, units_sold, units_requested, price_at_sale)
 SELECT
@@ -244,13 +258,16 @@ SELECT
     it.base_price
 FROM distribution_centers dc
 CROSS JOIN items it
--- Generate one row per hour for the last 60 days, but sample ~20% to keep data manageable
+-- One row per hour for the last 60 days would be ~350k rows. Sample 10% —
+-- enough that every (dc, item, hour-of-day) bucket has ~6 observations, which
+-- is the minimum for the moving-average forecast in Notebook 3 to mean
+-- anything. At 2% most buckets were empty and every forecast came out as 0.
 CROSS JOIN generate_series(
     NOW() - interval '60 days',
     NOW(),
     interval '1 hour'
 ) AS hour_ts
-WHERE random() < 0.02;  -- ~2% sampling → a few thousand rows
+WHERE random() < 0.10;  -- ~35k rows
 
 -- Generate 500 past orders spread over the last 30 days
 INSERT INTO orders (customer_id, dc_id, status, total_price, delivery_address, delivery_lat, delivery_lon, estimated_delivery_minutes, actual_delivery_minutes, created_at, delivered_at)

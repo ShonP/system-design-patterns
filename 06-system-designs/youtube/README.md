@@ -46,6 +46,110 @@ A hands-on system design exercise where we build a video-sharing platform step b
 
 ---
 
+## Capacity Estimate
+
+Assumptions: **1M uploads/day**, **100M watches/day**, average video **10 minutes**, average
+viewer watches **5 minutes** of it, source upload ~**8 Mbps** (user-recorded 1080p).
+
+### The rendition ladder is *not* N copies of the master
+
+This is the single most commonly botched number in this design. Bitrate scales roughly with
+pixel count, so the lower rungs are almost free:
+
+| Rung | Pixels | Bitrate | Relative to 1080p |
+|------|--------|---------|-------------------|
+| 1080p | 2,073,600 | 5.0 Mbps | 1.00x |
+| 720p  |   921,600 | 2.5 Mbps | 0.50x |
+| 480p  |   409,920 | 1.0 Mbps | 0.20x |
+| 360p  |   230,400 | 0.5 Mbps | 0.10x |
+| **ladder total** | | **9.0 Mbps** | **1.80x** |
+
+Storing all four qualities costs **1.8x** the 1080p rendition — not 4x. Compared with the
+uploaded master at 8 Mbps, the entire ladder is **1.13x**. Adding every rung below 1080p
+costs 80% more than storing 1080p alone and buys you every mobile and low-bandwidth viewer.
+
+> Lab 2 measures this against the bytes actually written to MinIO rather than asserting it.
+
+### Storage
+
+```
+per video (10 min):
+  uploaded master @ 8.0 Mbps = 0.60 GB
+  full ladder     @ 9.0 Mbps = 0.68 GB
+
+1M uploads/day:
+  renditions : 0.68 PB/day  →  ~246 PB/year
+  masters    : 0.60 PB/day  →  ~219 PB/year
+  ------------------------------------------
+  total      : 1.28 PB/day  →  ~465 PB/year
+```
+
+**Do you keep the masters?** Keeping them roughly doubles the storage bill. You keep them
+anyway: the day you adopt a new codec (H.264 → AV1) you need the source to re-encode from,
+and re-encoding from your own 1080p rendition compounds compression artifacts. Cold storage
+is the compromise — cheap to retain, slow to read, which is acceptable because you only read
+them during a codec migration.
+
+### Egress — the number that decides the architecture
+
+```
+per watch : 5 min @ ~2.5 Mbps average delivered = ~94 MB
+per day   : 100M x 94 MB = 9.38 PB/day
+average   : ~868 Gbps sustained
+peak      : ~2.6 Tbps (roughly 3x average)
+```
+
+We ingest 0.60 PB/day and serve 9.38 PB/day — **~16x more out than in**. Every design
+decision should be optimising the read path, which is why the CDN, not the database, is the
+centre of gravity in the final architecture.
+
+At a typical cloud egress price of $0.05/GB, 9.38 PB/day is **~$0.47M/day, ~$171M/year** if
+it all left object storage. That is the number that explains why YouTube built Google Global
+Cache and Netflix built Open Connect: past a certain volume you stop renting bandwidth and
+start shipping your own hardware into ISPs. The CDN here is not a latency optimisation, it is
+the business model.
+
+### Transcoding compute
+
+```
+1M videos/day x 10 min = 10M video-minutes/day
+
+Encoding one video-minute into the full 4-rung ladder with x264 costs roughly
+2 CPU-minutes (dominated by the 1080p rung; the small rungs are nearly free).
+
+10M x 2 = 20M CPU-min/day = ~333,000 CPU-hours/day
+        = ~13,900 cores running flat out, 24/7
+        ≈ 220 machines at 64 cores each
+```
+
+This is why the pipeline is a fan-out DAG on an elastic worker pool rather than a service:
+the work is bursty, embarrassingly parallel per segment, and expensive enough that you want
+the fleet to shrink overnight. It is also why hardware encoders (and, at YouTube's actual
+scale, custom transcoding ASICs) pay for themselves.
+
+### Metadata
+
+```
+1M videos/day x 365 = 365M rows/year x ~2 KB = ~730 GB/year
+```
+
+Trivial next to the video bytes. Metadata is a **latency and hot-partition** problem
+(a viral video's row is read millions of times), not a capacity problem — which is exactly
+what the Redis cache in the final architecture addresses.
+
+### Request rates
+
+```
+uploads : 1M/day    ≈    12/sec average
+watches : 100M/day  ≈ 1,160/sec average, ~3,500/sec at peak
+```
+
+Note how small these are. The API tier is nearly idle; **the entire difficulty of this system
+is in bytes, not in requests per second.** That is the opposite of most designs in this
+repo, and it is the thing to say out loud in an interview.
+
+---
+
 ## Planning the Approach
 
 Build the design sequentially through functional requirements, then use non-functional requirements to guide deep dives. With only 2 functional requirements, the non-functional requirements characterize most of the complexity — uploading and streaming large files at scale with low latency are deceptively hard problems.

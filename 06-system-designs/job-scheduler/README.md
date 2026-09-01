@@ -17,8 +17,8 @@ Real-world examples: cron jobs, Airflow DAGs, Celery beat, AWS EventBridge Sched
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Job Queue Design & Priority Scheduling | Priority queues with Redis sorted sets, fair scheduling, starvation prevention |
-| 2 | Distributed Task Execution | Worker pools, visibility timeouts, at-least-once delivery, idempotency |
+| 1 | Job Queue Design & Priority Scheduling | Requirements + capacity estimate, priority queues with Redis sorted sets, fair scheduling, starvation prevention |
+| 2 | Distributed Task Execution | Worker pools, atomic leases, visibility timeouts, a **demonstrated double execution** and its idempotency fix, heartbeats |
 | 3 | Cron-Like Scheduling & Dead Letter Queues | Recurring schedules with croniter, two-phase architecture, DLQ handling |
 
 ## Prerequisites
@@ -31,16 +31,17 @@ Real-world examples: cron jobs, Airflow DAGs, Celery beat, AWS EventBridge Sched
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/job-scheduler
+cd 06-system-designs/job-scheduler
 
 # Start PostgreSQL + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=job-scheduler --display-name="Job Scheduler (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -85,7 +86,7 @@ uv run python -m ipykernel install --user --name=job-scheduler --display-name="J
 |-------------|-------------------|
 | Execute 10k jobs/sec | Horizontal worker scaling + queue-based distribution |
 | Within 2s of scheduled time | Two-phase: DB poll every 5 min → priority queue for precision |
-| At-least-once execution | Visibility timeouts + retry with exponential backoff |
+| At-least-once execution | Visibility timeouts + retry with exponential backoff. Notebook 2 *produces* a real duplicate execution, then fixes the side effect with an idempotency key (and explains why that is exactly-once *effects*, not exactly-once *execution*) |
 | High availability | Stateless workers + durable queue + persistent DB |
 
 ## License

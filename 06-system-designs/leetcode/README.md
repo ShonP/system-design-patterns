@@ -16,9 +16,9 @@ This lab walks you through each challenge with runnable Python code, a real Post
 
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
-| 1 | Code Submission & Execution Pipeline | How submissions flow from API → queue → worker → container, async job polling |
-| 2 | Sandboxed Code Execution | Running untrusted code in Docker with read-only FS, memory/CPU limits, no network |
-| 3 | Leaderboards & Contest System | Redis sorted sets for real-time ranking, polling vs WebSockets trade-offs |
+| 1 | Code Submission & Execution Pipeline | Requirements + contest capacity estimate, API → queue → worker → container, async job polling |
+| 2 | Sandboxed Code Execution | Running untrusted code in a real locked-down container: read-only FS, memory/CPU/pid limits, no network |
+| 3 | Leaderboards & Contest System | Redis sorted sets, score encoding, polling vs WebSockets, and sizing on **throughput** rather than round-trip latency |
 
 ## Prerequisites
 
@@ -30,16 +30,17 @@ This lab walks you through each challenge with runnable Python code, a real Post
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/leetcode
+cd 06-system-designs/leetcode
 
 # Start PostgreSQL + Redis + Sandbox + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=leetcode --display-name="LeetCode (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -108,6 +109,7 @@ uv run python -m ipykernel install --user --name=leetcode --display-name="LeetCo
 | Submission result target | < 5 seconds |
 | Contest duration | 90 minutes |
 | Leaderboard refresh | every 5 seconds (client polling) |
+| Peak submissions during a contest | ~550/s → ~1,100 concurrent sandboxes (Notebook 1 computes this) |
 
 ## License
 

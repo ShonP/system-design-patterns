@@ -34,7 +34,9 @@ CREATE TABLE businesses (
     phone VARCHAR(20),
     website VARCHAR(255),
     price_range INTEGER CHECK (price_range >= 1 AND price_range <= 4),  -- $ to $$$$
-    avg_rating DECIMAL(3,2) DEFAULT 0,
+    avg_rating DECIMAL(3,2) DEFAULT 0,   -- DERIVED display value: rating_sum / num_reviews
+    rating_sum INTEGER NOT NULL DEFAULT 0,  -- exact numerator; integer addition commutes,
+                                            -- so concurrent reviewers cannot disagree
     num_reviews INTEGER DEFAULT 0,
     is_open BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -84,6 +86,13 @@ CREATE INDEX idx_reviews_rating ON reviews(rating);
 -- ============================================================
 -- Seed data
 -- ============================================================
+
+-- Pin random() for this session so `docker compose down -v && up -d` rebuilds
+-- essentially the same 500 businesses and 3000 reviews instead of a fresh random
+-- world every time, which makes the notebooks' printed numbers comparable across
+-- rebuilds. (Caveat: the review generator uses DISTINCT ON without ORDER BY, so
+-- which 3000 of the 5000 candidate pairs survive still depends on the plan.)
+SELECT setseed(0.42);
 
 -- Categories
 INSERT INTO categories (name, description) VALUES
@@ -145,12 +154,9 @@ SELECT
     city_data.city,
     city_data.state,
     city_data.zip,
-    city_data.base_lat + (random() - 0.5) * 0.1,   -- spread ±0.05 degrees (~5 km)
+    city_data.base_lat + (random() - 0.5) * 0.1,   -- spread ±0.05 degrees (~5.5 km)
     city_data.base_lon + (random() - 0.5) * 0.1,
-    ST_SetSRID(ST_MakePoint(
-        city_data.base_lon + (random() - 0.5) * 0.1,
-        city_data.base_lat + (random() - 0.5) * 0.1
-    ), 4326)::geography,
+    NULL::geography,  -- `location` is derived from latitude/longitude below — see the note after this INSERT
 
     ((i - 1) % 10) + 1,  -- category 1-10
     '(' || (200 + floor(random() * 800))::int || ') ' || (100 + floor(random() * 900))::int || '-' || (1000 + floor(random() * 9000))::int,
@@ -170,6 +176,17 @@ CROSS JOIN LATERAL (
     OFFSET ((i - 1) % 5)
     LIMIT 1
 ) AS city_data;
+
+-- Derive the PostGIS `location` column from the latitude/longitude columns.
+--
+-- This looks redundant, but it is the whole point: `location` is a DERIVED copy of
+-- (longitude, latitude). If the two are ever computed independently they silently
+-- drift apart, and then ST_DWithin (which reads `location`) and a plain lat/lon
+-- bounding box (which reads the columns) answer the same question differently.
+-- Deriving it in one statement from the stored columns makes that impossible.
+-- Note the argument order: ST_MakePoint takes (X, Y) = (longitude, latitude).
+UPDATE businesses
+SET location = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography;
 
 -- Reviews (3000 sample reviews — ~6 per business on average)
 INSERT INTO reviews (business_id, user_id, rating, text, created_at)
@@ -199,12 +216,15 @@ FROM (
     LIMIT 3000
 ) AS pairs;
 
--- Update avg_rating and num_reviews based on actual review data
+-- Update rating_sum, num_reviews and the derived avg_rating from actual review data.
+-- Note avg_rating is computed from the same integers stored in rating_sum, so the seeded
+-- state is exactly what an incremental `rating_sum + rating` update would have produced.
 UPDATE businesses b SET
-    avg_rating = sub.avg_r,
-    num_reviews = sub.cnt
+    rating_sum = sub.total,
+    num_reviews = sub.cnt,
+    avg_rating = ROUND(sub.total::numeric / sub.cnt, 2)
 FROM (
-    SELECT business_id, ROUND(AVG(rating)::numeric, 2) AS avg_r, COUNT(*) AS cnt
+    SELECT business_id, SUM(rating) AS total, COUNT(*) AS cnt
     FROM reviews
     GROUP BY business_id
 ) sub

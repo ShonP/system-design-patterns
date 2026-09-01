@@ -11,6 +11,10 @@ Calendar: events, reminders, recurring events, sharing.
 - Event vs occurrence; store the RRULE, expand on read
 - Recurring rules (RFC 5545 iCalendar RRULE via `python-dateutil`)
 - Timezone handling (UTC in storage + IANA zone for display, DST-jump detection)
+- **Recurrence × DST**: why expanding an RRULE in UTC silently slides a 9am standup to
+  10am, and how expanding in local wall time fixes it
+- Nonexistent and ambiguous wall-clock times (`fold`), and picking an explicit policy
+- Capacity estimation: read:write ratio, storage, and the 36× reminder spike
 - Invitations & RSVP, meeting rooms as resources
 - Sharing / ACLs
 - Single-occurrence overrides and cancellations (`event_exceptions` delta table)

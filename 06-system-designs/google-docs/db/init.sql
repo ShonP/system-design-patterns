@@ -96,21 +96,23 @@ INSERT INTO collaborators (document_id, user_id, role) VALUES
 -- Initial snapshots (version 0 = empty, version 1 = first save)
 INSERT INTO snapshots (document_id, version, content, op_count, created_by) VALUES
     (1, 0, '', 0, 1),
-    (1, 1, 'Meeting Notes — Q1 Planning\n\nAttendees: Alice, Bob, Charlie\n\nAgenda:\n1. Review last quarter\n2. Set goals for Q1\n3. Assign action items\n\nNotes:\n- Revenue grew 15% last quarter\n- Need to hire 3 more engineers\n- Launch date moved to March 15', 12, 1),
+    (1, 1, E'Meeting Notes — Q1 Planning\n\nAttendees: Alice, Bob, Charlie\n\nAgenda:\n1. Review last quarter\n2. Set goals for Q1\n3. Assign action items\n\nNotes:\n- Revenue grew 15% last quarter\n- Need to hire 3 more engineers\n- Launch date moved to March 15', 11, 1),
     (2, 0, '', 0, 1),
-    (2, 1, 'Project Proposal: Real-Time Collaboration Tool\n\nObjective:\nBuild a collaborative document editor that supports real-time editing by multiple users.\n\nKey Features:\n- Operational Transformation for conflict resolution\n- WebSocket-based real-time sync\n- Document versioning and history\n- Cursor presence and awareness', 8, 1),
+    (2, 1, E'Project Proposal: Real-Time Collaboration Tool\n\nObjective:\nBuild a collaborative document editor that supports real-time editing by multiple users.\n\nKey Features:\n- Operational Transformation for conflict resolution\n- WebSocket-based real-time sync\n- Document versioning and history\n- Cursor presence and awareness', 8, 1),
     (3, 0, '', 0, 2);
 
--- Sample operations on document 1 (simulating collaborative editing)
+-- Sample operations on document 1 (simulating collaborative editing).
+-- Positions are the real character offsets at the time each op was created --
+-- replaying them in order rebuilds snapshot v1 exactly (Notebook 1 asserts this).
 INSERT INTO operations (document_id, user_id, version, op_type, position, content, length) VALUES
-    (1, 1, 0, 'insert', 0,  'Meeting Notes', 0),
-    (1, 1, 0, 'insert', 13, ' — Q1 Planning', 0),
+    (1, 1, 0, 'insert', 0, E'Meeting Notes', 0),
+    (1, 1, 0, 'insert', 13, E' — Q1 Planning', 0),
     (1, 1, 0, 'insert', 27, E'\n\nAttendees: Alice', 0),
-    (1, 2, 0, 'insert', 45, ', Bob', 0),
-    (1, 3, 0, 'insert', 50, ', Charlie', 0),
+    (1, 2, 0, 'insert', 45, E', Bob', 0),
+    (1, 3, 0, 'insert', 50, E', Charlie', 0),
     (1, 1, 0, 'insert', 59, E'\n\nAgenda:\n1. Review last quarter', 0),
-    (1, 1, 0, 'insert', 93, E'\n2. Set goals for Q1', 0),
-    (1, 1, 0, 'insert', 114, E'\n3. Assign action items', 0),
-    (1, 2, 0, 'insert', 137, E'\n\nNotes:\n- Revenue grew 15% last quarter', 0),
-    (1, 2, 0, 'insert', 176, E'\n- Need to hire 3 more engineers', 0),
-    (1, 1, 0, 'insert', 208, E'\n- Launch date moved to March 15', 0);
+    (1, 1, 0, 'insert', 91, E'\n2. Set goals for Q1', 0),
+    (1, 1, 0, 'insert', 111, E'\n3. Assign action items', 0),
+    (1, 2, 0, 'insert', 134, E'\n\nNotes:\n- Revenue grew 15% last quarter', 0),
+    (1, 2, 0, 'insert', 174, E'\n- Need to hire 3 more engineers', 0),
+    (1, 1, 0, 'insert', 206, E'\n- Launch date moved to March 15', 0);

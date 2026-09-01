@@ -27,16 +27,17 @@ This lab lets you build and experiment with the core pieces yourself using real 
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/uber
+cd 06-system-designs/uber
 
 # Start PostgreSQL (with PostGIS) + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=uber --display-name="Uber Lab (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -60,6 +61,8 @@ uv run python -m ipykernel install --user --name=uber --display-name="Uber Lab (
 - **Redis Geo** — In-memory geospatial index using GEOADD / GEOSEARCH
 - **SRID 4326** — The coordinate reference system for GPS (latitude/longitude on Earth)
 - **ST_DWithin / ST_Distance** — PostGIS functions for proximity searches
+- **Cell boundaries** — why "same geohash prefix" is *not* the same question as "nearby", and why a
+  correct geohash search reads the query cell **plus its 8 neighbours** before filtering by distance
 
 ### Real-Time Location Tracking
 - **High-frequency writes** — Millions of drivers sending GPS every 5 seconds
@@ -111,6 +114,23 @@ uv run python -m ipykernel install --user --name=uber --display-name="Uber Lab (
 | Ride requests (peak) | ~100k from one area during events |
 | Match latency target | < 1 minute |
 | Location freshness | < 5 seconds |
+
+## What This Lab Does *Not* Model
+
+The labs are small on purpose. Where a toy shortcut is taken, it is called out in the notebook, but
+the short list is:
+
+- **Surge is computed off tiny samples.** A 1 km zone holding two drivers prices from a two-sample
+  ratio, so one driver going offline can swing the multiplier from 1.0× to 5.0×. Production surge
+  smooths over a rolling window and refuses to price off counts this small.
+- **Surge lags by one window.** The multiplier reacts to the *previous* window's backlog, which is
+  why the first window of the fixed-vs-surge simulation is identical under both rules.
+- **The Redis lock is single-node.** If the Redis primary fails over before the lock key replicates,
+  two holders can exist at once. Real systems either accept that window (an assignment is cheap to
+  undo) or carry a fencing token the database checks on write.
+- **Matching is nearest-first, nothing else.** No driver acceptance rate, no ETA through real road
+  networks, no batched matching across a window of riders, no fairness or utilisation targets.
+- **No payments, no ratings, no cancellation policy, no trip replay.**
 
 ## License
 

@@ -49,13 +49,14 @@ In this lab you'll implement the key pieces yourself — uploading multi-gigabyt
 cd 06-system-designs/dropbox
 
 # Start PostgreSQL + MinIO + Redis + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=dropbox --display-name="Dropbox (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -102,6 +103,23 @@ uv run python -m ipykernel install --user --name=dropbox --display-name="Dropbox
 - Presigned download URLs with expiry for secure sharing
 - Permission checks (read vs write)
 - Cache invalidation when shares change
+
+## What This Lab Does *Not* Do
+
+These notebooks are deliberately small. Where the toy diverges from the real system:
+
+| Toy version | Real Dropbox |
+|---|---|
+| Chunk boundaries from a 32-bit shift-and-add rolling hash | Rabin fingerprint over GF(2), tuned for boundary distribution |
+| Sync notifications over Redis Pub/Sub (fire-and-forget, no replay) | Long-poll / WebSocket notification service with durable cursors |
+| Conflict detection via a single `version` integer per file | Per-namespace journal cursors, server-side merge for some types |
+| Deletion by direct refcount query at delete time | Asynchronous garbage collection over a refcount store |
+| Whole-file re-upload on edit | Block-level delta sync — only changed 4 MB blocks move |
+| Presigned URLs signed by the notebook itself | A metadata service that authorises, then signs |
+
+The MinIO bucket is created **private** (`mc anonymous set none`). Notebook 4 checks this
+before it claims presigned URLs are what grants access — if the bucket were world-readable,
+every access control in the lab would be decorative.
 
 ## Real-World Parallels
 

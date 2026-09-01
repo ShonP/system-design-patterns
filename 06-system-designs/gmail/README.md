@@ -10,8 +10,11 @@ Web email at scale: SMTP/IMAP, mailbox storage, threading, and full-text search.
 
 - SMTP send/receive protocol
 - Message / thread / label data model
-- Per-user inverted search index
-- Hot/warm/cold storage tiers
+- Threading: subject normalization → RFC 5322 headers → full `References` walk with a
+  participant-gated subject fallback
+- Per-user inverted search index (benchmarked against a linear scan on the same query)
+- Capacity estimation: storage growth, index size, and peak read QPS
+- Hot/warm/cold storage tiers, attachment content-hash dedup
 
 ## Setup
 

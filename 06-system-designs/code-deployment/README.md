@@ -8,10 +8,13 @@ Build, test, deploy, rollback, canary.
 
 ## Concepts covered
 
+- Runnable capacity model: Little's Law → concurrent builds → CPU fleet → 90% idle at average
 - Pipeline as a DAG (topological sort + parallel execution)
 - Artifact immutability & content-addressed storage (why `:latest` is a lie)
-- Deploy strategies: big-bang (bad) → rolling → blue/green → canary
-- SLO-gated automatic rollback with minimum-sample safeguards
+- Deploy strategies: big-bang (bad) → rolling → blue/green → canary, with a **failing**
+  rollout so you can see a mixed fleet and time a rolling rollback against a blue/green flip
+- SLO-gated automatic rollback, and the three-outcome gate that shows how a broken build
+  gets promoted to 100% when every step is `inconclusive`
 - Separation of build vs deploy, feature flags, forward-compatible migrations
 
 ## Setup

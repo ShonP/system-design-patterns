@@ -8,11 +8,15 @@ Social graph: connections, people-you-may-know, graph traversal.
 
 ## Concepts covered
 
-- **Capacity estimation** for a billion-node social graph.
+- **Capacity estimation** for a billion-node social graph — edges, storage, read/write QPS with
+  a peak factor, and the resulting shard count (disk-bound, not QPS-bound).
 - **Edge storage patterns**: blob-in-a-row (bad) → single-row edge table (better) → **symmetric adjacency** (best, used by Facebook TAO).
 - **Connection-request state machine** (pending → accepted / rejected / withdrawn) with pydantic validation.
-- **BFS** for degrees of separation, and **bidirectional BFS** (5 orders of magnitude faster at depth 4).
-- **People You May Know**: naive live scoring → **Adamic–Adar** weighting → precomputed offline + KV serve.
+- **BFS** for degrees of separation, and **bidirectional BFS** — verified against plain BFS
+  (including the `max_depth` cut-off), benchmarked by *adjacency fetches* rather than by an
+  unstable millisecond timing, and projected out to `b=500` where the win is ~10^5 at depth 4.
+- **People You May Know**: naive live scoring → **Adamic–Adar** weighting (with the `1/log(d)`
+  divide-by-zero landmine shown and fixed) → precomputed offline + KV serve.
 - The **celebrity / hot-user** problem: hot shards, fat rows, skewed PYMK — and how to mitigate each.
 - Pagination with cursors, idempotency keys, and why we separate `requests` from `edges`.
 

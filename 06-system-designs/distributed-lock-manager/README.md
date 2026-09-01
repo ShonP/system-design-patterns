@@ -9,7 +9,9 @@ Mutual exclusion across services: leases, fencing tokens, and why TTL alone isn'
 ## Concepts covered
 
 - Lease-based locks with TTL
-- Fencing tokens against GC pauses
+- Back-of-envelope sizing: why **heartbeats**, not acquires, size the cluster
+- Fencing tokens against GC pauses (unsafe version demonstrated failing first)
+- `release` bugs: **no owner check** and **non-atomic check-then-delete**, both reproduced
 - Redis NX+PX approach and its pitfalls
 - Consensus-based alternatives (ZK/etcd)
 
@@ -26,7 +28,7 @@ Select the `.venv` kernel in VS Code (top-right). If it doesn't appear, reload t
 
 - [`notebooks/01_requirements_and_architecture.ipynb`](./notebooks/01_requirements_and_architecture.ipynb) — Requirements & Architecture
 - [`notebooks/02_data_and_api.ipynb`](./notebooks/02_data_and_api.ipynb) — Data Model & APIs
-- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: Toy lock manager with fencing
+- [`notebooks/03_deep_dive.ipynb`](./notebooks/03_deep_dive.ipynb) — Deep Dive: fencing tokens, owner-checked release, atomic compare-and-delete
 
 ## References
 

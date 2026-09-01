@@ -159,25 +159,28 @@ INSERT INTO friends (user_id, friend_id) VALUES
 
 -- Activity 1: Alice — morning run along the Embarcadero
 INSERT INTO activities (user_id, type, state, title, distance_m, duration_s, started_at, completed_at)
-VALUES (1, 'RUN', 'COMPLETE', 'Morning Embarcadero Run', 2540.0, 780,
-        NOW() - INTERVAL '2 hours', NOW() - INTERVAL '1 hour 47 minutes');
+-- distance_m / duration_s below are the values you get by summing the Haversine
+-- distance between the 10 route points that follow, at 30 s per point.
+-- Keep them in sync: notebook 1 asserts the stored summary matches the track.
+VALUES (1, 'RUN', 'COMPLETE', 'Morning Embarcadero Run', 909.5, 270,
+        NOW() - INTERVAL '2 hours', NOW() - INTERVAL '2 hours' + INTERVAL '270 seconds');
 
 INSERT INTO route_points (activity_id, seq, latitude, longitude, elevation_m, recorded_at, geom) VALUES
-    (1,  1, 37.7955, -122.3935, 3, NOW()-INTERVAL '2 hours',         ST_Point(-122.3935, 37.7955)::geography),
-    (1,  2, 37.7950, -122.3928, 3, NOW()-INTERVAL '119 minutes',     ST_Point(-122.3928, 37.7950)::geography),
-    (1,  3, 37.7944, -122.3919, 3, NOW()-INTERVAL '118 minutes',     ST_Point(-122.3919, 37.7944)::geography),
-    (1,  4, 37.7938, -122.3910, 2, NOW()-INTERVAL '117 minutes',     ST_Point(-122.3910, 37.7938)::geography),
-    (1,  5, 37.7932, -122.3900, 2, NOW()-INTERVAL '116 minutes',     ST_Point(-122.3900, 37.7932)::geography),
-    (1,  6, 37.7925, -122.3892, 2, NOW()-INTERVAL '115 minutes',     ST_Point(-122.3892, 37.7925)::geography),
-    (1,  7, 37.7918, -122.3884, 2, NOW()-INTERVAL '114 minutes',     ST_Point(-122.3884, 37.7918)::geography),
-    (1,  8, 37.7912, -122.3875, 3, NOW()-INTERVAL '113 minutes',     ST_Point(-122.3875, 37.7912)::geography),
-    (1,  9, 37.7905, -122.3868, 3, NOW()-INTERVAL '112 minutes',     ST_Point(-122.3868, 37.7905)::geography),
-    (1, 10, 37.7899, -122.3860, 3, NOW()-INTERVAL '111 minutes',     ST_Point(-122.3860, 37.7899)::geography);
+    (1,  1, 37.7955, -122.3935, 3, NOW()-INTERVAL '7200 seconds',   ST_Point(-122.3935, 37.7955)::geography),
+    (1,  2, 37.7950, -122.3928, 3, NOW()-INTERVAL '7170 seconds',   ST_Point(-122.3928, 37.7950)::geography),
+    (1,  3, 37.7944, -122.3919, 3, NOW()-INTERVAL '7140 seconds',   ST_Point(-122.3919, 37.7944)::geography),
+    (1,  4, 37.7938, -122.3910, 2, NOW()-INTERVAL '7110 seconds',   ST_Point(-122.3910, 37.7938)::geography),
+    (1,  5, 37.7932, -122.3900, 2, NOW()-INTERVAL '7080 seconds',   ST_Point(-122.3900, 37.7932)::geography),
+    (1,  6, 37.7925, -122.3892, 2, NOW()-INTERVAL '7050 seconds',   ST_Point(-122.3892, 37.7925)::geography),
+    (1,  7, 37.7918, -122.3884, 2, NOW()-INTERVAL '7020 seconds',   ST_Point(-122.3884, 37.7918)::geography),
+    (1,  8, 37.7912, -122.3875, 3, NOW()-INTERVAL '6990 seconds',   ST_Point(-122.3875, 37.7912)::geography),
+    (1,  9, 37.7905, -122.3868, 3, NOW()-INTERVAL '6960 seconds',   ST_Point(-122.3868, 37.7905)::geography),
+    (1, 10, 37.7899, -122.3860, 3, NOW()-INTERVAL '6930 seconds',   ST_Point(-122.3860, 37.7899)::geography);
 
 -- Activity 2: Bob — bike ride through Golden Gate Park
 INSERT INTO activities (user_id, type, state, title, distance_m, duration_s, started_at, completed_at)
-VALUES (2, 'RIDE', 'COMPLETE', 'Golden Gate Park Ride', 8500.0, 1500,
-        NOW() - INTERVAL '5 hours', NOW() - INTERVAL '4 hours 35 minutes');
+VALUES (2, 'RIDE', 'COMPLETE', 'Golden Gate Park Ride', 2827.9, 840,
+        NOW() - INTERVAL '5 hours', NOW() - INTERVAL '5 hours' + INTERVAL '840 seconds');
 
 INSERT INTO route_points (activity_id, seq, latitude, longitude, elevation_m, recorded_at, geom) VALUES
     (2,  1, 37.7694, -122.4862, 25, NOW()-INTERVAL '5 hours',       ST_Point(-122.4862, 37.7694)::geography),
@@ -219,33 +222,40 @@ INSERT INTO activities (user_id, type, state, title, distance_m, duration_s, sta
 VALUES (1, 'RUN', 'STARTED', 'Lunchtime Jog', 0, 0, NOW());
 
 -- Generate more completed activities for leaderboard demos
+-- started_at is derived from completed_at - duration_s. Drawing the two timestamps
+-- independently (the obvious way) lets completed_at land BEFORE started_at, which
+-- silently corrupts every feed that orders by completed_at. Anchoring on the end
+-- also keeps every COMPLETE activity in the past.
 INSERT INTO activities (user_id, type, state, title, distance_m, duration_s, started_at, completed_at)
-SELECT
-    ((i % 20) + 1),
-    CASE WHEN i % 3 = 0 THEN 'RIDE' ELSE 'RUN' END,
-    'COMPLETE',
-    'Activity #' || i,
-    (random() * 15000 + 1000)::int,
-    (random() * 3600 + 600)::int,
-    NOW() - (random() * INTERVAL '30 days'),
-    NOW() - (random() * INTERVAL '30 days') + INTERVAL '1 hour'
-FROM generate_series(9, 200) AS i;
+SELECT g.user_id, g.type, 'COMPLETE', g.title, g.distance_m, g.duration_s,
+       g.ended_at - make_interval(secs => g.duration_s), g.ended_at
+FROM (
+    SELECT ((i % 20) + 1)                                     AS user_id,
+           CASE WHEN i % 3 = 0 THEN 'RIDE' ELSE 'RUN' END     AS type,
+           'Activity #' || i                                  AS title,
+           (random() * 15000 + 1000)::int                     AS distance_m,
+           (random() * 3600 + 600)::int                       AS duration_s,
+           NOW() - (random() * INTERVAL '30 days')            AS ended_at
+    FROM generate_series(9, 200) AS i
+) g;
 
 -- ============================================================
 -- Segments (famous stretches to race on)
 -- ============================================================
 INSERT INTO segments (name, type, start_lat, start_lon, end_lat, end_lon, distance_m, city) VALUES
-    ('Embarcadero Sprint',       'RUN',  37.7955, -122.3935, 37.7899, -122.3860, 850,  'San Francisco'),
+    ('Embarcadero Sprint',       'RUN',  37.7955, -122.3935, 37.7899, -122.3860, 910,  'San Francisco'),
     ('Golden Gate Park Climb',   'RIDE', 37.7694, -122.4862, 37.7748, -122.4600, 2800, 'San Francisco'),
     ('Central Park North Loop',  'RUN',  40.7968, -73.9495,  40.8005, -73.9580,  1200, 'New York'),
     ('Hyde Park Serpentine',     'RUN',  51.5073, -0.1657,   51.5050, -0.1580,   900,  'London'),
     ('Waterfront Dash',          'RIDE', 47.6062, -122.3421, 47.6205, -122.3493, 1700, 'Seattle');
 
 -- Segment efforts (Alice and Bob ran the Embarcadero Sprint)
+-- Efforts 1 and 3 are the ones notebook 3 recomputes from the stored route points,
+-- so their elapsed_s must equal the time between the matched GPS points (270 s / 840 s).
 INSERT INTO segment_efforts (segment_id, activity_id, user_id, elapsed_s, started_at) VALUES
-    (1, 1, 1, 210, NOW() - INTERVAL '2 hours'),
+    (1, 1, 1, 270, NOW() - INTERVAL '2 hours'),
     (1, 5, 4, 225, NOW() - INTERVAL '3 hours'),
-    (2, 2, 2, 480, NOW() - INTERVAL '5 hours'),
+    (2, 2, 2, 840, NOW() - INTERVAL '5 hours'),
     (2, 7, 17, 510, NOW() - INTERVAL '6 hours');
 
 -- Generate more segment efforts for leaderboard variety

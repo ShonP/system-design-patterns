@@ -13,9 +13,9 @@ This lab walks you through the core building blocks — **photo upload pipelines
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
 | 1 | Photo Upload & Storage Pipeline | Pre-signed URLs, uploading to object storage, image thumbnails, the full upload flow |
-| 2 | News Feed Generation | Fan-out on read vs write, hybrid celebrity approach, Redis sorted sets for feeds |
-| 3 | Stories & Ephemeral Content | Time-to-live content, expiration with Redis TTL, efficient story ring queries |
-| 4 | Explore & Recommendation | Collaborative filtering basics, engagement scoring, content discovery algorithms |
+| 2 | News Feed Generation | Fan-out on read vs write, hybrid celebrity approach, Redis sorted sets, cursor pagination, feed invalidation |
+| 3 | Stories & Ephemeral Content | Time-to-live content, expiration with Redis TTL, efficient story ring queries, index sweeping |
+| 4 | Explore & Recommendation | Collaborative filtering, engagement scoring, diversity re-ranking, denormalised counter integrity |
 
 ## Architecture
 
@@ -53,13 +53,30 @@ This lab walks you through the core building blocks — **photo upload pipelines
 | **Fan-out on Write** | Push new posts into followers' precomputed feeds |
 | **Hybrid Fan-out** | Fan-out on write for normal users, fan-out on read for celebrities |
 | **TTL-based Expiration** | Stories auto-expire after 24 hours using Redis TTL |
+| **Cursor Pagination** | Page a feed that is being written to, without duplicates or skips |
+| **Cache Invalidation** | Unfollows and deletes must be removed from precomputed feeds |
 | **Collaborative Filtering** | Recommend posts based on what similar users liked |
+| **Atomic Counters** | `like_count` under concurrent likes — lost updates vs `SET x = x + 1` |
 
 ### Key Trade-offs
 - **Write amplification** vs **read latency** (fan-out strategies)
 - **Storage cost** (multiple image sizes) vs **bandwidth savings**
 - **Consistency** (how stale can a feed be?) vs **availability**
 - **Pre-computation** (explore scores) vs **freshness**
+- **Offset pagination** (simple) vs **cursor pagination** (correct under concurrent writes)
+- **Counter exactness** (row locks) vs **write throughput** (Redis absorption + async flush)
+
+## What These Labs Do *Not* Model
+
+The notebooks run against a single PostgreSQL, a single Redis and a single MinIO,
+with 53 users and ~180 posts. Deliberately out of scope:
+
+- **Async fan-out** — `fan_out_on_write` runs inline; production queues it
+- **Sharding** — one Redis holds every feed; at 500M users feeds are sharded by user id
+- **Ranking** — the feed here is strictly chronological; Instagram's is ML-ranked
+- **A real CDN** — Redis stands in for an edge cache
+- **ML recommendations** — Explore uses like-overlap, not learned embeddings
+- **Integrity/policy filtering** — no classifiers gate what Explore may surface
 
 ## Prerequisites
 
@@ -71,16 +88,17 @@ This lab walks you through the core building blocks — **photo upload pipelines
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/instagram
+cd 06-system-designs/instagram
 
 # Start PostgreSQL + Redis + MinIO + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=instagram --display-name="Instagram (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```

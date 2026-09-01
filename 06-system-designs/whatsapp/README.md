@@ -38,7 +38,7 @@ You will work with a live **WebSocket chat server**, **PostgreSQL** for durable 
 - **Users** — accounts that send and receive messages
 - **Chats** — 1:1 or group conversations (up to 100 participants)
 - **Messages** — text content with per-chat sequence numbers
-- **Inbox** — pending deliveries for offline users; rows deleted on ACK
+- **Inbox** — pending deliveries for offline users; status advances `pending → delivered → read` (never backwards)
 
 ### Message Flow
 1. Sender sends `send_message` over WebSocket
@@ -46,12 +46,25 @@ You will work with a live **WebSocket chat server**, **PostgreSQL** for durable 
 3. Server ACKs the sender
 4. Server publishes to **Redis pub/sub** per-recipient channel (real-time, best-effort)
 5. Recipient's server forwards to their WebSocket
-6. Recipient sends `ack` → inbox row deleted
+6. Recipient sends `ack` → inbox status becomes `delivered`, and a `delivery_receipt` is published back to the sender
 
 ### Presence & Read Receipts
 - **Presence**: Redis keys with TTL, refreshed by heartbeats
 - **Last seen**: stored on disconnect
 - **Read receipts**: inbox status transitions `pending → delivered → read`
+
+### What This Toy Does NOT Do
+
+Worth being explicit, so the lab doesn't oversell itself:
+
+- **Single chat server.** `connections` is an in-process dict. Real WhatsApp shards users
+  across thousands of servers with a consistent-hash routing layer.
+- **Redis pub/sub is at-most-once.** No persistence, no replay. The inbox table is what
+  makes delivery reliable; pub/sub is only the fast path.
+- **No forward secrecy.** Notebook 4 uses static RSA keys, not the Signal Double Ratchet.
+- **No presence fan-out.** `get_presence` is a pull. Real clients get pushed presence
+  updates for the contacts they have open.
+- **Inbox rows are never pruned.** They accumulate forever once read.
 
 ### Scaling (discussed in notebooks)
 - Redis pub/sub partitioned by user (optimal for 1:1-heavy workloads)
@@ -68,16 +81,17 @@ You will work with a live **WebSocket chat server**, **PostgreSQL** for durable 
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/whatsapp
+cd 06-system-designs/whatsapp
 
 # Start PostgreSQL + Redis + Chat Server + Visualization Tools
-docker-compose up -d
+docker compose up -d --build
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=whatsapp --display-name="WhatsApp (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -103,7 +117,8 @@ uv run python -m ipykernel install --user --name=whatsapp --display-name="WhatsA
 | Real-time delivery | Redis pub/sub | Lightweight, per-user channels, no disk overhead |
 | Presence | Redis with TTL | Automatic expiry, fast reads |
 | Offline delivery | Inbox table + sync | Guarantees eventual delivery even if pub/sub drops |
-| Ordering | Server timestamps + sequence numbers | Consistent ordering across all clients |
+| Ordering | Per-chat sequence numbers | The counter row is locked for the whole send transaction, so sequence order == commit order. Ordering is **per conversation**, not global — there is no cross-chat total order, and none is needed |
+| Duplicate sends | `client_message_id` unique index | A retried send after a lost ACK is a no-op instead of a second message (Notebook 1, "At-Least-Once Is Not Exactly-Once") |
 
 ## License
 

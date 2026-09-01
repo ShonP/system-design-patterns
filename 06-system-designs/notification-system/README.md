@@ -8,10 +8,18 @@ Scalable push / email / SMS notifications with priority, retries, and idempotenc
 
 ## Concepts covered
 
-- Priority queues with starvation protection
-- Exponential backoff + jitter + DLQ
-- Idempotency via dedup keys
-- Per-channel worker pools
+- Capacity math that confronts the per-provider caps: with a realistic channel mix the SMS
+  provider limit is exceeded **even at sustained load**, which is what forces the queue
+- Priority queues with starvation protection — strict priority is shown genuinely starving
+  lower levels under a continuous high-priority stream, then weighted round-robin fixing it
+  (and what that costs high priority)
+- Exponential backoff, **full jitter** (demonstrated on a 1,000-worker fleet, not one client),
+  and a DLQ that actually receives messages
+- **At-least-once delivery**: a worker crash between "call the provider" and "ack the queue"
+  produces a real duplicate notification, which is then killed by a delivery-side dedup guard
+  — and why front-door `dedup_key` idempotency does *not* catch it
+- Fan-out both ways: one event → many channels, and one event → millions of users in batches
+- Per-provider token buckets, circuit breakers, and the metrics you must have
 
 ## Setup
 

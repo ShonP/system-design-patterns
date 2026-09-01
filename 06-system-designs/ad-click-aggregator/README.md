@@ -13,8 +13,8 @@ This is a classic **"Scaling Writes"** problem. At peak we handle **10 000 click
 | # | Notebook | What You'll Learn |
 |---|----------|-------------------|
 | 1 | Click Event Ingestion | Produce & consume click events through Kafka, store in Postgres, **hot-shard mitigation** for viral ads |
-| 2 | Real-Time Aggregation with Sliding Windows | Tumbling & **sliding** windows, event-time vs processing-time, **reconciliation (Lambda architecture)** |
-| 3 | Deduplication & Fraud Detection | Impression IDs, HMAC signing, Redis-based dedup, anomaly detection |
+| 2 | Real-Time Aggregation with Sliding Windows | Tumbling & **sliding** windows, half-open boundaries, event-time vs processing-time, **watermarks & late-event drops**, **exactly-once counting via idempotency keys**, **reconciliation (Lambda architecture)** |
+| 3 | Deduplication & Fraud Detection | Impression IDs, HMAC signing, Redis-based dedup, **fixed vs sliding-window rate limiting**, anomaly detection |
 
 ## Architecture at a Glance
 
@@ -45,16 +45,17 @@ User clicks ad
 
 ```bash
 # Navigate to the lab directory
-cd system-designs/ad-click-aggregator
+cd 06-system-designs/ad-click-aggregator
 
 # Start PostgreSQL + Redis + Kafka + Visualization Tools
-docker-compose up -d
+docker compose up -d
 
 # Install dependencies
 uv sync
 
-# Register Jupyter kernel
-uv run python -m ipykernel install --user --name=adclick --display-name="Ad Click Aggregator (Python)"
+# Notebooks use the local .venv directly -- no global kernel to register.
+# In VS Code: open the kernel picker (top-right) and select `.venv`.
+# In classic Jupyter: uv run jupyter notebook notebooks/
 
 # Open the first notebook and start learning!
 ```
@@ -85,13 +86,19 @@ uv run python -m ipykernel install --user --name=adclick --display-name="Ad Clic
 ### Data Pipeline
 - **Event Ingestion** — Kafka as a durable, partitioned write buffer
 - **Stream Processing** — consuming events in real-time with windowed aggregation
-- **Sliding Windows** — tumbling (fixed) vs sliding (overlapping) time windows
+- **Sliding Windows** — tumbling (fixed) vs sliding (overlapping) time windows, and why
+  `RANGE ... INTERVAL` beats `ROWS` once a minute has zero clicks
 - **Event-Time vs Processing-Time** — why the distinction matters for accuracy
+- **Watermarks** — how a stream decides a window is closed, and what it costs when it is wrong
+- **Exactly-Once Counting** — at-least-once delivery + an additive UPSERT double-bills the
+  advertiser; an idempotency key written in the same transaction is the fix
 
 ### Deduplication & Fraud Prevention
 - **Impression IDs** — unique per ad-show to prevent double-counting
 - **HMAC Signing** — cryptographic proof that an impression ID is genuine
 - **Redis Dedup Cache** — fast O(1) lookup to reject duplicates before Kafka
+- **Rate Limiting** — a fixed-window counter leaks 2x the limit across a bucket boundary;
+  a sliding-window log does not
 
 ### Scaling Deep Dives
 - **Hot Shard Mitigation** — appending random suffixes to popular ad partition keys
@@ -106,6 +113,24 @@ uv run python -m ipykernel install --user --name=adclick --display-name="Ad Clic
 | Google Ads | Click fraud costs advertisers $100B+/year |
 | Amazon Ads | Millisecond bidding needs instant click counts |
 | TikTok Ads | Viral content causes extreme hot-shard spikes |
+
+## What This Lab Deliberately Does *Not* Do
+
+This is a teaching lab, not a production pipeline. Where the toy version differs from
+the real system, the notebooks say so — but in summary:
+
+- **No stream processor.** Windowing, watermarks and state live in Python dictionaries.
+  Flink/Spark do this with checkpointed, distributed state and a two-phase-commit sink.
+- **`unique_users` is not a distinct count.** Per-window unique counts are added together,
+  so a user active in two minutes is counted twice. Real systems merge HyperLogLog sketches.
+- **Consumer offsets are never committed.** Each notebook run reads from the start of the
+  topic with a fresh consumer group, which is what makes the replay demo easy to stage —
+  and is not how you would run this.
+- **Reconciliation re-reads the whole table.** A real job is incremental, writes to a
+  corrected copy rather than mutating rows advertisers are reading, and alerts on drift
+  instead of silently repairing it.
+- **Single broker, single partition leader, no replication.** Nothing here survives a
+  node loss.
 
 ## License
 

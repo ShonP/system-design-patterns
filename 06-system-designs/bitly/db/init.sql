@@ -6,7 +6,10 @@
 -- ============================================================
 CREATE TABLE urls (
     id BIGSERIAL PRIMARY KEY,
-    short_code VARCHAR(10) UNIQUE NOT NULL,
+    -- Generated codes are 7 chars, but a custom alias (Notebook 2) can be up to
+    -- 30, and we store the alias in this column too so redirect lookups stay a
+    -- single indexed point read. Size the column for the longest thing it holds.
+    short_code VARCHAR(50) UNIQUE NOT NULL,
     long_url TEXT NOT NULL,
     custom_alias VARCHAR(50) UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -19,7 +22,7 @@ CREATE TABLE urls (
 -- ============================================================
 CREATE TABLE clicks (
     id BIGSERIAL PRIMARY KEY,
-    short_code VARCHAR(10) NOT NULL REFERENCES urls(short_code),
+    short_code VARCHAR(50) NOT NULL REFERENCES urls(short_code),
     clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     referrer TEXT,
     user_agent TEXT,

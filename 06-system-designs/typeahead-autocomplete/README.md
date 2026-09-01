@@ -8,14 +8,17 @@ Prefix-based suggestions at scale: trie + precomputed top-K + decaying trend.
 
 ## Concepts covered
 
-- Back-of-envelope sizing for a per-keystroke service
+- Back-of-envelope sizing for a per-keystroke service (QPS, edge-cache effect, index size in GB)
 - Input normalization (lowercase, unicode folding, whitespace)
 - Three implementations: linear scan → sorted + bisect → trie with precomputed top-K
-- Benchmarks comparing all three on the same corpus
+- Benchmarks on **short vs long prefixes** — why query-time ranking collapses
+  exactly on the hot prefixes, and therefore why we precompute
+- Measuring the trie's real memory, and capping the top-K cache by depth
+  (~80% smaller, identical answers)
 - FastAPI + Pydantic `/suggest` and `/log` endpoints (exercised in-notebook via `TestClient`)
 - Freshness via a decaying counter in the aggregator (not the serving trie)
 - Optional typo tolerance via edit-distance-1 fallback
-- Memory / sharding / replication tradeoffs
+- Memory / sharding / replication tradeoffs, sized from the measured node count
 - Real-world case studies: Google, YouTube, Amazon, Elasticsearch completion suggester, and the Redis sorted-set trick (reproduced in pure Python)
 
 ## Setup

@@ -8,13 +8,14 @@ Web-scale search: crawler, inverted index, ranking, sharding.
 
 ## Concepts covered
 
-- Capacity estimation (back-of-envelope in code)
+- Capacity estimation in code: index shards, replicas, fan-out fleet, crawl bandwidth
 - End-to-end toy search (crawl → index → query)
 - Retrieval progression: **linear scan → inverted index → TF-IDF → BM25**
 - Tokenization pipeline: lowercase, stop-words, stemming
 - Boolean operators, phrase queries (positional index), snippet generation
 - Crawler: frontier politeness, URL canonicalization, Bloom-filter dedup, `robots.txt`
-- Ranking: PageRank, blending BM25 × PageRank
+- Ranking: PageRank, blending BM25 × PageRank (and why the blend needs normalized
+  features before its weight means anything)
 - Query sharding: by term vs by document, fan-out + top-K merge
 - LRU caching for hot queries
 

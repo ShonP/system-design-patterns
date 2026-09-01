@@ -18,7 +18,6 @@ scaling tradeoffs.
 | [`discord/`](./discord/) | Real-time chat and voice with presence |
 | [`distributed-cache/`](./distributed-cache/) | Distributed cache design |
 | [`distributed-lock-manager/`](./distributed-lock-manager/) | Chubby-style distributed locks |
-| [`distributed-rate-limiter/`](./distributed-rate-limiter/) | Distributed rate limiter in depth |
 | [`dropbox/`](./dropbox/) | File sync and sharing |
 | [`fb-live-comments/`](./fb-live-comments/) | Live comment streaming |
 | [`fb-news-feed/`](./fb-news-feed/) | News feed ranking and delivery |
